@@ -16,8 +16,8 @@ this site.
 - **Tailwind 4** (via `@tailwindcss/vite`) + **DaisyUI 5** for component classes.
 - **Self-hosted fonts** (Fraunces + Inter variable, via Fontsource). No external requests at
   runtime; no analytics or tracking of any kind.
-- **Cloudflare Workers static assets** (`wrangler.jsonc`), currently on workers.dev — custom
-  domain to be added once BBCC settles one.
+- **Cloudflare Workers static assets** (`wrangler.jsonc`), served at **https://bbcc.scot**
+  (apex + www as Workers custom domains; canonical is the apex).
 
 ## Commands
 
@@ -69,10 +69,8 @@ the first `v*` tag**:
       confirmed.
 - [ ] **Newsletter**: currently an honest mailto to info@bbcc.scot. Wire up a
       real list (e.g. MailChimp) if wanted — needs a privacy note if so.
-- [ ] **Domain**: `astro.config.mjs` site URL, `wrangler.jsonc` routes,
-      `lighthouserc.production.json` and the maintenance workflow's `PRODUCTION_URL` all carry a
-      workers.dev placeholder; update together when the domain is settled, and enable the
-      maintenance cron.
+- [ ] **Maintenance cron**: enable the schedule in `.github/workflows/maintenance.yml` after the
+      first successful production deploy (domain configs already point at bbcc.scot).
 - [ ] **Privacy / accessibility statements**: the concept footer linked to Privacy Policy and
       Accessibility pages that don't exist yet; add them as pages, then link them.
 

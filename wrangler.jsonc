@@ -15,7 +15,15 @@
   // for an instant maintenance switch (reverts on next deploy).
   "vars": {
     "SITE_MODE": "holding"
-  }
-  // Custom domain routes go here once BBCC settles a domain — see weebuilts
-  // wrangler.jsonc for the shape.
+  },
+  "routes": [
+    {
+      "pattern": "bbcc.scot",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.bbcc.scot",
+      "custom_domain": true
+    }
+  ]
 }
