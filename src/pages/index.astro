@@ -1,5 +1,15 @@
 ---
+import { Image, getImage } from "astro:assets";
 import Base from "../layouts/Base.astro";
+import centralAerial from "../assets/central-aerial.jpg";
+import blythswoodSquare from "../assets/blythswood-square.jpg";
+import bagpiper from "../assets/bagpiper.jpg";
+import rainyStreet from "../assets/rainy-street.jpg";
+import peopleMakeGlasgow from "../assets/people-make-glasgow.jpg";
+import clydeBridge from "../assets/clyde-bridge.jpg";
+import rooftops from "../assets/rooftops.jpg";
+
+const gallerySizes = "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 420px";
 ---
 
 <Base
@@ -98,7 +108,17 @@ import Base from "../layouts/Base.astro";
           </div>
         </div>
       </div>
-      <div class="hero-right" role="img" aria-label="Aerial view of Glasgow Central station"></div>
+      <div class="hero-right">
+        <Image
+          src={centralAerial}
+          alt="Aerial view of Glasgow Central station"
+          widths={[768, 1080, 1400]}
+          sizes="(max-width: 767px) 100vw, 50vw"
+          quality={65}
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
     </section>
 
     <!-- ═══ STATS STRIP — TEAL ═══ -->
@@ -158,14 +178,14 @@ import Base from "../layouts/Base.astro";
           </div>
           <div>
             <div class="rounded-2xl overflow-hidden" style="border:4px solid var(--pink);">
-              <img
-                src="/images/blythswood-square.jpg"
+              <Image
+                src={blythswoodSquare}
                 alt="Springtime in Blythswood Square, Glasgow"
                 class="w-full h-auto block"
                 style="max-height:420px;object-fit:cover;"
-                width="1400"
-                height="1050"
-                loading="lazy"
+                widths={[480, 800, 1200]}
+                sizes="(max-width: 1023px) 100vw, 640px"
+                quality={60}
               />
             </div>
           </div>
@@ -344,22 +364,28 @@ import Base from "../layouts/Base.astro";
 
         <div class="gallery-grid">
           <div class="gallery-item pink-frame">
-            <img src="/images/central-aerial.jpg" alt="Aerial view of Glasgow Central station" width="1400" height="933" loading="lazy" />
+            <Image src={centralAerial} alt="Aerial view of Glasgow Central station" widths={[420, 640, 960]} sizes={gallerySizes}
+              quality={60} />
           </div>
           <div class="gallery-item teal-frame">
-            <img src="/images/bagpiper.jpg" alt="Street bagpiper performing in Glasgow city centre" width="1600" height="900" loading="lazy" />
+            <Image src={bagpiper} alt="Street bagpiper performing in Glasgow city centre" widths={[420, 640, 960]} sizes={gallerySizes}
+              quality={60} />
           </div>
           <div class="gallery-item pink-frame">
-            <img src="/images/rainy-street.jpg" alt="Rainy street scene in Glasgow" width="1200" height="675" loading="lazy" />
+            <Image src={rainyStreet} alt="Rainy street scene in Glasgow" widths={[420, 640, 960]} sizes={gallerySizes}
+              quality={60} />
           </div>
           <div class="gallery-item teal-frame">
-            <img src="/images/people-make-glasgow.jpg" alt="Glasgow city centre — 'People Make Glasgow' sign with pedestrians" width="1066" height="1600" loading="lazy" />
+            <Image src={peopleMakeGlasgow} alt="Glasgow city centre — 'People Make Glasgow' sign with pedestrians" widths={[420, 640, 960]} sizes={gallerySizes}
+              quality={60} />
           </div>
           <div class="gallery-item pink-frame">
-            <img src="/images/clyde-bridge.jpg" alt="Suspension bridge over the River Clyde, Glasgow" width="1600" height="1067" loading="lazy" />
+            <Image src={clydeBridge} alt="Suspension bridge over the River Clyde, Glasgow" widths={[420, 640, 960]} sizes={gallerySizes}
+              quality={60} />
           </div>
           <div class="gallery-item teal-frame">
-            <img src="/images/rooftops.jpg" alt="Glasgow city centre rooftops panorama" width="1600" height="400" loading="lazy" />
+            <Image src={rooftops} alt="Glasgow city centre rooftops panorama" widths={[420, 640, 960]} sizes={gallerySizes}
+              quality={60} />
           </div>
         </div>
       </div>

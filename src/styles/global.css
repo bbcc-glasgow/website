@@ -152,10 +152,15 @@ input:focus-visible {
 }
 .hero-right {
   position: relative;
-  background-image: url("/images/central-aerial.jpg");
-  background-size: cover;
-  background-position: left center;
-  background-attachment: scroll;
+  overflow: hidden;
+}
+.hero-right img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
 }
 .hero-right::after {
   content: "";

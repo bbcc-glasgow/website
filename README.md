@@ -10,7 +10,8 @@ this site.
 
 ## Stack
 
-- **Astro 5** — static output, no client-side framework; a small vanilla script drives the
+- **Astro 5** (+ Sharp via `astro:assets` for build-time image optimisation) — static output, no
+  client-side framework; a small vanilla script drives the
   scroll-reveal, stat counters and scroll-spy (all disabled under `prefers-reduced-motion`).
 - **Tailwind 4** (via `@tailwindcss/vite`) + **DaisyUI 5** for component classes.
 - **Self-hosted fonts** (Fraunces + Inter variable, via Fontsource). No external requests at
@@ -77,7 +78,10 @@ the first `v*` tag**:
 
 ## Image credits
 
-All photos are Creative Commons; retained at reduced resolution in `public/images/`:
+All photos are Creative Commons. Sources live in `src/assets/` and are optimised at build time
+by `astro:assets` (Sharp): responsive srcsets at 420–1400px widths, WebP at quality 60–65, lazy
+loading everywhere except the hero. Only the logo stays in `public/images/` (it doubles as the
+favicon).
 
 | File | Source |
 | --- | --- |
