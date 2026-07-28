@@ -27,5 +27,8 @@ jobs:
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
+          # v3 of the action bundles wrangler 3.x, which cannot read the
+          # Workers static-assets config (main + assets) — pin wrangler 4.
+          wranglerVersion: "4.115.0"
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
