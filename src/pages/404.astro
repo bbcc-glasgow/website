@@ -1,0 +1,24 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base
+  title="Page not found — Blythswood & Broomielaw Community Council"
+  description="The page you were looking for does not exist. Return to the Blythswood & Broomielaw Community Council homepage."
+>
+  <main class="min-h-screen flex items-center justify-center px-4" style="background:var(--paper);">
+    <div class="text-center max-w-md">
+      <!-- #b5166d: pink family dark enough for AA small text on the paper background -->
+      <p class="section-eyebrow mb-4" style="color:#b5166d;">404</p>
+      <h1 class="font-fraunces font-bold text-ink mb-4" style="font-size:clamp(2rem,5vw,3rem);">
+        Page not found
+      </h1>
+      <p class="mb-8" style="color:var(--body-text);">
+        The page you were looking for doesn't exist or has moved.
+      </p>
+      <a href="/" class="btn border-0 text-white font-semibold" style="background:var(--pink);">
+        Back to the homepage
+      </a>
+    </div>
+  </main>
+</Base>

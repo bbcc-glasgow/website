@@ -1,0 +1,55 @@
+# Interim Standing Maintainer (ADR-0012 decision 4): periodic production
+# health check, mirroring weebuilts. The cron is commented out until the site
+# has a first production deploy and PRODUCTION_URL below is real — enable both
+# in the same PR.
+name: maintenance
+
+on:
+  # schedule:
+  #   - cron: "0 7 * * 1" # Mondays 07:00 UTC — enable after first deploy
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+env:
+  PRODUCTION_URL: https://bbcc-website.workers.dev # TODO: real URL at first deploy
+
+jobs:
+  production-health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Uptime
+        run: curl -sSf --max-time 15 -o /dev/null "$PRODUCTION_URL"
+
+      - name: Lighthouse budgets against production
+        run: pnpm exec lhci autorun --config=lighthouserc.production.json || echo "LHCI_FAILED=1" >> "$GITHUB_ENV"
+
+      - name: Build for a11y scan parity
+        run: pnpm build
+
+      - name: Accessibility against production
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          PLAYWRIGHT_BASE_URL="$PRODUCTION_URL" pnpm test:a11y || echo "A11Y_FAILED=1" >> "$GITHUB_ENV"
+
+      - name: File maintenance finding
+        if: env.LHCI_FAILED == '1' || env.A11Y_FAILED == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Maintenance: production health regression ($(date -u +%F))"
+          BODY="Automated Standing-Maintainer check failed. LHCI failed: ${LHCI_FAILED:-0}. A11y failed: ${A11Y_FAILED:-0}. See run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          gh issue create --title "$TITLE" --body "$BODY" --label "maintenance"

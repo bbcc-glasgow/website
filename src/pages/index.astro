@@ -1,0 +1,715 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base
+  title="Blythswood & Broomielaw Community Council"
+  description="Blythswood & Broomielaw Community Council gives residents and workers a democratic voice in shaping the heart of Glasgow — planning, licensing, public realm, and community life in the city centre."
+>
+  <!-- Skip link for keyboard/screen-reader users -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- ═══ STICKY NAVBAR ═══ -->
+  <nav id="navbar" aria-label="Main navigation">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+      <a href="#" class="flex items-center gap-3 no-underline">
+        <div class="w-10 h-10 overflow-hidden rounded-md flex-shrink-0">
+          <img
+            src="/images/bbcc-logo.png"
+            alt="Blythswood and Broomielaw Community Council logo"
+            class="h-full w-auto object-left"
+            width="40"
+            height="40"
+          />
+        </div>
+        <span class="font-fraunces font-semibold text-ink text-lg leading-tight hidden sm:block">
+          Blythswood &amp; Broomielaw
+        </span>
+      </a>
+
+      <div class="hidden md:flex items-center gap-1">
+        <a href="#our-area" class="nav-link">Our Area</a>
+        <a href="#our-projects" class="nav-link">Projects</a>
+        <a href="#meetings" class="nav-link">Meetings</a>
+        <a href="#get-involved" class="nav-link">Get Involved</a>
+        <a
+          href="#get-involved"
+          class="btn btn-sm text-white font-semibold border-0 ml-3"
+          style="background:var(--pink);">Join Us</a
+        >
+      </div>
+
+      <!-- Mobile hamburger -->
+      <label for="mobile-drawer" class="md:hidden btn btn-ghost btn-sm p-2" aria-label="Open menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </label>
+    </div>
+  </nav>
+
+  <!-- Mobile drawer (CSS-only) -->
+  <input type="checkbox" id="mobile-drawer" class="drawer-toggle" aria-label="Toggle mobile menu" />
+  <label for="mobile-drawer" class="drawer-overlay" aria-hidden="true"></label>
+  <div class="mobile-menu">
+    <div class="flex justify-between items-center mb-6">
+      <span class="font-fraunces font-semibold text-ink text-base">Menu</span>
+      <label for="mobile-drawer" class="btn btn-ghost btn-sm p-1" aria-label="Close menu">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </label>
+    </div>
+    <nav aria-label="Mobile navigation" class="flex flex-col gap-1">
+      <a href="#our-area" class="nav-link block py-3 border-b border-gray-100">Our Area</a>
+      <a href="#our-projects" class="nav-link block py-3 border-b border-gray-100">Projects</a>
+      <a href="#meetings" class="nav-link block py-3 border-b border-gray-100">Meetings</a>
+      <a href="#get-involved" class="nav-link block py-3 border-b border-gray-100">Get Involved</a>
+      <a href="#get-involved" class="btn text-white border-0 mt-4 w-full" style="background:var(--pink);">Join Us</a>
+    </nav>
+  </div>
+
+  <main id="main-content">
+    <!-- ═══ HERO — SPLIT PINK / GLASGOW PHOTO ═══ -->
+    <section id="home">
+      <div class="hero-left">
+        <div class="max-w-lg">
+          <p class="section-eyebrow mb-5 text-white">
+            Glasgow's City Centre Community Council
+          </p>
+          <h1 class="font-fraunces font-bold text-white leading-tight mb-6">
+            Your City,<br />Our City.
+          </h1>
+          <p class="text-white mb-8 leading-relaxed" style="font-size:1.125rem;max-width:38ch;">
+            Blythswood &amp; Broomielaw Community Council gives residents and workers a democratic
+            voice in shaping the heart of Glasgow.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a href="#get-involved" class="btn font-semibold border-0 shadow-md" style="background:#fff;color:var(--pink);">
+              Get Involved
+            </a>
+            <a
+              href="#our-area"
+              class="btn font-semibold border-2 bg-transparent text-white"
+              style="border-color:rgba(255,255,255,0.7);"
+            >
+              Our Area
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="hero-right" role="img" aria-label="Aerial view of Glasgow Central station"></div>
+    </section>
+
+    <!-- ═══ STATS STRIP — TEAL ═══ -->
+    <section id="stats" class="py-12 px-4">
+      <div class="max-w-6xl mx-auto">
+        <div class="stats stats-horizontal shadow-none divide-x divide-white/20 flex flex-wrap lg:flex-nowrap">
+          <div class="stat text-center px-6 py-4">
+            <div class="stat-value" data-count="200000" data-suffix="+" id="count-0">200,000+</div>
+            <div class="stat-title">Daily Visitors</div>
+            <div class="stat-desc">to city centre businesses</div>
+          </div>
+          <div class="stat text-center px-6 py-4">
+            <div class="stat-value">1820s</div>
+            <div class="stat-title">Blythswood Grid</div>
+            <div class="stat-desc">planned street heritage</div>
+          </div>
+          <div class="stat text-center px-6 py-4">
+            <div class="stat-value" data-count="30" data-prefix="~" id="count-2">~30</div>
+            <div class="stat-title">Lanes &amp; Closes</div>
+            <div class="stat-desc">mapped in our network</div>
+          </div>
+          <div class="stat text-center px-6 py-4">
+            <div class="stat-value" style="font-size:1.75rem;line-height:1.2;">UNESCO<br />City of Music</div>
+            <div class="stat-title">Glasgow</div>
+            <div class="stat-desc">our cultural designation</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ OUR AREA — INK DARK SECTION ═══ -->
+    <section id="our-area" class="py-20 px-4">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start mb-16">
+          <div>
+            <p class="section-eyebrow mb-4" style="color:var(--teal);">Our Patch</p>
+            <h2 class="font-fraunces font-bold text-white leading-tight mb-6" style="font-size:clamp(2rem,3.5vw,2.75rem);">
+              The Commercial Heart of Glasgow
+            </h2>
+            <p class="leading-relaxed mb-6" style="color:rgba(255,255,255,0.75);font-size:1rem;">
+              We cover the dense, layered area between the M8 and Renfield Street — home to
+              Blythswood Square, the financial district, Central Station, the Broomielaw riverside,
+              and thousands of people who live, work and pass through every day.
+            </p>
+            <p class="leading-relaxed mb-8" style="color:rgba(255,255,255,0.75);font-size:1rem;">
+              As a statutory Community Council, we have a right to be consulted on planning,
+              licensing and policy decisions that affect our area. We amplify the voices of those
+              who use this city.
+            </p>
+            <div class="boundary-box mb-6">
+              <p class="font-semibold mb-1" style="color:var(--teal);">Boundary</p>
+              <p style="color:rgba(255,255,255,0.75);font-size:0.9rem;line-height:1.6;">
+                North: Sauchiehall Street &nbsp;·&nbsp; East: Renfield / Queen / Jamaica St
+                &nbsp;·&nbsp; South: River Clyde &nbsp;·&nbsp; West: The M8
+              </p>
+            </div>
+          </div>
+          <div>
+            <div class="rounded-2xl overflow-hidden" style="border:4px solid var(--pink);">
+              <img
+                src="/images/blythswood-square.jpg"
+                alt="Springtime in Blythswood Square, Glasgow"
+                class="w-full h-auto block"
+                style="max-height:420px;object-fit:cover;"
+                width="1400"
+                height="1050"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="pillar-card" style="background:var(--pink);">
+            <h3 class="text-white">Planning &amp; Licensing</h3>
+            <p class="text-white">Statutory consultee on applications that reshape our streets.</p>
+          </div>
+          <div class="pillar-card" style="background:var(--teal-dark);">
+            <h3 class="text-white">Public Realm</h3>
+            <p class="text-white">Greening lanes, improving footpaths, reducing clutter.</p>
+          </div>
+          <div class="pillar-card" style="background:var(--amber);">
+            <h3 style="color:var(--ink);">Night-time Economy</h3>
+            <p style="color:rgba(26,26,46,0.85);">Backing venues, culture, and a thriving evening city.</p>
+          </div>
+          <div class="pillar-card" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);">
+            <h3 class="text-white">Heritage</h3>
+            <p style="color:rgba(255,255,255,0.75);">Protecting the Victorian grid and built character.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PRIORITY PROJECTS — WHITE SECTION ═══ -->
+    <section id="our-projects" class="py-20 px-4" style="background:#fff;">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-12">
+          <p class="section-eyebrow mb-3" style="color:var(--pink);">Active Work</p>
+          <h2 class="font-fraunces font-bold text-ink" style="font-size:clamp(2rem,3.5vw,2.75rem);">
+            What We're Working On
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="projects-grid">
+          <div class="project-card">
+            <div class="card-top-border" style="background:var(--pink);"></div>
+            <div class="card-body-custom">
+              <span class="badge card-tag border-0" style="background:rgba(220,26,132,0.1);color:var(--pink);">Strategy</span>
+              <h3>Local Place Plan</h3>
+              <p>
+                Developing a community-led spatial vision for Blythswood &amp; Broomielaw — shaping
+                how the area grows over the next decade.
+              </p>
+              <div class="collapse collapse-arrow mt-4" style="background:transparent;">
+                <input type="checkbox" aria-label="Find out more about the Local Place Plan" />
+                <div class="collapse-title">Find out more</div>
+                <div class="collapse-content">
+                  <p class="text-sm leading-relaxed" style="color:#595959;">
+                    Full details for this project are being prepared. Contact us to find out more or
+                    get involved.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="card-top-border" style="background:var(--teal);"></div>
+            <div class="card-body-custom">
+              <span class="badge card-tag border-0" style="background:rgba(0,168,150,0.1);color:var(--teal-dark);">Environment</span>
+              <h3>Taking Back Our Lanes</h3>
+              <p>
+                Our district has 30 private lanes trapped in fragmented ownership structures —
+                preventing coordinated maintenance, lighting, or improvement. We are campaigning for
+                Glasgow City Council to take statutory ownership and management responsibility,
+                creating a coherent public realm for the first time.
+              </p>
+              <div class="collapse collapse-arrow mt-4" style="background:transparent;">
+                <input type="checkbox" aria-label="Find out more about Taking Back Our Lanes" />
+                <div class="collapse-title">Find out more</div>
+                <div class="collapse-content">
+                  <p class="text-sm leading-relaxed" style="color:#595959;">
+                    Our area contains 30 private lanes in a patchwork of private and shared
+                    ownership. This fragmentation blocks any single body from taking responsibility
+                    for lighting, surfacing, or maintenance. We are building a formal case for
+                    Glasgow City Council to assume statutory management — the essential first step
+                    to creating a safe and coherent network of public lanes.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="card-top-border" style="background:var(--amber);"></div>
+            <div class="card-body-custom">
+              <span class="badge card-tag border-0" style="background:rgba(244,161,0,0.12);color:#8a5f00;">Biodiversity</span>
+              <h3>Mapping Street Trees</h3>
+              <p>
+                A community tree audit of every street tree in our area — building evidence for
+                protecting and expanding the canopy.
+              </p>
+              <div class="collapse collapse-arrow mt-4" style="background:transparent;">
+                <input type="checkbox" aria-label="Find out more about Mapping Street Trees" />
+                <div class="collapse-title">Find out more</div>
+                <div class="collapse-content">
+                  <p class="text-sm leading-relaxed" style="color:#595959;">
+                    Full details for this project are being prepared. Contact us to find out more or
+                    get involved.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="card-top-border" style="background:var(--pink);"></div>
+            <div class="card-body-custom">
+              <span class="badge card-tag border-0" style="background:rgba(220,26,132,0.1);color:var(--pink);">Place-making</span>
+              <h3>Union Corner</h3>
+              <p>
+                Advocating for the sensitive redevelopment of the Union Street / Argyle Street
+                corner — a gateway to the city centre.
+              </p>
+              <div class="collapse collapse-arrow mt-4" style="background:transparent;">
+                <input type="checkbox" aria-label="Find out more about Union Corner" />
+                <div class="collapse-title">Find out more</div>
+                <div class="collapse-content">
+                  <p class="text-sm leading-relaxed" style="color:#595959;">
+                    Full details for this project are being prepared. Contact us to find out more or
+                    get involved.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="card-top-border" style="background:var(--teal);"></div>
+            <div class="card-body-custom">
+              <span class="badge card-tag border-0" style="background:rgba(0,168,150,0.1);color:var(--teal-dark);">Culture</span>
+              <h3>Backing Venues</h3>
+              <p>
+                Supporting Glasgow's music and arts venues against noise complaints and licensing
+                conditions that threaten their future.
+              </p>
+              <div class="collapse collapse-arrow mt-4" style="background:transparent;">
+                <input type="checkbox" aria-label="Find out more about Backing Venues" />
+                <div class="collapse-title">Find out more</div>
+                <div class="collapse-content">
+                  <p class="text-sm leading-relaxed" style="color:#595959;">
+                    Full details for this project are being prepared. Contact us to find out more or
+                    get involved.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="project-card flex flex-col items-center justify-center text-center p-8"
+            style="opacity:1;transform:none;background:var(--paper);border:2px dashed rgba(26,26,46,0.15);"
+          >
+            <p class="font-fraunces font-semibold text-ink text-xl mb-3">Have an idea?</p>
+            <p class="text-sm text-gray-600 mb-5">
+              Tell us about issues in your neighbourhood that we should prioritise.
+            </p>
+            <a href="#get-involved" class="btn btn-sm border-0 text-white font-semibold" style="background:var(--ink);">Contact us</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PHOTO GALLERY — PAPER BACKGROUND ═══ -->
+    <section id="gallery" class="py-20 px-4">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-10">
+          <p class="section-eyebrow mb-3" style="color:var(--teal-dark);">Glasgow</p>
+          <h2 class="font-fraunces font-bold text-ink" style="font-size:clamp(1.75rem,3vw,2.5rem);">
+            The City We Call Home
+          </h2>
+        </div>
+
+        <div class="gallery-grid">
+          <div class="gallery-item pink-frame">
+            <img src="/images/central-aerial.jpg" alt="Aerial view of Glasgow Central station" width="1400" height="933" loading="lazy" />
+          </div>
+          <div class="gallery-item teal-frame">
+            <img src="/images/bagpiper.jpg" alt="Street bagpiper performing in Glasgow city centre" width="1600" height="900" loading="lazy" />
+          </div>
+          <div class="gallery-item pink-frame">
+            <img src="/images/rainy-street.jpg" alt="Rainy street scene in Glasgow" width="1200" height="675" loading="lazy" />
+          </div>
+          <div class="gallery-item teal-frame">
+            <img src="/images/people-make-glasgow.jpg" alt="Glasgow city centre — 'People Make Glasgow' sign with pedestrians" width="1066" height="1600" loading="lazy" />
+          </div>
+          <div class="gallery-item pink-frame">
+            <img src="/images/clyde-bridge.jpg" alt="Suspension bridge over the River Clyde, Glasgow" width="1600" height="1067" loading="lazy" />
+          </div>
+          <div class="gallery-item teal-frame">
+            <img src="/images/rooftops.jpg" alt="Glasgow city centre rooftops panorama" width="1600" height="400" loading="lazy" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ JAG — NEIGHBOURING COUNCILS ═══ -->
+    <section id="jag">
+      <div style="max-width:72rem;margin:0 auto;">
+        <p class="section-eyebrow" style="color:var(--teal);margin-bottom:0.75rem;">Joint Action Group</p>
+        <h2 class="font-fraunces" style="font-size:clamp(1.75rem,3vw,2.5rem);font-weight:600;color:white;line-height:1.2;margin-bottom:1.25rem;">
+          Working Together Across Glasgow
+        </h2>
+        <p style="font-size:1rem;color:rgba(255,255,255,0.75);line-height:1.72;max-width:65ch;margin-bottom:3rem;">
+          Through the Joint Action Group (JAG), we team up with neighbouring community councils to
+          channel community voices directly to Glasgow City Council — because some challenges can
+          only be solved together.
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:rgba(0,168,150,0.2);">
+          <a href="#jag" class="jag-card">
+            <p class="section-eyebrow" style="font-size:0.65rem;color:var(--teal);margin-bottom:6px;">East</p>
+            <h3 class="font-fraunces" style="font-size:1rem;font-weight:600;color:white;margin-bottom:6px;line-height:1.3;">
+              Merchant City &amp; Trongate
+            </h3>
+            <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:14px;">
+              Our immediate neighbours to the east, covering Glasgow's historic merchant quarter.
+            </p>
+            <span style="font-size:0.75rem;font-weight:700;color:var(--pink-on-dark);">Visit council →</span>
+          </a>
+          <a href="#jag" class="jag-card">
+            <p class="section-eyebrow" style="font-size:0.65rem;color:var(--teal);margin-bottom:6px;">North</p>
+            <h3 class="font-fraunces" style="font-size:1rem;font-weight:600;color:white;margin-bottom:6px;line-height:1.3;">
+              Garnethill
+            </h3>
+            <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:14px;">
+              Our northern neighbours above Sauchiehall Street, sharing many of our city-centre concerns.
+            </p>
+            <span style="font-size:0.75rem;font-weight:700;color:var(--pink-on-dark);">Visit council →</span>
+          </a>
+          <a href="#jag" class="jag-card">
+            <p class="section-eyebrow" style="font-size:0.65rem;color:var(--teal);margin-bottom:6px;">West</p>
+            <h3 class="font-fraunces" style="font-size:1rem;font-weight:600;color:white;margin-bottom:6px;line-height:1.3;">
+              Anderston / City / Yorkhill
+            </h3>
+            <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:14px;">
+              Our western neighbours across the motorway, from Anderston to Yorkhill.
+            </p>
+            <span style="font-size:0.75rem;font-weight:700;color:var(--pink-on-dark);">Visit council →</span>
+          </a>
+          <a href="#jag" class="jag-card">
+            <p class="section-eyebrow" style="font-size:0.65rem;color:var(--teal);margin-bottom:6px;">South</p>
+            <h3 class="font-fraunces" style="font-size:1rem;font-weight:600;color:white;margin-bottom:6px;line-height:1.3;">
+              Gorbals
+            </h3>
+            <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:14px;">
+              Our southern neighbours across the Clyde, working on waterfront and regeneration issues.
+            </p>
+            <span style="font-size:0.75rem;font-weight:700;color:var(--pink-on-dark);">Visit council →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ GET INVOLVED — PINK BACKGROUND ═══ -->
+    <section id="get-involved" class="py-20 px-4">
+      <div class="max-w-7xl mx-auto text-center">
+        <p class="section-eyebrow mb-4 text-white">Participate</p>
+        <h2 class="font-fraunces font-bold text-white mb-4" style="font-size:clamp(2.25rem,4vw,3.25rem);">
+          Your City. Your Say.
+        </h2>
+        <p class="text-white mb-12 mx-auto" style="font-size:1.0625rem;max-width:52ch;">
+          Community Councils only work when the community shows up. Here's how to make your voice count.
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div class="card bg-white shadow-lg">
+            <div class="card-body text-left">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background:rgba(0,168,150,0.12);">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--teal-dark);" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </div>
+              <h3 class="font-fraunces font-semibold text-ink text-xl mb-2">Attend a Meeting</h3>
+              <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                Our public meetings are open to all. Come along, ask questions, and help set our agenda.
+              </p>
+              <a href="#meetings" class="btn btn-sm border-0 text-white font-semibold" style="background:var(--teal-dark);">See dates</a>
+            </div>
+          </div>
+
+          <div class="card bg-white shadow-lg">
+            <div class="card-body text-left">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background:rgba(244,161,0,0.12);">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:#8a5f00;" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
+              </div>
+              <h3 class="font-fraunces font-semibold text-ink text-xl mb-2">Take the Survey</h3>
+              <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                Tell us what matters most to you about living and working in the city centre. Takes 3 minutes.
+              </p>
+              <a href="#get-involved" class="btn btn-sm border-0 font-semibold text-ink" style="background:var(--amber);">Start survey</a>
+            </div>
+          </div>
+
+          <div class="card bg-white shadow-lg">
+            <div class="card-body text-left">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background:rgba(220,26,132,0.08);">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pink);" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path>
+                </svg>
+              </div>
+              <h3 class="font-fraunces font-semibold text-ink text-xl mb-2">Join the Committee</h3>
+              <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                Elections are held annually. Become an elected member and help steer the work of the council.
+              </p>
+              <a href="#newsletter" class="btn btn-sm border-0 text-white font-semibold" style="background:var(--pink);">Find out how</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ MEETINGS — INK DARK SECTION ═══ -->
+    <section id="meetings" class="py-20 px-4">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-12">
+          <p class="section-eyebrow mb-3" style="color:var(--teal);">Open Meetings</p>
+          <h2 class="font-fraunces font-bold text-white" style="font-size:clamp(2rem,3.5vw,2.75rem);">
+            Coming to a Meeting
+          </h2>
+        </div>
+
+        <div class="meeting-card mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <div>
+              <p class="section-eyebrow text-xs mb-1" style="color:var(--teal);">Next Meeting</p>
+              <h3 class="font-fraunces font-semibold text-white text-2xl">General Meeting</h3>
+            </div>
+            <span class="badge text-white border-0 font-medium px-4 py-3 text-sm" style="background:var(--teal-dark);">Open to all</span>
+          </div>
+
+          <div class="grid sm:grid-cols-3 gap-4 mb-6">
+            <div class="flex items-start gap-3">
+              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--teal);" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <div>
+                <p class="text-xs font-semibold" style="color:rgba(255,255,255,0.7);">Date</p>
+                <p class="text-white text-sm font-medium">To be announced</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--teal);" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <div>
+                <p class="text-xs font-semibold" style="color:rgba(255,255,255,0.7);">Time</p>
+                <p class="text-white text-sm font-medium">To be announced</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--teal);" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <div>
+                <p class="text-xs font-semibold" style="color:rgba(255,255,255,0.7);">Location</p>
+                <p class="text-white text-sm font-medium">To be announced</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <a href="#newsletter" class="btn btn-sm font-semibold" style="background:var(--pink);color:#fff;border:0;">Get notified by email</a>
+          </div>
+        </div>
+
+        <p class="text-center text-sm" style="color:rgba(255,255,255,0.65);">
+          All meetings are held in public. No registration required. Agendas published one week in advance.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══ NEWSLETTER — AMBER SECTION ═══ -->
+    <section id="newsletter" class="py-20 px-4">
+      <div class="max-w-2xl mx-auto text-center">
+        <p class="section-eyebrow mb-4" style="color:rgba(26,26,46,0.85);">Stay Informed</p>
+        <h2 class="font-fraunces font-bold text-ink mb-4" style="font-size:clamp(2rem,4vw,3rem);">
+          Stay in the Loop
+        </h2>
+        <p class="text-ink mb-8 leading-relaxed" style="font-size:1rem;">
+          For occasional updates on meetings, consultations, and planning decisions that affect your
+          city centre, email us and ask to join the mailing list.
+        </p>
+
+        <a
+          href="mailto:blythswoodbroomielawcc@gmail.com?subject=Subscribe%20to%20BBCC%20updates"
+          class="btn border-0 font-semibold text-white px-8 shadow-lg"
+          style="background:var(--ink);"
+        >
+          Email us to subscribe
+        </a>
+
+        <p class="text-sm mt-4" style="color:rgba(26,26,46,0.85);">
+          No spam. Unsubscribe any time.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══ FOOTER — INK DARK ═══ -->
+  <footer id="footer" class="pt-16 pb-8 px-4">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid md:grid-cols-3 gap-10 pb-12 border-b" style="border-color:rgba(255,255,255,0.1);">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 overflow-hidden rounded-md flex-shrink-0">
+              <img src="/images/bbcc-logo.png" alt="Blythswood and Broomielaw Community Council logo" class="h-full w-auto object-left" width="40" height="40" loading="lazy" />
+            </div>
+            <span class="font-fraunces font-semibold text-white text-base leading-tight">
+              Blythswood &amp;<br />Broomielaw CC
+            </span>
+          </div>
+          <p style="color:rgba(255,255,255,0.65);font-size:0.875rem;line-height:1.6;max-width:28ch;">
+            The statutory community council for the heart of Glasgow.
+          </p>
+        </div>
+
+        <div>
+          <p class="text-white font-semibold text-sm mb-4">Quick Links</p>
+          <nav class="flex flex-col gap-2" aria-label="Footer navigation">
+            <a href="#our-area" class="footer-link">Our Area</a>
+            <a href="#our-projects" class="footer-link">Priority Projects</a>
+            <a href="#meetings" class="footer-link">Meetings</a>
+            <a href="#get-involved" class="footer-link">Get Involved</a>
+            <a href="#newsletter" class="footer-link">Newsletter</a>
+          </nav>
+        </div>
+
+        <div>
+          <p class="text-white font-semibold text-sm mb-4">Contact</p>
+          <p style="color:rgba(255,255,255,0.65);font-size:0.875rem;line-height:1.8;">
+            Email:
+            <a href="mailto:blythswoodbroomielawcc@gmail.com" class="footer-link" style="color:var(--pink-on-dark);">blythswoodbroomielawcc@gmail.com</a>
+          </p>
+          <p style="color:rgba(255,255,255,0.65);font-size:0.875rem;margin-top:0.75rem;">
+            Glasgow City Council area<br />
+            Scotland, UK
+          </p>
+        </div>
+      </div>
+
+      <div class="pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <p style="color:rgba(255,255,255,0.65);font-size:0.75rem;">
+          &copy; 2026 Blythswood &amp; Broomielaw Community Council.
+        </p>
+        <p style="color:rgba(255,255,255,0.65);font-size:0.75rem;">
+          Photos: Wikimedia Commons and Flickr (Creative Commons) — see site repository for credits.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ─── Navbar scroll shadow ──────────────────────────────────────
+    const navbar = document.getElementById("navbar");
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!navbar) return;
+        navbar.classList.toggle("scrolled", window.scrollY > 10);
+      },
+      { passive: true },
+    );
+
+    // ─── Animated stat counters (IntersectionObserver) ─────────────
+    // Final values are server-rendered; the count-up is decoration only.
+    function animateCount(el: HTMLElement, target: number, prefix: string, suffix: string, duration: number) {
+      const start = performance.now();
+      function update(ts: number) {
+        const progress = Math.min((ts - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(target * eased);
+        el.textContent = prefix + current.toLocaleString("en-GB") + suffix;
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
+    const statsSection = document.getElementById("stats");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let statsCounted = false;
+    if (statsSection && !reducedMotion) {
+      const statsObs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !statsCounted) {
+              statsCounted = true;
+              const el0 = document.getElementById("count-0");
+              if (el0) animateCount(el0, 200000, "", "+", 2000);
+              const el2 = document.getElementById("count-2");
+              if (el2) animateCount(el2, 30, "~", "", 1500);
+            }
+          });
+        },
+        { threshold: 0.3 },
+      );
+      statsObs.observe(statsSection);
+    }
+
+    // ─── Project card scroll-reveal with stagger ──────────────────
+    const projectCards = Array.from(document.querySelectorAll<HTMLElement>(".project-card"));
+    if (reducedMotion) {
+      projectCards.forEach((card) => card.classList.add("visible"));
+    } else {
+      const revealObs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const card = entry.target as HTMLElement;
+              const idx = projectCards.indexOf(card);
+              setTimeout(() => card.classList.add("visible"), idx * 80);
+              revealObs.unobserve(card);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: "0px 0px -40px 0px" },
+      );
+      projectCards.forEach((card) => {
+        if (!card.querySelector(".card-top-border")) return;
+        revealObs.observe(card);
+      });
+    }
+
+    // ─── Scroll-spy: highlight active nav link ────────────────────
+    const navLinks = document.querySelectorAll<HTMLAnchorElement>('a.nav-link[href^="#"]');
+    if (navLinks.length) {
+      const spy = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const id = (entry.target as HTMLElement).id;
+              navLinks.forEach((link) => {
+                link.classList.toggle("nav-active", link.getAttribute("href") === "#" + id);
+              });
+            }
+          });
+        },
+        { threshold: 0.25, rootMargin: "-10% 0px -55% 0px" },
+      );
+      document.querySelectorAll("section[id]").forEach((s) => spy.observe(s));
+    }
+  </script>
+</Base>
