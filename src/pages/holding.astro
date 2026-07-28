@@ -1,0 +1,46 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base
+  title="Blythswood & Broomielaw Community Council"
+  description="Blythswood & Broomielaw Community Council — the statutory community council for Glasgow's city centre. Our new website is on its way; contact us by email."
+>
+  <main class="min-h-screen grid" style="grid-template-rows:1fr auto;">
+    <div class="flex items-center justify-center px-4" style="background:var(--pink);">
+      <div class="text-center max-w-lg py-16">
+        <div class="w-16 h-16 mx-auto mb-6 overflow-hidden rounded-xl bg-white p-1">
+          <img
+            src="/images/bbcc-logo.png"
+            alt="Blythswood and Broomielaw Community Council logo"
+            class="h-full w-auto object-left"
+            width="64"
+            height="64"
+          />
+        </div>
+        <p class="section-eyebrow mb-4 text-white">Glasgow's City Centre Community Council</p>
+        <h1 class="font-fraunces font-bold text-white leading-tight mb-6" style="font-size:clamp(2.25rem,6vw,3.5rem);">
+          Your City,<br />Our City.
+        </h1>
+        <p class="text-white mb-8 leading-relaxed" style="font-size:1.125rem;">
+          Blythswood &amp; Broomielaw Community Council gives residents and workers a democratic
+          voice in shaping the heart of Glasgow. Our website is under construction — in the
+          meantime, we'd love to hear from you.
+        </p>
+        <a
+          href="mailto:blythswoodbroomielawcc@gmail.com"
+          class="btn font-semibold border-0 shadow-md"
+          style="background:#fff;color:var(--pink);"
+        >
+          Email us
+        </a>
+      </div>
+    </div>
+    <footer class="py-6 px-4 text-center" style="background:var(--ink);">
+      <p style="color:rgba(255,255,255,0.65);font-size:0.8125rem;">
+        &copy; 2026 Blythswood &amp; Broomielaw Community Council &nbsp;·&nbsp;
+        <a href="mailto:blythswoodbroomielawcc@gmail.com" class="footer-link" style="color:var(--pink-on-dark);font-size:0.8125rem;text-decoration:underline;">blythswoodbroomielawcc@gmail.com</a>
+      </p>
+    </footer>
+  </main>
+</Base>

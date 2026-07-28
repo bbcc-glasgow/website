@@ -32,6 +32,23 @@ Merges to `main` do **not** publish. Deploys happen only on a `v*` tag or manual
 deploy workflow (ADR-0005 release tap). Requires `CLOUDFLARE_API_TOKEN` and
 `CLOUDFLARE_ACCOUNT_ID` repository secrets.
 
+## Site mode: holding page vs live site
+
+A small Worker (`worker.js`, `run_worker_first`) gates the static assets on the `SITE_MODE`
+variable in `wrangler.jsonc`:
+
+- **`holding`** (current): every route serves `src/pages/holding.astro` — the branded holding
+  page with the contact email. Nothing under development is publicly reachable (only hashed
+  `/_astro/` assets and `/images/` pass through). `/` returns 200; all other paths return 503 so
+  crawlers don't index half-built URLs.
+- **`live`**: all requests pass straight through to the built site.
+
+**To go live** (or to switch back): change `SITE_MODE` in `wrangler.jsonc` in a one-line PR, then
+tag / dispatch a deploy. **For an instant emergency maintenance switch**: edit the `SITE_MODE`
+variable in the Cloudflare dashboard (Workers → bbcc-website → Settings → Variables) — takes
+effect in seconds, but note the next deploy resets it to the wrangler.jsonc value, which is the
+source of truth.
+
 ## Verify before first release tag
 
 The seed content is ported from the concept page. Items below are placeholders or unverified

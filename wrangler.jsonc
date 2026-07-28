@@ -2,9 +2,19 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "bbcc-website",
   "compatibility_date": "2026-07-01",
+  "main": "worker.js",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "404-page"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": true
+  },
+  // SITE_MODE is the source of truth for what visitors see: "holding" serves
+  // the holding page on every route; "live" serves the real site. Flip it here
+  // and deploy (workflow_dispatch), or temporarily in the Cloudflare dashboard
+  // for an instant maintenance switch (reverts on next deploy).
+  "vars": {
+    "SITE_MODE": "holding"
   }
   // Custom domain routes go here once BBCC settles a domain — see weebuilts
   // wrangler.jsonc for the shape.
