@@ -67,7 +67,7 @@ the first `v*` tag**:
 - [ ] **Social media**: the concept's Instagram feed section and social icons were omitted from
       the port because no verified account URLs existed. Re-add when BBCC's real accounts are
       confirmed.
-- [ ] **Newsletter**: currently an honest mailto to blythswoodbroomielawcc@gmail.com. Wire up a
+- [ ] **Newsletter**: currently an honest mailto to info@bbcc.scot. Wire up a
       real list (e.g. MailChimp) if wanted — needs a privacy note if so.
 - [ ] **Domain**: `astro.config.mjs` site URL, `wrangler.jsonc` routes,
       `lighthouserc.production.json` and the maintenance workflow's `PRODUCTION_URL` all carry a
