@@ -3,6 +3,8 @@
 # Lighthouse both need; pnpm comes via corepack.
 FROM mcr.microsoft.com/playwright:v1.49.1-noble
 
+ENV CHROME_PATH=/ms-playwright/chromium-1148/chrome-linux/chrome
+
 RUN corepack enable
 
 WORKDIR /work

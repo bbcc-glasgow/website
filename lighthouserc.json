@@ -4,7 +4,8 @@
       "staticDistDir": "./dist",
       "numberOfRuns": 3,
       "settings": {
-        "chromeFlags": "--no-sandbox --headless=new"
+        "chromePath": "/ms-playwright/chromium-1148/chrome-linux/chrome",
+        "chromeFlags": "--no-sandbox --headless=new --disable-dev-shm-usage"
       }
     },
     "assert": {
