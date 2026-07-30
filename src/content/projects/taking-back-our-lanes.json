@@ -1,7 +1,10 @@
 {
   "tag": "Environment",
   "tagColour": "var(--teal-dark)",
+  "tagBgColour": "rgba(0,168,150,0.1)",
+  "borderColour": "var(--teal)",
   "title": "Taking Back Our Lanes",
   "summary": "Our district has 30 private lanes trapped in fragmented ownership structures — preventing coordinated maintenance, lighting, or improvement. We are campaigning for Glasgow City Council to take statutory ownership and management responsibility, creating a coherent public realm for the first time.",
-  "details": "Our area contains 30 private lanes in a patchwork of private and shared ownership. This fragmentation blocks any single body from taking responsibility for lighting, surfacing, or maintenance. We are building a formal case for Glasgow City Council to assume statutory management — the essential first step to creating a safe and coherent network of public lanes."
+  "details": "Our area contains 30 private lanes in a patchwork of private and shared ownership. This fragmentation blocks any single body from taking responsibility for lighting, surfacing, or maintenance. We are building a formal case for Glasgow City Council to assume statutory management — the essential first step to creating a safe and coherent network of public lanes.",
+  "order": 2
 }

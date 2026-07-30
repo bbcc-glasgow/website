@@ -5,9 +5,12 @@ const projects = defineCollection({
   schema: z.object({
     tag: z.string(),
     tagColour: z.string(),
+    tagBgColour: z.string(),
+    borderColour: z.string(),
     title: z.string(),
     summary: z.string(),
     details: z.string(),
+    order: z.number(),
   }),
 });
 
@@ -18,6 +21,12 @@ const site = defineCollection({
       z.object({
         value: z.string(),
         label: z.string(),
+        desc: z.string(),
+        countValue: z.number().optional(),
+        prefix: z.string().optional(),
+        suffix: z.string().optional(),
+        valueStyle: z.string().optional(),
+        duration: z.number().optional(),
       }),
     ),
     boundaryDescription: z.string(),
