@@ -52,14 +52,18 @@ source of truth.
 
 ## Verify before first release tag
 
-The seed content is ported from the concept page. Items below are placeholders or unverified
-claims deliberately left for the owner to confirm — **each should be resolved via an issue before
-the first `v*` tag**:
+The seed content is ported from the concept page. Project cards draw their title, summary and
+details from `src/content/projects/*.json`; site-level data (stats, boundary description, contact
+email) lives in `src/content/site/index.json`. Items below are placeholders or unverified claims
+deliberately left for the owner to confirm — **each should be resolved via an issue before the
+first `v*` tag**:
 
 - [ ] **Meeting card**: date, time and location are "To be announced" — fill in the real next
       meeting.
 - [ ] **Stats strip**: "200,000+ daily visitors" and "~30 lanes & closes" need a source or
       revised wording; "1820s Blythswood grid" and "UNESCO City of Music" are on solid ground.
+      Values and wording are in `src/content/site/index.json` (same file holds the boundary
+      description).
 - [ ] **Survey card**: "Start survey" currently has no survey behind it — link a real survey or
       remove the card.
 - [ ] **JAG cards**: "Visit council →" links are placeholders — add the neighbouring councils'
@@ -67,8 +71,8 @@ the first `v*` tag**:
 - [ ] **Social media**: the concept's Instagram feed section and social icons were omitted from
       the port because no verified account URLs existed. Re-add when BBCC's real accounts are
       confirmed.
-- [ ] **Newsletter**: currently an honest mailto to info@bbcc.scot. Wire up a
-      real list (e.g. MailChimp) if wanted — needs a privacy note if so.
+- [ ] **Newsletter**: currently an honest mailto (contact email in `src/content/site/index.json`).
+      Wire up a real list (e.g. MailChimp) if wanted — needs a privacy note if so.
 - [ ] **Maintenance cron**: enable the schedule in `.github/workflows/maintenance.yml` after the
       first successful production deploy (domain configs already point at bbcc.scot).
 - [ ] **Privacy / accessibility statements**: the concept footer linked to Privacy Policy and
