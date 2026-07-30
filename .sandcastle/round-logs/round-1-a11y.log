@@ -1,110 +1,14 @@
+/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:21535
+  if (key == null || signature == null) throw new Error(`Cannot find matching keyid: ${JSON.stringify({ signatures, keys })}`);
+                                              ^
 
-> bbcc-website@0.1.0 test:a11y /home/agent/workspace
-> playwright test
+Error: Cannot find matching keyid: {"signatures":[{"sig":"MEQCIDcYLtZbVsUG23Cn8u8skaybYfR1MYftRQehbV98/rLwAiB/sPecWFZM0QvFlpmfRqfO+UgAIMB5/rWT51jQRO8lqw==","keyid":"SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"},{"sig":"MEUCIQCAMqKvfUcWwCPXDb61mi2Q4vMvvtvdTJwRhz07dORwVgIgDQGe+s6g1SKQ10lYOZsF0NHCN/Aq8DDaGBuwy42srss=","keyid":"SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"}],"keys":[{"expires":null,"keyid":"SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA","keytype":"ecdsa-sha2-nistp256","scheme":"ecdsa-sha2-nistp256","key":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1Olb3zMAFFxXKHiIkQO5cJ3Yhl5i6UPp+IhuteBJbuHcA5UogKo0EWtlWwW6KSaKoTNEYL7JlCQiVnkhBktUgg=="}]}
+    at verifySignature (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:21535:47)
+    at fetchLatestStableVersion (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:21553:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async fetchLatestStableVersion2 (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:21672:14)
+    at async Engine.getDefaultVersion (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:22292:23)
+    at async Engine.executePackageManagerRequest (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:22390:47)
+    at async Object.runMain (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:23096:5)
 
-TAP version 13
-# Subtest: Project schema
-    # Subtest: should accept a complete project object
-    ok 1 - should accept a complete project object
-      ---
-      duration_ms: 1.163377
-      ...
-    # Subtest: should reject missing tag
-    ok 2 - should reject missing tag
-      ---
-      duration_ms: 0.809293
-      ...
-    # Subtest: should reject missing tagColour
-    ok 3 - should reject missing tagColour
-      ---
-      duration_ms: 0.145417
-      ...
-    # Subtest: should reject missing title
-    ok 4 - should reject missing title
-      ---
-      duration_ms: 0.104333
-      ...
-    # Subtest: should reject missing summary
-    ok 5 - should reject missing summary
-      ---
-      duration_ms: 0.281209
-      ...
-    # Subtest: should reject missing details
-    ok 6 - should reject missing details
-      ---
-      duration_ms: 0.125667
-      ...
-    # Subtest: should reject non-string title
-    ok 7 - should reject non-string title
-      ---
-      duration_ms: 0.159875
-      ...
-    1..7
-ok 1 - Project schema
-  ---
-  duration_ms: 3.542215
-  type: 'suite'
-  ...
-# Subtest: Site schema
-    # Subtest: should accept a complete site object
-    ok 1 - should accept a complete site object
-      ---
-      duration_ms: 0.516959
-      ...
-    # Subtest: should reject missing stats
-    ok 2 - should reject missing stats
-      ---
-      duration_ms: 0.402792
-      ...
-    # Subtest: should reject missing boundaryDescription
-    ok 3 - should reject missing boundaryDescription
-      ---
-      duration_ms: 0.394168
-      ...
-    # Subtest: should reject missing contactEmail
-    ok 4 - should reject missing contactEmail
-      ---
-      duration_ms: 0.255542
-      ...
-    # Subtest: should reject invalid email format
-    ok 5 - should reject invalid email format
-      ---
-      duration_ms: 0.138917
-      ...
-    # Subtest: should reject non-array stats
-    ok 6 - should reject non-array stats
-      ---
-      duration_ms: 0.075334
-      ...
-    # Subtest: should reject stat object missing value
-    ok 7 - should reject stat object missing value
-      ---
-      duration_ms: 0.117584
-      ...
-    # Subtest: should reject stat object missing label
-    ok 8 - should reject stat object missing label
-      ---
-      duration_ms: 0.100167
-      ...
-    1..8
-ok 2 - Site schema
-  ---
-  duration_ms: 2.443171
-  type: 'suite'
-  ...
-
-Running 3 tests using 3 workers
-
-  ✓  1 tests/a11y.spec.ts:12:3 › accessibility › dist contains at least one page (6ms)
-  ✓  3 tests/a11y.spec.ts:17:5 › accessibility › axe scan: /holding/ (498ms)
-  ✓  2 tests/a11y.spec.ts:17:5 › accessibility › axe scan: / (858ms)
-
-  3 passed (3.7s)
-(node:2145) ExperimentalWarning: globSync is an experimental feature and might change at any time
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:2194) ExperimentalWarning: globSync is an experimental feature and might change at any time
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:2195) ExperimentalWarning: globSync is an experimental feature and might change at any time
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:2201) ExperimentalWarning: globSync is an experimental feature and might change at any time
-(Use `node --trace-warnings ...` to show where the warning was created)
+Node.js v22.12.0

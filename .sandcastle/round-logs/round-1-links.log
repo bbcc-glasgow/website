@@ -1,8 +1,14 @@
+/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:21535
+  if (key == null || signature == null) throw new Error(`Cannot find matching keyid: ${JSON.stringify({ signatures, keys })}`);
+                                              ^
 
-> bbcc-website@0.1.0 test:links /home/agent/workspace
-> linkinator ./dist --recurse --verbosity error --skip "^https?://"
+Error: Cannot find matching keyid: {"signatures":[{"sig":"MEQCIDcYLtZbVsUG23Cn8u8skaybYfR1MYftRQehbV98/rLwAiB/sPecWFZM0QvFlpmfRqfO+UgAIMB5/rWT51jQRO8lqw==","keyid":"SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"},{"sig":"MEUCIQCAMqKvfUcWwCPXDb61mi2Q4vMvvtvdTJwRhz07dORwVgIgDQGe+s6g1SKQ10lYOZsF0NHCN/Aq8DDaGBuwy42srss=","keyid":"SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"}],"keys":[{"expires":null,"keyid":"SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA","keytype":"ecdsa-sha2-nistp256","scheme":"ecdsa-sha2-nistp256","key":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1Olb3zMAFFxXKHiIkQO5cJ3Yhl5i6UPp+IhuteBJbuHcA5UogKo0EWtlWwW6KSaKoTNEYL7JlCQiVnkhBktUgg=="}]}
+    at verifySignature (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:21535:47)
+    at fetchLatestStableVersion (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:21553:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async fetchLatestStableVersion2 (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:21672:14)
+    at async Engine.getDefaultVersion (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:22292:23)
+    at async Engine.executePackageManagerRequest (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:22390:47)
+    at async Object.runMain (/usr/lib/node_modules/corepack/dist/lib/corepack.cjs:23096:5)
 
-(node:2116) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-🏊‍♂️ crawling ./dist
-🤖 Successfully scanned 0 links in 0.008 seconds.
+Node.js v22.12.0
