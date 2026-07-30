@@ -1,0 +1,12 @@
+
+> bbcc-website@0.1.0 test:lighthouse /home/agent/workspace
+> lhci autorun
+
+✅  .lighthouseci/ directory writable
+✅  Configuration file found
+❌  Chrome installation not found
+Healthcheck failed!
+
+ ELIFECYCLE  Command failed with exit code 1.
+(node:2400) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)

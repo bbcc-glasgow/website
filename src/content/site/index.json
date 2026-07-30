@@ -1,0 +1,10 @@
+{
+  "stats": [
+    { "value": "200,000+", "label": "Daily Visitors" },
+    { "value": "1820s", "label": "Blythswood Grid" },
+    { "value": "~30", "label": "Lanes & Closes" },
+    { "value": "UNESCO City of Music", "label": "Glasgow" }
+  ],
+  "boundaryDescription": "North: Sauchiehall Street · East: Renfield / Queen / Jamaica St · South: River Clyde · West: The M8",
+  "contactEmail": "info@bbcc.scot"
+}

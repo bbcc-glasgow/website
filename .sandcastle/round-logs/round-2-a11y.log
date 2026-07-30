@@ -1,0 +1,110 @@
+
+> bbcc-website@0.1.0 test:a11y /home/agent/workspace
+> playwright test
+
+TAP version 13
+# Subtest: Project schema
+    # Subtest: should accept a complete project object
+    ok 1 - should accept a complete project object
+      ---
+      duration_ms: 0.775543
+      ...
+    # Subtest: should reject missing tag
+    ok 2 - should reject missing tag
+      ---
+      duration_ms: 0.508668
+      ...
+    # Subtest: should reject missing tagColour
+    ok 3 - should reject missing tagColour
+      ---
+      duration_ms: 0.100584
+      ...
+    # Subtest: should reject missing title
+    ok 4 - should reject missing title
+      ---
+      duration_ms: 0.069708
+      ...
+    # Subtest: should reject missing summary
+    ok 5 - should reject missing summary
+      ---
+      duration_ms: 0.19325
+      ...
+    # Subtest: should reject missing details
+    ok 6 - should reject missing details
+      ---
+      duration_ms: 0.068833
+      ...
+    # Subtest: should reject non-string title
+    ok 7 - should reject non-string title
+      ---
+      duration_ms: 0.113667
+      ...
+    1..7
+ok 1 - Project schema
+  ---
+  duration_ms: 2.277879
+  type: 'suite'
+  ...
+# Subtest: Site schema
+    # Subtest: should accept a complete site object
+    ok 1 - should accept a complete site object
+      ---
+      duration_ms: 0.325834
+      ...
+    # Subtest: should reject missing stats
+    ok 2 - should reject missing stats
+      ---
+      duration_ms: 0.233458
+      ...
+    # Subtest: should reject missing boundaryDescription
+    ok 3 - should reject missing boundaryDescription
+      ---
+      duration_ms: 0.228292
+      ...
+    # Subtest: should reject missing contactEmail
+    ok 4 - should reject missing contactEmail
+      ---
+      duration_ms: 0.192501
+      ...
+    # Subtest: should reject invalid email format
+    ok 5 - should reject invalid email format
+      ---
+      duration_ms: 0.082501
+      ...
+    # Subtest: should reject non-array stats
+    ok 6 - should reject non-array stats
+      ---
+      duration_ms: 0.04675
+      ...
+    # Subtest: should reject stat object missing value
+    ok 7 - should reject stat object missing value
+      ---
+      duration_ms: 0.049333
+      ...
+    # Subtest: should reject stat object missing label
+    ok 8 - should reject stat object missing label
+      ---
+      duration_ms: 0.044375
+      ...
+    1..8
+ok 2 - Site schema
+  ---
+  duration_ms: 1.44117
+  type: 'suite'
+  ...
+
+Running 3 tests using 3 workers
+
+  ✓  1 tests/a11y.spec.ts:12:3 › accessibility › dist contains at least one page (4ms)
+  ✓  2 tests/a11y.spec.ts:17:5 › accessibility › axe scan: /holding/ (329ms)
+  ✓  3 tests/a11y.spec.ts:17:5 › accessibility › axe scan: / (532ms)
+
+  3 passed (3.1s)
+(node:5749) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5798) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5805) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5799) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
