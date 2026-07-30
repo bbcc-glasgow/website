@@ -1,4 +1,5 @@
 .sandcastle/
+public/admin/decap-cms.js
 node_modules/
 .pnpm-store/
 dist/
