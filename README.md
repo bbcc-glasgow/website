@@ -50,6 +50,14 @@ variable in the Cloudflare dashboard (Workers → bbcc-website → Settings → 
 effect in seconds, but note the next deploy resets it to the wrangler.jsonc value, which is the
 source of truth.
 
+## Decap CMS / DecapBridge
+
+Content editors log in at `/admin` and authenticate through DecapBridge (PKCE flow). The
+DecapBridge dashboard holds the GitHub fine-grained PAT (contents + pull-requests scoped to
+`bbcc-glasgow/website` only). **The PAT value is never stored in this repository or in any
+repository secret**; only the site ID (`648cbae2-8402-4cde-ade9-014199b3e953`) appears in
+`public/admin/config.yml`, which is not a secret.
+
 ## Verify before first release tag
 
 The seed content is ported from the concept page. Project cards draw their title, summary and
