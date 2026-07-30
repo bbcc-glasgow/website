@@ -34,4 +34,14 @@ const site = defineCollection({
   }),
 });
 
-export const collections = { projects, site };
+const holding = defineCollection({
+  type: "data",
+  schema: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    ctaLabel: z.string(),
+  }),
+});
+
+export const collections = { projects, site, holding };
