@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "cp node_modules/decap-cms-app/dist/decap-cms-app.js public/admin/decap-cms.js",
+    "prebuild": "cp node_modules/decap-cms/dist/decap-cms.js public/admin/decap-cms.js && cp node_modules/decap-cms/dist/373.decap-cms.js public/admin/373.decap-cms.js && cp node_modules/decap-cms/dist/cms.css public/admin/cms.css",
     "build": "astro build",
     "preview": "astro preview",
     "test:links": "linkinator ./dist --recurse --verbosity error --skip \"^https?://\"",
@@ -22,7 +22,7 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
     "astro": "^5.1.0",
-    "decap-cms-app": "3.11.0"
+    "decap-cms": "3.11.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",

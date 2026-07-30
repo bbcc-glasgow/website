@@ -100,54 +100,74 @@ describe("Decap CMS vendor setup", () => {
 
   // ── package.json ─────────────────────────────────────────────────────
 
-  it("should have decap-cms-app as a dependency in package.json", () => {
+  it("should have decap-cms as a dependency in package.json", () => {
     const pkg = JSON.parse(readFileSync(resolve(repoRoot, "package.json"), "utf-8"));
     assert.ok(pkg.dependencies, "package.json must have a dependencies field");
     assert.ok(
-      pkg.dependencies["decap-cms-app"],
-      "decap-cms-app must be listed in dependencies",
+      pkg.dependencies["decap-cms"],
+      "decap-cms must be listed in dependencies",
     );
   });
 
-  it("should pin decap-cms-app at version 3.11.0", () => {
+  it("should pin decap-cms at version 3.11.0", () => {
     const pkg = JSON.parse(readFileSync(resolve(repoRoot, "package.json"), "utf-8"));
     assert.strictEqual(
-      pkg.dependencies["decap-cms-app"],
+      pkg.dependencies["decap-cms"],
       "3.11.0",
-      "decap-cms-app must be pinned at 3.11.0",
+      "decap-cms must be pinned at 3.11.0",
     );
   });
 
-  it("should have a prebuild script in package.json that vendors decap-cms.js", () => {
+  it("should have a prebuild script in package.json that vendors three decap-cms files", () => {
     const pkg = JSON.parse(readFileSync(resolve(repoRoot, "package.json"), "utf-8"));
     assert.ok(pkg.scripts, "package.json must have a scripts field");
     assert.ok(pkg.scripts.prebuild, "package.json must define a prebuild script");
-    assert.ok(
-      pkg.scripts.prebuild.includes("decap-cms.js"),
-      "prebuild script must reference decap-cms.js",
-    );
     assert.ok(
       pkg.scripts.prebuild.startsWith("cp "),
       "prebuild script must use cp to copy the pre-built bundle",
     );
     assert.ok(
-      pkg.scripts.prebuild.includes("node_modules/decap-cms-app/dist/decap-cms-app.js"),
-      "prebuild script must copy from the npm package dist",
+      pkg.scripts.prebuild.includes("node_modules/decap-cms/dist/decap-cms.js"),
+      "prebuild script must copy decap-cms.js from the npm package dist",
+    );
+    assert.ok(
+      pkg.scripts.prebuild.includes("node_modules/decap-cms/dist/373.decap-cms.js"),
+      "prebuild script must copy 373.decap-cms.js from the npm package dist",
+    );
+    assert.ok(
+      pkg.scripts.prebuild.includes("node_modules/decap-cms/dist/cms.css"),
+      "prebuild script must copy cms.css from the npm package dist",
     );
     assert.ok(
       pkg.scripts.prebuild.includes("public/admin/decap-cms.js"),
-      "prebuild script must output to public/admin/decap-cms.js",
+      "prebuild script must output decap-cms.js to public/admin/",
+    );
+    assert.ok(
+      pkg.scripts.prebuild.includes("public/admin/373.decap-cms.js"),
+      "prebuild script must output 373.decap-cms.js to public/admin/",
+    );
+    assert.ok(
+      pkg.scripts.prebuild.includes("public/admin/cms.css"),
+      "prebuild script must output cms.css to public/admin/",
     );
   });
 
   // ── .gitignore ───────────────────────────────────────────────────────
 
-  it("should have public/admin/decap-cms.js listed in .gitignore", () => {
+  it("should have all three generated files listed in .gitignore", () => {
     const gitignore = readFileSync(resolve(repoRoot, ".gitignore"), "utf-8");
     const lines = gitignore.split("\n").map((l) => l.trim());
     assert.ok(
       lines.some((l) => l === "public/admin/decap-cms.js"),
       ".gitignore must contain 'public/admin/decap-cms.js'",
+    );
+    assert.ok(
+      lines.some((l) => l === "public/admin/373.decap-cms.js"),
+      ".gitignore must contain 'public/admin/373.decap-cms.js'",
+    );
+    assert.ok(
+      lines.some((l) => l === "public/admin/cms.css"),
+      ".gitignore must contain 'public/admin/cms.css'",
     );
   });
 });
