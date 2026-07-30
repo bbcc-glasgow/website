@@ -14,11 +14,13 @@
     "preview": "astro preview",
     "test:links": "linkinator ./dist --recurse --verbosity error --skip \"^https?://\"",
     "test:a11y": "playwright test",
+    "test:sitemap": "node --test tests/sitemap.test.mjs",
     "test:gitignore": "node --experimental-strip-types --test tests/gitignore.test.ts",
     "test:lighthouse": "lhci autorun",
     "gate": "pnpm build && pnpm test:links && pnpm test:a11y && pnpm test:lighthouse"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "astro": "^5.1.0",
     "decap-cms-app": "3.11.0"
   },
