@@ -145,15 +145,36 @@ describe("preview deploy workflow", () => {
     );
   });
 
-  it("should look up the workers.dev subdomain via JSON output for reliability", () => {
+  it("should NOT query the Cloudflare API for subdomain (use wrangler's own output)", () => {
     const content = readFileSync(workflowPath, "utf-8");
-    // Using --json with jq is more robust than parsing human-readable text
-    // across wrangler versions and locales.
-    const usesJsonOutput =
-      content.match(/whoami.*--json/i) || content.match(/jq/);
+    // The issue steer says: "use Cloudflare's built-in Versioned Preview URLs,
+    // don't hand-roll the URL" -- so we must NOT query the Cloudflare API.
     assert.ok(
-      usesJsonOutput,
-      "should use JSON output (--json) and jq for subdomain lookup, not fragile text parsing",
+      !content.includes("cloudflare.com/client/v4/accounts"),
+      "should not reconstruct the URL via the Cloudflare API",
+    );
+  });
+
+  it("should have a stale-comment job that runs on PR close", () => {
+    const content = readFileSync(workflowPath, "utf-8");
+    assert.ok(
+      content.includes("stale-comment:"),
+      "should have a stale-comment job for PR close handling",
+    );
+    assert.ok(
+      content.includes("github.event.action == 'closed'"),
+      "stale-comment job should only run when the PR is closed",
+    );
+  });
+
+  it("should update the existing comment body to mark it stale on PR close", () => {
+    const content = readFileSync(workflowPath, "utf-8");
+    const hasStaleFlag =
+      content.toLowerCase().includes("stale") &&
+      content.includes("Preview deployment (stale)");
+    assert.ok(
+      hasStaleFlag,
+      "should mark the preview comment as stale on PR close",
     );
   });
 });
