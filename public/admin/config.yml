@@ -1,15 +1,64 @@
-# Placeholder config — replaced with real content in slice 2.
-# Uses test-repo so the CMS loads without external backend dependencies.
+# Decap CMS configuration for BBCC website
+# Uses git-gateway backend via DecapBridge for authenticated content editing.
+#
+# Before deploying, register this site with DecapBridge and replace the
+# PLACEHOLDER_SITE_ID in identity_url with the actual site ID assigned
+# during registration.
+
 backend:
-  name: test-repo
-media_folder: static/media
-public_folder: /media
+  name: git-gateway
+  repo: bbcc-glasgow/website
+  branch: main
+  identity_url: https://auth.decapbridge.com/sites/PLACEHOLDER_SITE_ID
+  gateway_url: https://gateway.decapbridge.com
+
+# All edits create a pull request rather than pushing directly to main.
+publish_mode: editorial_workflow
+
+media_folder: public/images
+public_folder: /images
+
 collections:
-  - name: placeholder
-    label: Placeholder
+  - name: projects
+    label: Projects
+    label_singular: Project
+    description: Community council projects and initiatives
+    folder: src/content/projects
+    extension: .json
+    format: json
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    fields:
+      - { name: tag, label: Tag, widget: string }
+      - { name: tagColour, label: Tag Colour, widget: string }
+      - { name: tagBgColour, label: Tag Background Colour, widget: string }
+      - { name: borderColour, label: Border Colour, widget: string }
+      - { name: title, label: Title, widget: string }
+      - { name: summary, label: Summary, widget: text }
+      - { name: details, label: Details, widget: text }
+      - { name: order, label: Order, widget: number, value_type: int }
+
+  - name: site
+    label: Site Facts
+    description: Site-wide configuration data, statistics, and contact information
     files:
-      - file: placeholder.json
-        name: placeholder
-        label: Placeholder
+      - file: src/content/site/index.json
+        name: index
+        label: Site Facts
         fields:
-          - { name: title, label: Title, widget: string }
+          - name: stats
+            label: Statistics
+            widget: list
+            summary: "{{fields.value}} {{fields.label}}"
+            fields:
+              - { name: value, label: Value, widget: string }
+              - { name: label, label: Label, widget: string }
+              - { name: desc, label: Description, widget: string }
+              - { name: countValue, label: Count Value, widget: number, value_type: int, required: false }
+              - { name: prefix, label: Prefix, widget: string, required: false }
+              - { name: suffix, label: Suffix, widget: string, required: false }
+              - { name: valueStyle, label: Value Style, widget: string, required: false }
+              - { name: duration, label: Duration (ms), widget: number, value_type: int, required: false }
+          - { name: boundaryDescription, label: Boundary Description, widget: text }
+          - { name: contactEmail, label: Contact Email, widget: string }
