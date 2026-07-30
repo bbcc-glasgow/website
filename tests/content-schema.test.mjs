@@ -115,6 +115,68 @@ describe("Project schema", () => {
   });
 });
 
+const holdingSchema = z.object({
+  eyebrow: z.string(),
+  heading: z.string(),
+  body: z.string(),
+  ctaLabel: z.string(),
+});
+
+// ── Holding schema tests ──────────────────────────────────────────────
+
+describe("Holding schema", () => {
+  const validHolding = {
+    eyebrow: "Glasgow's City Centre Community Council",
+    heading: "Your City,<br />Our City.",
+    body: "Blythswood & Broomielaw Community Council gives residents and workers a democratic voice in shaping the heart of Glasgow. Our website is under construction — in the meantime, we'd love to hear from you.",
+    ctaLabel: "Email us",
+  };
+
+  it("should accept a complete holding object", () => {
+    const result = holdingSchema.safeParse(validHolding);
+    assert.ok(result.success);
+  });
+
+  it("should reject missing eyebrow", () => {
+    const { eyebrow: _, ...rest } = validHolding;
+    const result = holdingSchema.safeParse(rest);
+    assert.ok(!result.success);
+  });
+
+  it("should reject missing heading", () => {
+    const { heading: _, ...rest } = validHolding;
+    const result = holdingSchema.safeParse(rest);
+    assert.ok(!result.success);
+  });
+
+  it("should reject missing body", () => {
+    const { body: _, ...rest } = validHolding;
+    const result = holdingSchema.safeParse(rest);
+    assert.ok(!result.success);
+  });
+
+  it("should reject missing ctaLabel", () => {
+    const { ctaLabel: _, ...rest } = validHolding;
+    const result = holdingSchema.safeParse(rest);
+    assert.ok(!result.success);
+  });
+
+  it("should reject non-string eyebrow", () => {
+    const result = holdingSchema.safeParse({ ...validHolding, eyebrow: 42 });
+    assert.ok(!result.success);
+  });
+
+  it("should reject non-string heading", () => {
+    const result = holdingSchema.safeParse({ ...validHolding, heading: false });
+    assert.ok(!result.success);
+  });
+
+  it("should accept heading with embedded <br /> tag", () => {
+    const result = holdingSchema.safeParse(validHolding);
+    assert.ok(result.success);
+  });
+});
+
 // ── Site schema tests ──────────────────────────────────────────────────
 
 describe("Site schema", () => {

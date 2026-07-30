@@ -1,5 +1,12 @@
 ---
+import { getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
+
+const holdingEntry = await getEntry("holding", "index");
+const { eyebrow, heading, body, ctaLabel } = holdingEntry.data;
+
+const siteEntry = await getEntry("site", "index");
+const { contactEmail } = siteEntry.data;
 ---
 
 <Base
@@ -18,28 +25,24 @@ import Base from "../layouts/Base.astro";
             height="64"
           />
         </div>
-        <p class="section-eyebrow mb-4 text-white">Glasgow's City Centre Community Council</p>
-        <h1 class="font-fraunces font-bold text-white leading-tight mb-6" style="font-size:clamp(2.25rem,6vw,3.5rem);">
-          Your City,<br />Our City.
-        </h1>
+        <p class="section-eyebrow mb-4 text-white">{eyebrow}</p>
+        <h1 class="font-fraunces font-bold text-white leading-tight mb-6" style="font-size:clamp(2.25rem,6vw,3.5rem);" set:html={heading}></h1>
         <p class="text-white mb-8 leading-relaxed" style="font-size:1.125rem;">
-          Blythswood &amp; Broomielaw Community Council gives residents and workers a democratic
-          voice in shaping the heart of Glasgow. Our website is under construction — in the
-          meantime, we'd love to hear from you.
+          {body}
         </p>
         <a
-          href="mailto:info@bbcc.scot"
+          href={`mailto:${contactEmail}`}
           class="btn font-semibold border-0 shadow-md"
           style="background:#fff;color:var(--pink);"
         >
-          Email us
+          {ctaLabel}
         </a>
       </div>
     </div>
     <footer class="py-6 px-4 text-center" style="background:var(--ink);">
       <p style="color:rgba(255,255,255,0.65);font-size:0.8125rem;">
         &copy; 2026 Blythswood &amp; Broomielaw Community Council &nbsp;·&nbsp;
-        <a href="mailto:info@bbcc.scot" class="footer-link" style="color:var(--pink-on-dark);font-size:0.8125rem;text-decoration:underline;">info@bbcc.scot</a>
+        <a href={`mailto:${contactEmail}`} class="footer-link" style="color:var(--pink-on-dark);font-size:0.8125rem;text-decoration:underline;">{contactEmail}</a>
       </p>
     </footer>
   </main>

@@ -79,3 +79,16 @@ collections:
               - { name: duration, label: Duration (ms), widget: number, value_type: int, required: false }
           - { name: boundaryDescription, label: Boundary Description, widget: text }
           - { name: contactEmail, label: Contact Email, widget: string }
+
+  - name: holding
+    label: Holding Page
+    description: Editable content for the site's holding page
+    files:
+      - file: src/content/holding/index.json
+        name: index
+        label: Holding Page
+        fields:
+          - { name: eyebrow, label: Eyebrow, widget: string }
+          - { name: heading, label: Heading, widget: string }
+          - { name: body, label: Body, widget: text }
+          - { name: ctaLabel, label: CTA Label, widget: string }
