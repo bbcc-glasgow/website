@@ -62,12 +62,17 @@ jobs:
         id: url
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          # Use JSON output for reliable parsing regardless of locale/wrangler version.
-          WHOAMI=$(npx "wrangler@${WRANGLER_VERSION}" whoami --json 2>&1)
-          SUBDOMAIN=$(echo "${WHOAMI}" | jq -r '.workers_dev_subdomain // empty')
+          # Query the Cloudflare Workers Subdomain API directly rather than
+          # parsing 'wrangler whoami --json', which omits the subdomain field
+          # in wrangler v4.
+          SUBDOMAIN=$(curl -s \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/subdomain" \
+            | jq -r '.result.subdomain // empty')
           if [ -z "${SUBDOMAIN}" ]; then
-            echo "::error::Could not determine workers.dev subdomain from 'wrangler whoami --json'. Ensure your Cloudflare account has a workers.dev subdomain enabled for preview deployments."
+            echo "::error::Could not determine workers.dev subdomain from Cloudflare API. Ensure your account has workers.dev enabled (Dashboard > Workers & Pages > your subdomain)."
             exit 1
           fi
           echo "subdomain=${SUBDOMAIN}" >> "${GITHUB_OUTPUT}"
