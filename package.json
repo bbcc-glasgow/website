@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "cp node_modules/decap-cms-app/dist/decap-cms-app.js public/admin/decap-cms.js",
     "build": "astro build",
     "preview": "astro preview",
     "test:links": "linkinator ./dist --recurse --verbosity error --skip \"^https?://\"",
@@ -18,7 +19,8 @@
     "gate": "pnpm build && pnpm test:links && pnpm test:a11y && pnpm test:lighthouse"
   },
   "dependencies": {
-    "astro": "^5.1.0"
+    "astro": "^5.1.0",
+    "decap-cms-app": "3.11.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",

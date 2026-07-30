@@ -1,0 +1,15 @@
+# Placeholder config — replaced with real content in slice 2.
+# Uses test-repo so the CMS loads without external backend dependencies.
+backend:
+  name: test-repo
+media_folder: static/media
+public_folder: /media
+collections:
+  - name: placeholder
+    label: Placeholder
+    files:
+      - file: placeholder.json
+        name: placeholder
+        label: Placeholder
+        fields:
+          - { name: title, label: Title, widget: string }
