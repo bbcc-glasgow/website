@@ -7,104 +7,169 @@ TAP version 13
     # Subtest: should accept a complete project object
     ok 1 - should accept a complete project object
       ---
-      duration_ms: 0.775543
+      duration_ms: 0.799374
       ...
     # Subtest: should reject missing tag
     ok 2 - should reject missing tag
       ---
-      duration_ms: 0.508668
+      duration_ms: 0.515416
       ...
     # Subtest: should reject missing tagColour
     ok 3 - should reject missing tagColour
       ---
-      duration_ms: 0.100584
+      duration_ms: 0.094499
       ...
     # Subtest: should reject missing title
     ok 4 - should reject missing title
       ---
-      duration_ms: 0.069708
+      duration_ms: 0.074542
       ...
     # Subtest: should reject missing summary
     ok 5 - should reject missing summary
       ---
-      duration_ms: 0.19325
+      duration_ms: 0.187791
       ...
     # Subtest: should reject missing details
     ok 6 - should reject missing details
       ---
-      duration_ms: 0.068833
+      duration_ms: 0.07625
       ...
     # Subtest: should reject non-string title
     ok 7 - should reject non-string title
       ---
-      duration_ms: 0.113667
+      duration_ms: 0.142417
       ...
     1..7
 ok 1 - Project schema
   ---
-  duration_ms: 2.277879
+  duration_ms: 2.356205
   type: 'suite'
   ...
 # Subtest: Site schema
     # Subtest: should accept a complete site object
     ok 1 - should accept a complete site object
       ---
-      duration_ms: 0.325834
+      duration_ms: 0.424749
       ...
     # Subtest: should reject missing stats
     ok 2 - should reject missing stats
       ---
-      duration_ms: 0.233458
+      duration_ms: 0.215583
       ...
     # Subtest: should reject missing boundaryDescription
     ok 3 - should reject missing boundaryDescription
       ---
-      duration_ms: 0.228292
+      duration_ms: 0.236458
       ...
     # Subtest: should reject missing contactEmail
     ok 4 - should reject missing contactEmail
       ---
-      duration_ms: 0.192501
+      duration_ms: 0.179333
       ...
     # Subtest: should reject invalid email format
     ok 5 - should reject invalid email format
       ---
-      duration_ms: 0.082501
+      duration_ms: 0.083875
       ...
     # Subtest: should reject non-array stats
     ok 6 - should reject non-array stats
       ---
-      duration_ms: 0.04675
+      duration_ms: 0.056167
       ...
     # Subtest: should reject stat object missing value
     ok 7 - should reject stat object missing value
       ---
-      duration_ms: 0.049333
+      duration_ms: 0.062375
       ...
     # Subtest: should reject stat object missing label
     ok 8 - should reject stat object missing label
       ---
-      duration_ms: 0.044375
+      duration_ms: 0.058792
       ...
     1..8
 ok 2 - Site schema
   ---
-  duration_ms: 1.44117
+  duration_ms: 1.569873
   type: 'suite'
+  ...
+# Subtest: .gitignore sandcastle configuration
+    # Subtest: should list .sandcastle/ in .gitignore
+    ok 1 - should list .sandcastle/ in .gitignore
+      ---
+      duration_ms: 0.358249
+      ...
+    # Subtest: should have no tracked files under .sandcastle/
+    not ok 2 - should have no tracked files under .sandcastle/
+      ---
+      duration_ms: 6.615742
+      location: '/home/agent/workspace/tests/gitignore.test.ts:16:3'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly equal:
+        + actual - expected
+        
+        + '.sandcastle/round-logs/round-1-a11y.log\n' +
+        +   '.sandcastle/round-logs/round-1-build.log\n' +
+        +   '.sandcastle/round-logs/round-1-lighthouse.log\n' +
+        +   '.sandcastle/round-logs/round-1-links.log\n' +
+        +   '.sandcastle/round-logs/round-2-a11y.log\n' +
+        +   '.sandcastle/round-logs/round-2-build.log\n' +
+        +   '.sandcastle/round-logs/round-2-lighthouse.log\n' +
+        +   '.sandcastle/round-logs/round-2-links.log'
+        - ''
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: ''
+      actual: |-
+        .sandcastle/round-logs/round-1-a11y.log
+        .sandcastle/round-logs/round-1-build.log
+        .sandcastle/round-logs/round-1-lighthouse.log
+        .sandcastle/round-logs/round-1-links.log
+        .sandcastle/round-logs/round-2-a11y.log
+        .sandcastle/round-logs/round-2-build.log
+        .sandcastle/round-logs/round-2-lighthouse.log
+        .sandcastle/round-logs/round-2-links.log
+      operator: 'strictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///home/agent/workspace/tests/gitignore.test.ts:29:12)
+        Test.runInAsyncScope (node:async_hooks:211:14)
+        Test.run (node:internal/test_runner/test:934:25)
+        Suite.processPendingSubtests (node:internal/test_runner/test:633:18)
+        Test.postRun (node:internal/test_runner/test:1045:19)
+        Test.run (node:internal/test_runner/test:973:12)
+        async Promise.all (index 0)
+        Suite.run (node:internal/test_runner/test:1320:7)
+        startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+      ...
+    # Subtest: should keep .sandcastle/round-logs/ files on disk
+    ok 3 - should keep .sandcastle/round-logs/ files on disk
+      ---
+      duration_ms: 0.235167
+      ...
+    1..3
+not ok 3 - .gitignore sandcastle configuration
+  ---
+  duration_ms: 7.321741
+  type: 'suite'
+  location: '/home/agent/workspace/tests/gitignore.test.ts:8:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
   ...
 
 Running 3 tests using 3 workers
 
-  ✓  1 tests/a11y.spec.ts:12:3 › accessibility › dist contains at least one page (4ms)
-  ✓  2 tests/a11y.spec.ts:17:5 › accessibility › axe scan: /holding/ (329ms)
-  ✓  3 tests/a11y.spec.ts:17:5 › accessibility › axe scan: / (532ms)
+  ✓  1 a11y.spec.ts:12:3 › accessibility › dist contains at least one page (5ms)
+  ✓  2 a11y.spec.ts:17:5 › accessibility › axe scan: /holding/ (339ms)
+  ✓  3 a11y.spec.ts:17:5 › accessibility › axe scan: / (561ms)
 
-  3 passed (3.1s)
-(node:5749) ExperimentalWarning: globSync is an experimental feature and might change at any time
+  3 passed (3.3s)
+(node:6970) ExperimentalWarning: globSync is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
-(node:5798) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(node:7021) ExperimentalWarning: globSync is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
-(node:5805) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(node:7023) ExperimentalWarning: globSync is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
-(node:5799) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(node:7022) ExperimentalWarning: globSync is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
