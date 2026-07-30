@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node_modules/.bin/esbuild src/admin-cms.js --bundle --outfile=public/admin/decap-cms.js --minify --format=iife",
+    "prebuild": "cp node_modules/decap-cms-app/dist/decap-cms-app.js public/admin/decap-cms.js",
     "build": "astro build",
     "preview": "astro preview",
     "test:links": "linkinator ./dist --recurse --verbosity error --skip \"^https?://\"",

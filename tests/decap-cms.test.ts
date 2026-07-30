@@ -54,7 +54,7 @@ describe("Decap CMS vendor setup", () => {
     );
   });
 
-  it("should have a prebuild script in package.json that bundles decap-cms.js", () => {
+  it("should have a prebuild script in package.json that vendors decap-cms.js", () => {
     const pkg = JSON.parse(readFileSync(resolve(repoRoot, "package.json"), "utf-8"));
     assert.ok(pkg.scripts, "package.json must have a scripts field");
     assert.ok(pkg.scripts.prebuild, "package.json must define a prebuild script");
@@ -63,12 +63,12 @@ describe("Decap CMS vendor setup", () => {
       "prebuild script must reference decap-cms.js",
     );
     assert.ok(
-      pkg.scripts.prebuild.includes("esbuild"),
-      "prebuild script must use esbuild as the bundler",
+      pkg.scripts.prebuild.startsWith("cp "),
+      "prebuild script must use cp to copy the pre-built bundle",
     );
     assert.ok(
-      pkg.scripts.prebuild.includes("src/admin-cms.js"),
-      "prebuild script must bundle from src/admin-cms.js",
+      pkg.scripts.prebuild.includes("node_modules/decap-cms-app/dist/decap-cms-app.js"),
+      "prebuild script must copy from the npm package dist",
     );
     assert.ok(
       pkg.scripts.prebuild.includes("public/admin/decap-cms.js"),
