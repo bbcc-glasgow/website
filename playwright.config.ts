@@ -15,7 +15,7 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: "pnpm preview --port 4321",
+        command: "npm run preview -- --port 4321",
         port: 4321,
         reuseExistingServer: !process.env.CI,
       },
