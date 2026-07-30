@@ -12,9 +12,12 @@ const { z } = require("zod");
 const projectSchema = z.object({
   tag: z.string(),
   tagColour: z.string(),
+  tagBgColour: z.string(),
+  borderColour: z.string(),
   title: z.string(),
   summary: z.string(),
   details: z.string(),
+  order: z.number(),
 });
 
 const siteSchema = z.object({
@@ -22,6 +25,12 @@ const siteSchema = z.object({
     z.object({
       value: z.string(),
       label: z.string(),
+      desc: z.string(),
+      countValue: z.number().optional(),
+      prefix: z.string().optional(),
+      suffix: z.string().optional(),
+      valueStyle: z.string().optional(),
+      duration: z.number().optional(),
     }),
   ),
   boundaryDescription: z.string(),
@@ -34,9 +43,12 @@ describe("Project schema", () => {
   const validProject = {
     tag: "Strategy",
     tagColour: "var(--pink)",
+    tagBgColour: "rgba(220,26,132,0.1)",
+    borderColour: "var(--pink)",
     title: "Local Place Plan",
     summary: "A community-led spatial vision.",
     details: "Full details here.",
+    order: 1,
   };
 
   it("should accept a complete project object", () => {
@@ -52,6 +64,18 @@ describe("Project schema", () => {
 
   it("should reject missing tagColour", () => {
     const { tagColour: _, ...rest } = validProject;
+    const result = projectSchema.safeParse(rest);
+    assert.ok(!result.success);
+  });
+
+  it("should reject missing tagBgColour", () => {
+    const { tagBgColour: _, ...rest } = validProject;
+    const result = projectSchema.safeParse(rest);
+    assert.ok(!result.success);
+  });
+
+  it("should reject missing borderColour", () => {
+    const { borderColour: _, ...rest } = validProject;
     const result = projectSchema.safeParse(rest);
     assert.ok(!result.success);
   });
@@ -74,8 +98,19 @@ describe("Project schema", () => {
     assert.ok(!result.success);
   });
 
+  it("should reject missing order", () => {
+    const { order: _, ...rest } = validProject;
+    const result = projectSchema.safeParse(rest);
+    assert.ok(!result.success);
+  });
+
   it("should reject non-string title", () => {
     const result = projectSchema.safeParse({ ...validProject, title: 42 });
+    assert.ok(!result.success);
+  });
+
+  it("should reject non-numeric order", () => {
+    const result = projectSchema.safeParse({ ...validProject, order: "first" });
     assert.ok(!result.success);
   });
 });
@@ -84,13 +119,21 @@ describe("Project schema", () => {
 
 describe("Site schema", () => {
   const validSite = {
-    stats: [{ value: "200,000+", label: "Daily Visitors" }],
+    stats: [{ value: "200,000+", label: "Daily Visitors", desc: "to city centre businesses" }],
     boundaryDescription: "North: Sauchiehall Street",
     contactEmail: "info@bbcc.scot",
   };
 
   it("should accept a complete site object", () => {
     const result = siteSchema.safeParse(validSite);
+    assert.ok(result.success);
+  });
+
+  it("should accept site object with optional animation fields", () => {
+    const result = siteSchema.safeParse({
+      ...validSite,
+      stats: [{ value: "200,000+", label: "Daily Visitors", desc: "to city centre businesses", countValue: 200000, suffix: "+" }],
+    });
     assert.ok(result.success);
   });
 
@@ -140,6 +183,14 @@ describe("Site schema", () => {
     const result = siteSchema.safeParse({
       ...validSite,
       stats: [{ value: "200,000+" }],
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should reject stat object missing desc", () => {
+    const result = siteSchema.safeParse({
+      ...validSite,
+      stats: [{ value: "200,000+", label: "Daily Visitors" }],
     });
     assert.ok(!result.success);
   });

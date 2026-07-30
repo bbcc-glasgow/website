@@ -1,5 +1,6 @@
 ---
 import { Image, getImage } from "astro:assets";
+import { getCollection, getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
 import centralAerial from "../assets/central-aerial.jpg";
 import blythswoodSquare from "../assets/blythswood-square.jpg";
@@ -10,6 +11,12 @@ import clydeBridge from "../assets/clyde-bridge.jpg";
 import rooftops from "../assets/rooftops.jpg";
 
 const gallerySizes = "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 420px";
+
+const projects = (await getCollection("projects"))
+  .map((p) => p.data)
+  .sort((a, b) => a.order - b.order);
+const siteEntry = await getEntry("site", "index");
+const { stats, boundaryDescription, contactEmail } = siteEntry.data;
 ---
 
 <Base
@@ -125,26 +132,23 @@ const gallerySizes = "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 420px"
     <section id="stats" class="py-12 px-4">
       <div class="max-w-6xl mx-auto">
         <div class="stats stats-horizontal shadow-none divide-x divide-white/20 flex flex-wrap lg:flex-nowrap">
-          <div class="stat text-center px-6 py-4">
-            <div class="stat-value" data-count="200000" data-suffix="+" id="count-0">200,000+</div>
-            <div class="stat-title">Daily Visitors</div>
-            <div class="stat-desc">to city centre businesses</div>
-          </div>
-          <div class="stat text-center px-6 py-4">
-            <div class="stat-value">1820s</div>
-            <div class="stat-title">Blythswood Grid</div>
-            <div class="stat-desc">planned street heritage</div>
-          </div>
-          <div class="stat text-center px-6 py-4">
-            <div class="stat-value" data-count="30" data-prefix="~" id="count-2">~30</div>
-            <div class="stat-title">Lanes &amp; Closes</div>
-            <div class="stat-desc">mapped in our network</div>
-          </div>
-          <div class="stat text-center px-6 py-4">
-            <div class="stat-value" style="font-size:1.75rem;line-height:1.2;">UNESCO<br />City of Music</div>
-            <div class="stat-title">Glasgow</div>
-            <div class="stat-desc">our cultural designation</div>
-          </div>
+          {
+            stats.map((stat, i) => (
+              <div class="stat text-center px-6 py-4">
+                <div
+                  class="stat-value"
+                  {...(stat.countValue !== undefined ? { "data-count": stat.countValue, "id": `count-${i}` } : {})}
+                  {...(stat.prefix ? { "data-prefix": stat.prefix } : {})}
+                  {...(stat.suffix ? { "data-suffix": stat.suffix } : {})}
+                  {...(stat.duration ? { "data-duration": stat.duration } : {})}
+                  style={stat.valueStyle || undefined}
+                  set:html={stat.value}
+                ></div>
+                <div class="stat-title">{stat.label}</div>
+                <div class="stat-desc">{stat.desc}</div>
+              </div>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -171,8 +175,7 @@ const gallerySizes = "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 420px"
             <div class="boundary-box mb-6">
               <p class="font-semibold mb-1" style="color:var(--teal);">Boundary</p>
               <p style="color:rgba(255,255,255,0.75);font-size:0.9rem;line-height:1.6;">
-                North: Sauchiehall Street &nbsp;·&nbsp; East: Renfield / Queen / Jamaica St
-                &nbsp;·&nbsp; South: River Clyde &nbsp;·&nbsp; West: The M8
+                {boundaryDescription}
               </p>
             </div>
           </div>
@@ -223,120 +226,27 @@ const gallerySizes = "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 420px"
         </div>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="projects-grid">
-          <div class="project-card">
-            <div class="card-top-border" style="background:var(--pink);"></div>
-            <div class="card-body-custom">
-              <span class="badge card-tag border-0" style="background:rgba(220,26,132,0.1);color:var(--pink);">Strategy</span>
-              <h3>Local Place Plan</h3>
-              <p>
-                Developing a community-led spatial vision for Blythswood &amp; Broomielaw — shaping
-                how the area grows over the next decade.
-              </p>
-              <div class="collapse collapse-arrow mt-4" style="background:transparent;">
-                <input type="checkbox" aria-label="Find out more about the Local Place Plan" />
-                <div class="collapse-title">Find out more</div>
-                <div class="collapse-content">
-                  <p class="text-sm leading-relaxed" style="color:#595959;">
-                    Full details for this project are being prepared. Contact us to find out more or
-                    get involved.
-                  </p>
+          {
+            projects.map((p) => (
+              <div class="project-card">
+                <div class="card-top-border" style={`background:${p.borderColour};`}></div>
+                <div class="card-body-custom">
+                  <span class="badge card-tag border-0" style={`background:${p.tagBgColour};color:${p.tagColour};`}>{p.tag}</span>
+                  <h3>{p.title}</h3>
+                  <p>{p.summary}</p>
+                  <div class="collapse collapse-arrow mt-4" style="background:transparent;">
+                    <input type="checkbox" aria-label={`Find out more about the ${p.title}`} />
+                    <div class="collapse-title">Find out more</div>
+                    <div class="collapse-content">
+                      <p class="text-sm leading-relaxed" style="color:#595959;">
+                        {p.details}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div class="project-card">
-            <div class="card-top-border" style="background:var(--teal);"></div>
-            <div class="card-body-custom">
-              <span class="badge card-tag border-0" style="background:rgba(0,168,150,0.1);color:var(--teal-dark);">Environment</span>
-              <h3>Taking Back Our Lanes</h3>
-              <p>
-                Our district has 30 private lanes trapped in fragmented ownership structures —
-                preventing coordinated maintenance, lighting, or improvement. We are campaigning for
-                Glasgow City Council to take statutory ownership and management responsibility,
-                creating a coherent public realm for the first time.
-              </p>
-              <div class="collapse collapse-arrow mt-4" style="background:transparent;">
-                <input type="checkbox" aria-label="Find out more about Taking Back Our Lanes" />
-                <div class="collapse-title">Find out more</div>
-                <div class="collapse-content">
-                  <p class="text-sm leading-relaxed" style="color:#595959;">
-                    Our area contains 30 private lanes in a patchwork of private and shared
-                    ownership. This fragmentation blocks any single body from taking responsibility
-                    for lighting, surfacing, or maintenance. We are building a formal case for
-                    Glasgow City Council to assume statutory management — the essential first step
-                    to creating a safe and coherent network of public lanes.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="project-card">
-            <div class="card-top-border" style="background:var(--amber);"></div>
-            <div class="card-body-custom">
-              <span class="badge card-tag border-0" style="background:rgba(244,161,0,0.12);color:#8a5f00;">Biodiversity</span>
-              <h3>Mapping Street Trees</h3>
-              <p>
-                A community tree audit of every street tree in our area — building evidence for
-                protecting and expanding the canopy.
-              </p>
-              <div class="collapse collapse-arrow mt-4" style="background:transparent;">
-                <input type="checkbox" aria-label="Find out more about Mapping Street Trees" />
-                <div class="collapse-title">Find out more</div>
-                <div class="collapse-content">
-                  <p class="text-sm leading-relaxed" style="color:#595959;">
-                    Full details for this project are being prepared. Contact us to find out more or
-                    get involved.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="project-card">
-            <div class="card-top-border" style="background:var(--pink);"></div>
-            <div class="card-body-custom">
-              <span class="badge card-tag border-0" style="background:rgba(220,26,132,0.1);color:var(--pink);">Place-making</span>
-              <h3>Union Corner</h3>
-              <p>
-                Advocating for the sensitive redevelopment of the Union Street / Argyle Street
-                corner — a gateway to the city centre.
-              </p>
-              <div class="collapse collapse-arrow mt-4" style="background:transparent;">
-                <input type="checkbox" aria-label="Find out more about Union Corner" />
-                <div class="collapse-title">Find out more</div>
-                <div class="collapse-content">
-                  <p class="text-sm leading-relaxed" style="color:#595959;">
-                    Full details for this project are being prepared. Contact us to find out more or
-                    get involved.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="project-card">
-            <div class="card-top-border" style="background:var(--teal);"></div>
-            <div class="card-body-custom">
-              <span class="badge card-tag border-0" style="background:rgba(0,168,150,0.1);color:var(--teal-dark);">Culture</span>
-              <h3>Backing Venues</h3>
-              <p>
-                Supporting Glasgow's music and arts venues against noise complaints and licensing
-                conditions that threaten their future.
-              </p>
-              <div class="collapse collapse-arrow mt-4" style="background:transparent;">
-                <input type="checkbox" aria-label="Find out more about Backing Venues" />
-                <div class="collapse-title">Find out more</div>
-                <div class="collapse-content">
-                  <p class="text-sm leading-relaxed" style="color:#595959;">
-                    Full details for this project are being prepared. Contact us to find out more or
-                    get involved.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+            ))
+          }
 
           <div
             class="project-card flex flex-col items-center justify-center text-center p-8"
@@ -581,7 +491,7 @@ const gallerySizes = "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 420px"
         </p>
 
         <a
-          href="mailto:info@bbcc.scot?subject=Subscribe%20to%20BBCC%20updates"
+          href={`mailto:${contactEmail}?subject=Subscribe%20to%20BBCC%20updates`}
           class="btn border-0 font-semibold text-white px-8 shadow-lg"
           style="background:var(--ink);"
         >
@@ -628,7 +538,7 @@ const gallerySizes = "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 420px"
           <p class="text-white font-semibold text-sm mb-4">Contact</p>
           <p style="color:rgba(255,255,255,0.65);font-size:0.875rem;line-height:1.8;">
             Email:
-            <a href="mailto:info@bbcc.scot" class="footer-link" style="color:var(--pink-on-dark);text-decoration:underline;">info@bbcc.scot</a>
+            <a href={`mailto:${contactEmail}`} class="footer-link" style="color:var(--pink-on-dark);text-decoration:underline;">{contactEmail}</a>
           </p>
           <p style="color:rgba(255,255,255,0.65);font-size:0.875rem;margin-top:0.75rem;">
             Glasgow City Council area<br />
@@ -683,10 +593,15 @@ const gallerySizes = "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 420px"
           entries.forEach((entry) => {
             if (entry.isIntersecting && !statsCounted) {
               statsCounted = true;
-              const el0 = document.getElementById("count-0");
-              if (el0) animateCount(el0, 200000, "", "+", 2000);
-              const el2 = document.getElementById("count-2");
-              if (el2) animateCount(el2, 30, "~", "", 1500);
+              const els = statsSection.querySelectorAll("[data-count]");
+              els.forEach((el) => {
+                const target = parseInt(el.getAttribute("data-count"), 10);
+                if (isNaN(target)) return;
+                const prefix = el.getAttribute("data-prefix") || "";
+                const suffix = el.getAttribute("data-suffix") || "";
+                const duration = parseInt(el.getAttribute("data-duration"), 10) || 2000;
+                animateCount(el, target, prefix, suffix, duration);
+              });
             }
           });
         },
