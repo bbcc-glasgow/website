@@ -179,17 +179,41 @@ describe("Decap CMS config.yml", () => {
     assert.strictEqual(map.branch, "main");
   });
 
-  it("should set identity_url with PLACEHOLDER_SITE_ID", () => {
-    const text = getConfig();
-    const lines = yamlSection(text, "backend");
+  it("should set auth_type to pkce", () => {
+    const lines = yamlSection(getConfig(), "backend");
+    const map = yamlFlatMap(lines);
+    assert.strictEqual(map.auth_type, "pkce");
+  });
+
+  it("should set base_url to https://auth.decapbridge.com", () => {
+    const lines = yamlSection(getConfig(), "backend");
+    const map = yamlFlatMap(lines);
+    assert.strictEqual(map.base_url, "https://auth.decapbridge.com");
+  });
+
+  it("should set auth_endpoint with the DecapBridge site ID", () => {
+    const lines = yamlSection(getConfig(), "backend");
     const map = yamlFlatMap(lines);
     assert.ok(
-      map.identity_url?.includes("PLACEHOLDER_SITE_ID"),
-      "identity_url must contain PLACEHOLDER_SITE_ID",
+      map.auth_endpoint?.includes("648cbae2-8402-4cde-ade9-014199b3e953"),
+      "auth_endpoint must contain the DecapBridge site ID",
     );
     assert.ok(
-      map.identity_url?.startsWith("https://auth.decapbridge.com/sites/"),
-      "identity_url must start with https://auth.decapbridge.com/sites/",
+      map.auth_endpoint?.startsWith("/sites/"),
+      "auth_endpoint must start with /sites/",
+    );
+  });
+
+  it("should set auth_token_endpoint with the DecapBridge site ID", () => {
+    const lines = yamlSection(getConfig(), "backend");
+    const map = yamlFlatMap(lines);
+    assert.ok(
+      map.auth_token_endpoint?.includes("648cbae2-8402-4cde-ade9-014199b3e953"),
+      "auth_token_endpoint must contain the DecapBridge site ID",
+    );
+    assert.ok(
+      map.auth_token_endpoint?.startsWith("/sites/"),
+      "auth_token_endpoint must start with /sites/",
     );
   });
 
@@ -199,17 +223,67 @@ describe("Decap CMS config.yml", () => {
     assert.strictEqual(map.gateway_url, "https://gateway.decapbridge.com");
   });
 
-  it("should have a comment explaining the PLACEHOLDER_SITE_ID substitution", () => {
+  it("should not contain PLACEHOLDER_SITE_ID (site is already registered)", () => {
     const text = getConfig();
-    const lines = text.split("\n");
-    const hasComment = lines.some(
-      (l) => l.trim().startsWith("#") && l.includes("PLACEHOLDER_SITE_ID"),
-    );
-    const hasPlaceholder = text.includes("PLACEHOLDER_SITE_ID");
-    assert.ok(hasPlaceholder, "config.yml must contain PLACEHOLDER_SITE_ID");
     assert.ok(
-      hasComment,
-      "config.yml must have at least one comment line mentioning PLACEHOLDER_SITE_ID",
+      !text.includes("PLACEHOLDER_SITE_ID"),
+      "config.yml must not contain PLACEHOLDER_SITE_ID after site registration",
+    );
+  });
+
+  it("should include commit_messages section in backend", () => {
+    const text = getConfig();
+    const lines = yamlSection(text, "backend");
+    const hasCommitMessages = lines.some((l) => l.trim() === "commit_messages:");
+    assert.ok(hasCommitMessages, "backend must have a commit_messages section");
+  });
+
+  // ── Auth section ─────────────────────────────────────────────────
+
+  it("should have an auth section", () => {
+    const lines = yamlSection(getConfig(), "auth");
+    assert.ok(lines.length > 0, "config.yml must have an auth section");
+  });
+
+  it("should set email_claim in auth section", () => {
+    const lines = yamlSection(getConfig(), "auth");
+    const map = yamlFlatMap(lines);
+    assert.strictEqual(map.email_claim, "email");
+  });
+
+  it("should set first_name_claim in auth section", () => {
+    const lines = yamlSection(getConfig(), "auth");
+    const map = yamlFlatMap(lines);
+    assert.strictEqual(map.first_name_claim, "first_name");
+  });
+
+  it("should set last_name_claim in auth section", () => {
+    const lines = yamlSection(getConfig(), "auth");
+    const map = yamlFlatMap(lines);
+    assert.strictEqual(map.last_name_claim, "last_name");
+  });
+
+  it("should set avatar_url_claim in auth section", () => {
+    const lines = yamlSection(getConfig(), "auth");
+    const map = yamlFlatMap(lines);
+    assert.strictEqual(map.avatar_url_claim, "avatar_url");
+  });
+
+  // ── Logo and site URL ────────────────────────────────────────────
+
+  it("should set logo_url to the DecapBridge logo", () => {
+    const text = getConfig();
+    assert.ok(
+      /logo_url:\s*https:\/\/decapbridge\.com\/decapcms-with-bridge\.svg/.test(text),
+      "logo_url must point to DecapBridge logo SVG",
+    );
+  });
+
+  it("should set site_url to https://bbcc.scot", () => {
+    const text = getConfig();
+    assert.ok(
+      /site_url:\s*https:\/\/bbcc\.scot/.test(text),
+      "site_url must be https://bbcc.scot",
     );
   });
 

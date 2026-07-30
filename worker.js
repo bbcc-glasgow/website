@@ -20,7 +20,9 @@ export default {
 
     const url = new URL(request.url);
     const passthrough =
-      url.pathname.startsWith("/_astro/") || url.pathname.startsWith("/images/");
+      url.pathname.startsWith("/_astro/") ||
+      url.pathname.startsWith("/images/") ||
+      url.pathname.startsWith("/admin");
     if (passthrough) {
       return env.ASSETS.fetch(request);
     }
