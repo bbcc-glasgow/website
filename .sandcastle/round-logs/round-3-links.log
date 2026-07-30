@@ -1,8 +1,0 @@
-
-> bbcc-website@0.1.0 test:links /home/agent/workspace
-> linkinator ./dist --recurse --verbosity error --skip "^https?://"
-
-(node:11674) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-🏊‍♂️ crawling ./dist
-🤖 Successfully scanned 0 links in 0.006 seconds.
