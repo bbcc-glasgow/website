@@ -7,101 +7,131 @@ TAP version 13
     # Subtest: should accept a complete project object
     ok 1 - should accept a complete project object
       ---
-      duration_ms: 0.799374
+      duration_ms: 0.865667
       ...
     # Subtest: should reject missing tag
     ok 2 - should reject missing tag
       ---
-      duration_ms: 0.515416
+      duration_ms: 0.540751
       ...
     # Subtest: should reject missing tagColour
     ok 3 - should reject missing tagColour
       ---
-      duration_ms: 0.094499
+      duration_ms: 0.094375
+      ...
+    # Subtest: should reject missing tagBgColour
+    ok 4 - should reject missing tagBgColour
+      ---
+      duration_ms: 0.189292
+      ...
+    # Subtest: should reject missing borderColour
+    ok 5 - should reject missing borderColour
+      ---
+      duration_ms: 0.077333
       ...
     # Subtest: should reject missing title
-    ok 4 - should reject missing title
+    ok 6 - should reject missing title
       ---
-      duration_ms: 0.074542
+      duration_ms: 0.065708
       ...
     # Subtest: should reject missing summary
-    ok 5 - should reject missing summary
+    ok 7 - should reject missing summary
       ---
-      duration_ms: 0.187791
+      duration_ms: 0.124125
       ...
     # Subtest: should reject missing details
-    ok 6 - should reject missing details
+    ok 8 - should reject missing details
       ---
-      duration_ms: 0.07625
+      duration_ms: 0.139542
+      ...
+    # Subtest: should reject missing order
+    ok 9 - should reject missing order
+      ---
+      duration_ms: 0.266583
       ...
     # Subtest: should reject non-string title
-    ok 7 - should reject non-string title
+    ok 10 - should reject non-string title
       ---
-      duration_ms: 0.142417
+      duration_ms: 0.360084
       ...
-    1..7
+    # Subtest: should reject non-numeric order
+    ok 11 - should reject non-numeric order
+      ---
+      duration_ms: 0.073209
+      ...
+    1..11
 ok 1 - Project schema
   ---
-  duration_ms: 2.356205
+  duration_ms: 3.368796
   type: 'suite'
   ...
 # Subtest: Site schema
     # Subtest: should accept a complete site object
     ok 1 - should accept a complete site object
       ---
-      duration_ms: 0.424749
+      duration_ms: 0.331625
+      ...
+    # Subtest: should accept site object with optional animation fields
+    ok 2 - should accept site object with optional animation fields
+      ---
+      duration_ms: 0.105792
       ...
     # Subtest: should reject missing stats
-    ok 2 - should reject missing stats
+    ok 3 - should reject missing stats
       ---
-      duration_ms: 0.215583
+      duration_ms: 0.051959
       ...
     # Subtest: should reject missing boundaryDescription
-    ok 3 - should reject missing boundaryDescription
+    ok 4 - should reject missing boundaryDescription
       ---
-      duration_ms: 0.236458
+      duration_ms: 0.054833
       ...
     # Subtest: should reject missing contactEmail
-    ok 4 - should reject missing contactEmail
+    ok 5 - should reject missing contactEmail
       ---
-      duration_ms: 0.179333
+      duration_ms: 0.046333
       ...
     # Subtest: should reject invalid email format
-    ok 5 - should reject invalid email format
+    ok 6 - should reject invalid email format
       ---
-      duration_ms: 0.083875
+      duration_ms: 0.069417
       ...
     # Subtest: should reject non-array stats
-    ok 6 - should reject non-array stats
+    ok 7 - should reject non-array stats
       ---
-      duration_ms: 0.056167
+      duration_ms: 0.0445
       ...
     # Subtest: should reject stat object missing value
-    ok 7 - should reject stat object missing value
+    ok 8 - should reject stat object missing value
       ---
-      duration_ms: 0.062375
+      duration_ms: 0.05175
       ...
     # Subtest: should reject stat object missing label
-    ok 8 - should reject stat object missing label
+    ok 9 - should reject stat object missing label
       ---
-      duration_ms: 0.058792
+      duration_ms: 0.057542
       ...
-    1..8
+    # Subtest: should reject stat object missing desc
+    ok 10 - should reject stat object missing desc
+      ---
+      duration_ms: 0.150001
+      ...
+    1..10
 ok 2 - Site schema
   ---
-  duration_ms: 1.569873
+  duration_ms: 1.087918
   type: 'suite'
   ...
 # Subtest: .gitignore sandcastle configuration
     # Subtest: should list .sandcastle/ in .gitignore
     ok 1 - should list .sandcastle/ in .gitignore
       ---
-      duration_ms: 0.358249
+      duration_ms: 0.296709
       ...
     # Subtest: should have no tracked files under .sandcastle/
     not ok 2 - should have no tracked files under .sandcastle/
       ---
-      duration_ms: 6.615742
+      duration_ms: 6.712009
       location: '/home/agent/workspace/tests/gitignore.test.ts:16:3'
       failureType: 'testCodeFailure'
       error: |-
@@ -145,12 +175,12 @@ ok 2 - Site schema
     # Subtest: should keep .sandcastle/round-logs/ files on disk
     ok 3 - should keep .sandcastle/round-logs/ files on disk
       ---
-      duration_ms: 0.235167
+      duration_ms: 0.144792
       ...
     1..3
 not ok 3 - .gitignore sandcastle configuration
   ---
-  duration_ms: 7.321741
+  duration_ms: 7.255092
   type: 'suite'
   location: '/home/agent/workspace/tests/gitignore.test.ts:8:1'
   failureType: 'subtestsFailed'
@@ -160,16 +190,16 @@ not ok 3 - .gitignore sandcastle configuration
 
 Running 3 tests using 3 workers
 
-  ✓  1 a11y.spec.ts:12:3 › accessibility › dist contains at least one page (5ms)
-  ✓  2 a11y.spec.ts:17:5 › accessibility › axe scan: /holding/ (339ms)
-  ✓  3 a11y.spec.ts:17:5 › accessibility › axe scan: / (561ms)
+  ✓  1 a11y.spec.ts:12:3 › accessibility › dist contains at least one page (8ms)
+  ✓  3 a11y.spec.ts:17:5 › accessibility › axe scan: /holding/ (331ms)
+  ✓  2 a11y.spec.ts:17:5 › accessibility › axe scan: / (558ms)
 
   3 passed (3.3s)
-(node:6970) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(node:6817) ExperimentalWarning: globSync is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
-(node:7021) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(node:6867) ExperimentalWarning: globSync is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
-(node:7023) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(node:6868) ExperimentalWarning: globSync is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
-(node:7022) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(node:6869) ExperimentalWarning: globSync is an experimental feature and might change at any time
 (Use `node --trace-warnings ...` to show where the warning was created)
