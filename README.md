@@ -58,6 +58,57 @@ DecapBridge dashboard holds the GitHub fine-grained PAT (contents + pull-request
 repository secret**; only the site ID (`648cbae2-8402-4cde-ade9-014199b3e953`) appears in
 `public/admin/config.yml`, which is not a secret.
 
+## Editing the site (volunteers)
+
+Volunteers do **not** need a GitHub account or GitHub collaborator access to edit the site.
+Content is managed through Decap CMS (the login screen at `/admin`) and authenticated via
+DecapBridge, which issues a PR behind the scenes.
+
+### Step-by-step walkthrough
+
+1. **Go to `/admin`** — open `https://bbcc.scot/admin` (or your local dev server at
+   `http://localhost:4321/admin`). You see the Decap CMS login screen.
+
+2. **Log in with your invite** — click "Login with DecapBridge". The screen offers **Password**
+   (the one you set when you accepted the invite), **Google**, or **Microsoft**. Pick whichever
+   method matches the email address the invite was sent to. No GitHub credentials are needed at any
+   point.
+
+3. **Find the entry you want to edit** — the sidebar lists the available collections. For example,
+   click **"Site Facts"** to open `src/content/site/index.json`, then scroll to the **Statistics**
+   section to update a date, a contact email, or a boundary description. (The exact fields vary by
+   collection — see the full list below.)
+
+4. **Save and let automation handle the rest** — click **"Save"**, then **"Publish"** (editorial
+   workflow). DecapCMS opens a pull request on GitHub against `main` with your changes. The CI
+   gates (link integrity, a11y, Lighthouse budgets) run automatically. A maintainer reviews the PR
+   and merges it; after merge, tagging a release dispatches the deploy workflow and your change
+   goes live at https://bbcc.scot.
+
+### Inviting a new volunteer
+
+Send the volunteer an email invite from the DecapBridge dashboard:
+
+1. Go to https://decapbridge.com and log in as a site owner.
+2. Select the **bbcc-website** site.
+3. Navigate to **Collaborators** → **Invite by email**.
+4. Enter the volunteer's email address and click send.
+
+The volunteer receives an email with a link to set a password (or to use Google/Microsoft
+authentication). Once they accept, they can log in at `/admin` and start editing — no GitHub
+account required.
+
+### How the credentials are secured
+
+The GitHub fine-grained PAT that DecapBridge uses to open PRs lives in the DecapBridge dashboard
+(settings for the bbcc-website site), scoped to `bbcc-glasgow/website` only. **The token value is
+never committed to this repository.** The repository stores only the site UUID in
+`public/admin/config.yml`, which is an identifier, not a secret.
+
+> **Screenshots** — detailed screenshots of the login flow, the editor interface, and the
+> DecapBridge invite screen will be added after the first real volunteer login confirms the exact
+> user-facing UI.
+
 ## Verify before first release tag
 
 The seed content is ported from the concept page. Project cards draw their title, summary and
