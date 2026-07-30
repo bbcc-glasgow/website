@@ -2,6 +2,7 @@
   "ci": {
     "collect": {
       "staticDistDir": "./dist",
+      "autodiscoverUrlBlocklist": ["http://localhost:0/admin/index.html"],
       "numberOfRuns": 3,
       "settings": {
         "chromePath": "/ms-playwright/chromium-1148/chrome-linux/chrome",
