@@ -144,4 +144,16 @@ describe("preview deploy workflow", () => {
       "should not duplicate CI gate checks (preview is additive)",
     );
   });
+
+  it("should look up the workers.dev subdomain via JSON output for reliability", () => {
+    const content = readFileSync(workflowPath, "utf-8");
+    // Using --json with jq is more robust than parsing human-readable text
+    // across wrangler versions and locales.
+    const usesJsonOutput =
+      content.match(/whoami.*--json/i) || content.match(/jq/);
+    assert.ok(
+      usesJsonOutput,
+      "should use JSON output (--json) and jq for subdomain lookup, not fragile text parsing",
+    );
+  });
 });
