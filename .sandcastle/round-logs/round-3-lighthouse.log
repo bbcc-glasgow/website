@@ -1,0 +1,37 @@
+
+> bbcc-website@0.1.0 test:lighthouse /home/agent/workspace
+> lhci autorun
+
+✅  .lighthouseci/ directory writable
+✅  Configuration file found
+✅  Chrome installation found
+Healthcheck passed!
+
+Started a web server on port 35613...
+Running Lighthouse 3 time(s) on http://localhost:35613/404.html
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Running Lighthouse 3 time(s) on http://localhost:35613/index.html
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Running Lighthouse 3 time(s) on http://localhost:35613/holding/index.html
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Done running Lighthouse!
+
+
+Done running autorun.
+(node:10353) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:10361) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Checking assertions against 3 URL(s), 9 total run(s)
+
+All results processed!
+(node:11623) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:10341) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)

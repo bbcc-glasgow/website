@@ -1,0 +1,543 @@
+
+> bbcc-website@0.1.0 test:a11y /home/agent/workspace
+> playwright test
+
+TAP version 13
+# Subtest: Project schema
+    # Subtest: should accept a complete project object
+    ok 1 - should accept a complete project object
+      ---
+      duration_ms: 1.078878
+      ...
+    # Subtest: should reject missing tag
+    ok 2 - should reject missing tag
+      ---
+      duration_ms: 0.686628
+      ...
+    # Subtest: should reject missing tagColour
+    ok 3 - should reject missing tagColour
+      ---
+      duration_ms: 0.145834
+      ...
+    # Subtest: should reject missing tagBgColour
+    ok 4 - should reject missing tagBgColour
+      ---
+      duration_ms: 0.229501
+      ...
+    # Subtest: should reject missing borderColour
+    ok 5 - should reject missing borderColour
+      ---
+      duration_ms: 0.114625
+      ...
+    # Subtest: should reject missing title
+    ok 6 - should reject missing title
+      ---
+      duration_ms: 0.159417
+      ...
+    # Subtest: should reject missing summary
+    ok 7 - should reject missing summary
+      ---
+      duration_ms: 0.248625
+      ...
+    # Subtest: should reject missing details
+    ok 8 - should reject missing details
+      ---
+      duration_ms: 0.198084
+      ...
+    # Subtest: should reject missing order
+    ok 9 - should reject missing order
+      ---
+      duration_ms: 0.388001
+      ...
+    # Subtest: should reject non-string title
+    ok 10 - should reject non-string title
+      ---
+      duration_ms: 0.481877
+      ...
+    # Subtest: should reject non-numeric order
+    ok 11 - should reject non-numeric order
+      ---
+      duration_ms: 0.107
+      ...
+    1..11
+ok 1 - Project schema
+  ---
+  duration_ms: 4.626224
+  type: 'suite'
+  ...
+# Subtest: Holding schema
+    # Subtest: should accept a complete holding object
+    ok 1 - should accept a complete holding object
+      ---
+      duration_ms: 0.141376
+      ...
+    # Subtest: should reject missing eyebrow
+    ok 2 - should reject missing eyebrow
+      ---
+      duration_ms: 0.072126
+      ...
+    # Subtest: should reject missing heading
+    ok 3 - should reject missing heading
+      ---
+      duration_ms: 0.069292
+      ...
+    # Subtest: should reject missing body
+    ok 4 - should reject missing body
+      ---
+      duration_ms: 0.061876
+      ...
+    # Subtest: should reject missing ctaLabel
+    ok 5 - should reject missing ctaLabel
+      ---
+      duration_ms: 0.079375
+      ...
+    # Subtest: should reject non-string eyebrow
+    ok 6 - should reject non-string eyebrow
+      ---
+      duration_ms: 0.084709
+      ...
+    # Subtest: should reject non-string heading
+    ok 7 - should reject non-string heading
+      ---
+      duration_ms: 0.0605
+      ...
+    # Subtest: should accept heading with embedded <br /> tag
+    ok 8 - should accept heading with embedded <br /> tag
+      ---
+      duration_ms: 0.05925
+      ...
+    1..8
+ok 2 - Holding schema
+  ---
+  duration_ms: 0.787211
+  type: 'suite'
+  ...
+# Subtest: Site schema
+    # Subtest: should accept a complete site object
+    ok 1 - should accept a complete site object
+      ---
+      duration_ms: 0.478543
+      ...
+    # Subtest: should accept site object with optional animation fields
+    ok 2 - should accept site object with optional animation fields
+      ---
+      duration_ms: 0.159793
+      ...
+    # Subtest: should reject missing stats
+    ok 3 - should reject missing stats
+      ---
+      duration_ms: 0.103292
+      ...
+    # Subtest: should reject missing boundaryDescription
+    ok 4 - should reject missing boundaryDescription
+      ---
+      duration_ms: 0.149
+      ...
+    # Subtest: should reject missing contactEmail
+    ok 5 - should reject missing contactEmail
+      ---
+      duration_ms: 0.068917
+      ...
+    # Subtest: should reject invalid email format
+    ok 6 - should reject invalid email format
+      ---
+      duration_ms: 0.098292
+      ...
+    # Subtest: should reject non-array stats
+    ok 7 - should reject non-array stats
+      ---
+      duration_ms: 0.070166
+      ...
+    # Subtest: should reject stat object missing value
+    ok 8 - should reject stat object missing value
+      ---
+      duration_ms: 0.140918
+      ...
+    # Subtest: should reject stat object missing label
+    ok 9 - should reject stat object missing label
+      ---
+      duration_ms: 0.085709
+      ...
+    # Subtest: should reject stat object missing desc
+    ok 10 - should reject stat object missing desc
+      ---
+      duration_ms: 0.122458
+      ...
+    1..10
+ok 3 - Site schema
+  ---
+  duration_ms: 1.631797
+  type: 'suite'
+  ...
+# Subtest: Decap CMS vendor setup
+    # Subtest: should have a public/admin/ directory
+    ok 1 - should have a public/admin/ directory
+      ---
+      duration_ms: 0.252376
+      ...
+    # Subtest: should have public/admin/index.html
+    ok 2 - should have public/admin/index.html
+      ---
+      duration_ms: 0.156376
+      ...
+    # Subtest: should not reference any external CDN URLs in index.html
+    ok 3 - should not reference any external CDN URLs in index.html
+      ---
+      duration_ms: 0.375918
+      ...
+    # Subtest: should load decap-cms.js from a relative path using ./decap-cms.js
+    ok 4 - should load decap-cms.js from a relative path using ./decap-cms.js
+      ---
+      duration_ms: 0.286917
+      ...
+    # Subtest: should have decap-cms as a dependency in package.json
+    ok 5 - should have decap-cms as a dependency in package.json
+      ---
+      duration_ms: 0.315751
+      ...
+    # Subtest: should pin decap-cms at version 3.11.0
+    ok 6 - should pin decap-cms at version 3.11.0
+      ---
+      duration_ms: 0.388835
+      ...
+    # Subtest: should have a prebuild script in package.json that vendors three decap-cms files
+    ok 7 - should have a prebuild script in package.json that vendors three decap-cms files
+      ---
+      duration_ms: 0.283668
+      ...
+    # Subtest: should have all three generated files listed in .gitignore
+    ok 8 - should have all three generated files listed in .gitignore
+      ---
+      duration_ms: 0.328251
+      ...
+    1..8
+ok 4 - Decap CMS vendor setup
+  ---
+  duration_ms: 2.587259
+  type: 'suite'
+  ...
+# Subtest: Decap CMS config.yml
+    # Subtest: should have a public/admin/config.yml file
+    ok 1 - should have a public/admin/config.yml file
+      ---
+      duration_ms: 0.222459
+      ...
+    # Subtest: should use git-gateway backend
+    ok 2 - should use git-gateway backend
+      ---
+      duration_ms: 0.503085
+      ...
+    # Subtest: should set repo to bbcc-glasgow/website
+    ok 3 - should set repo to bbcc-glasgow/website
+      ---
+      duration_ms: 0.374335
+      ...
+    # Subtest: should set branch to main
+    ok 4 - should set branch to main
+      ---
+      duration_ms: 0.342668
+      ...
+    # Subtest: should set auth_type to pkce
+    ok 5 - should set auth_type to pkce
+      ---
+      duration_ms: 0.254126
+      ...
+    # Subtest: should set base_url to https://auth.decapbridge.com
+    ok 6 - should set base_url to https://auth.decapbridge.com
+      ---
+      duration_ms: 0.281876
+      ...
+    # Subtest: should set auth_endpoint with the DecapBridge site ID
+    ok 7 - should set auth_endpoint with the DecapBridge site ID
+      ---
+      duration_ms: 0.289751
+      ...
+    # Subtest: should set auth_token_endpoint with the DecapBridge site ID
+    ok 8 - should set auth_token_endpoint with the DecapBridge site ID
+      ---
+      duration_ms: 0.272959
+      ...
+    # Subtest: should set gateway_url to https://gateway.decapbridge.com
+    ok 9 - should set gateway_url to https://gateway.decapbridge.com
+      ---
+      duration_ms: 0.250626
+      ...
+    # Subtest: should not contain PLACEHOLDER_SITE_ID (site is already registered)
+    ok 10 - should not contain PLACEHOLDER_SITE_ID (site is already registered)
+      ---
+      duration_ms: 0.201917
+      ...
+    # Subtest: should include commit_messages section in backend
+    ok 11 - should include commit_messages section in backend
+      ---
+      duration_ms: 0.225168
+      ...
+    # Subtest: should have an auth section
+    ok 12 - should have an auth section
+      ---
+      duration_ms: 0.245876
+      ...
+    # Subtest: should set email_claim in auth section
+    ok 13 - should set email_claim in auth section
+      ---
+      duration_ms: 0.298084
+      ...
+    # Subtest: should set first_name_claim in auth section
+    ok 14 - should set first_name_claim in auth section
+      ---
+      duration_ms: 0.218959
+      ...
+    # Subtest: should set last_name_claim in auth section
+    ok 15 - should set last_name_claim in auth section
+      ---
+      duration_ms: 0.331876
+      ...
+    # Subtest: should set avatar_url_claim in auth section
+    ok 16 - should set avatar_url_claim in auth section
+      ---
+      duration_ms: 0.276835
+      ...
+    # Subtest: should set logo_url to the DecapBridge logo
+    ok 17 - should set logo_url to the DecapBridge logo
+      ---
+      duration_ms: 0.22546
+      ...
+    # Subtest: should set site_url to https://bbcc.scot
+    ok 18 - should set site_url to https://bbcc.scot
+      ---
+      duration_ms: 0.254834
+      ...
+    # Subtest: should set publish_mode to editorial_workflow
+    ok 19 - should set publish_mode to editorial_workflow
+      ---
+      duration_ms: 0.23796
+      ...
+    # Subtest: should set media_folder to public/images
+    ok 20 - should set media_folder to public/images
+      ---
+      duration_ms: 0.203917
+      ...
+    # Subtest: should set public_folder to /images
+    ok 21 - should set public_folder to /images
+      ---
+      duration_ms: 0.214834
+      ...
+    # Subtest: should have a projects collection with folder at src/content/projects
+    ok 22 - should have a projects collection with folder at src/content/projects
+      ---
+      duration_ms: 0.58296
+      ...
+    # Subtest: should have a projects collection with fields matching the \#4 schema
+    ok 23 - should have a projects collection with fields matching the \#4 schema
+      ---
+      duration_ms: 0.440502
+      ...
+    # Subtest: should have a site collection with file at src/content/site/index.json
+    ok 24 - should have a site collection with file at src/content/site/index.json
+      ---
+      duration_ms: 0.330709
+      ...
+    # Subtest: should have a site collection with fields matching the \#4 schema
+    ok 25 - should have a site collection with fields matching the \#4 schema
+      ---
+      duration_ms: 0.450377
+      ...
+    1..25
+ok 5 - Decap CMS config.yml
+  ---
+  duration_ms: 7.915444
+  type: 'suite'
+  ...
+# Subtest: .gitignore sandcastle configuration
+    # Subtest: should list .sandcastle/ in .gitignore
+    ok 1 - should list .sandcastle/ in .gitignore
+      ---
+      duration_ms: 0.371877
+      ...
+    # Subtest: should have no tracked files under .sandcastle/
+    not ok 2 - should have no tracked files under .sandcastle/
+      ---
+      duration_ms: 8.672114
+      location: '/home/agent/workspace/tests/gitignore.test.ts:16:3'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly equal:
+        + actual - expected
+        
+        + '.sandcastle/round-logs/round-1-a11y.log\n' +
+        +   '.sandcastle/round-logs/round-1-build.log\n' +
+        +   '.sandcastle/round-logs/round-1-lighthouse.log\n' +
+        +   '.sandcastle/round-logs/round-1-links.log\n' +
+        +   '.sandcastle/round-logs/round-2-a11y.log\n' +
+        +   '.sandcastle/round-logs/round-2-build.log\n' +
+        +   '.sandcastle/round-logs/round-2-lighthouse.log\n' +
+        +   '.sandcastle/round-logs/round-2-links.log'
+        - ''
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: ''
+      actual: |-
+        .sandcastle/round-logs/round-1-a11y.log
+        .sandcastle/round-logs/round-1-build.log
+        .sandcastle/round-logs/round-1-lighthouse.log
+        .sandcastle/round-logs/round-1-links.log
+        .sandcastle/round-logs/round-2-a11y.log
+        .sandcastle/round-logs/round-2-build.log
+        .sandcastle/round-logs/round-2-lighthouse.log
+        .sandcastle/round-logs/round-2-links.log
+      operator: 'strictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///home/agent/workspace/tests/gitignore.test.ts:29:12)
+        Test.runInAsyncScope (node:async_hooks:211:14)
+        Test.run (node:internal/test_runner/test:934:25)
+        Suite.processPendingSubtests (node:internal/test_runner/test:633:18)
+        Test.postRun (node:internal/test_runner/test:1045:19)
+        Test.run (node:internal/test_runner/test:973:12)
+        async Promise.all (index 0)
+        Suite.run (node:internal/test_runner/test:1320:7)
+        startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+      ...
+    # Subtest: should keep .sandcastle/round-logs/ files on disk
+    ok 3 - should keep .sandcastle/round-logs/ files on disk
+      ---
+      duration_ms: 0.224125
+      ...
+    1..3
+not ok 6 - .gitignore sandcastle configuration
+  ---
+  duration_ms: 9.384282
+  type: 'suite'
+  location: '/home/agent/workspace/tests/gitignore.test.ts:8:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: public/admin/index.html - robots meta tag
+    # Subtest: should contain a noindex robots meta tag in the head
+    ok 1 - should contain a noindex robots meta tag in the head
+      ---
+      duration_ms: 0.339043
+      ...
+    # Subtest: should not contain a standalone 'index' value in the robots meta tag
+    ok 2 - should not contain a standalone 'index' value in the robots meta tag
+      ---
+      duration_ms: 0.285542
+      ...
+    1..2
+ok 7 - public/admin/index.html - robots meta tag
+  ---
+  duration_ms: 0.682128
+  type: 'suite'
+  ...
+# Subtest: Sitemap - /admin exclusion
+    # Subtest: sitemap-index.xml should exist after build
+    ok 1 - sitemap-index.xml should exist after build
+      ---
+      duration_ms: 0.052542
+      ...
+    # Subtest: sitemap-0.xml should exist after build
+    ok 2 - sitemap-0.xml should exist after build
+      ---
+      duration_ms: 0.029666
+      ...
+    # Subtest: should list no URL starting with /admin in sitemap-0.xml
+    ok 3 - should list no URL starting with /admin in sitemap-0.xml
+      ---
+      duration_ms: 0.276334
+      ...
+    # Subtest: should list no URL starting with /admin in sitemap-index.xml
+    ok 4 - should list no URL starting with /admin in sitemap-index.xml
+      ---
+      duration_ms: 0.276835
+      ...
+    1..4
+ok 8 - Sitemap - /admin exclusion
+  ---
+  duration_ms: 0.688752
+  type: 'suite'
+  ...
+# Subtest: preview deploy workflow
+    # Subtest: should exist at .github/workflows/preview.yml
+    ok 1 - should exist at .github/workflows/preview.yml
+      ---
+      duration_ms: 0.304334
+      ...
+    # Subtest: should trigger on pull_request against main
+    ok 2 - should trigger on pull_request against main
+      ---
+      duration_ms: 0.273876
+      ...
+    # Subtest: should NOT use wrangler deploy (preserve the release boundary)
+    ok 3 - should NOT use wrangler deploy (preserve the release boundary)
+      ---
+      duration_ms: 0.379709
+      ...
+    # Subtest: should use wrangler versions upload (or equivalent non-deploy command)
+    ok 4 - should use wrangler versions upload (or equivalent non-deploy command)
+      ---
+      duration_ms: 0.27646
+      ...
+    # Subtest: should override SITE_MODE to live for preview versions
+    ok 5 - should override SITE_MODE to live for preview versions
+      ---
+      duration_ms: 0.209126
+      ...
+    # Subtest: should post a PR comment with the preview URL
+    ok 6 - should post a PR comment with the preview URL
+      ---
+      duration_ms: 0.257792
+      ...
+    # Subtest: should use the existing CLOUDFLARE_API_TOKEN secret
+    ok 7 - should use the existing CLOUDFLARE_API_TOKEN secret
+      ---
+      duration_ms: 0.218168
+      ...
+    # Subtest: should use the existing CLOUDFLARE_ACCOUNT_ID variable
+    ok 8 - should use the existing CLOUDFLARE_ACCOUNT_ID variable
+      ---
+      duration_ms: 0.211042
+      ...
+    # Subtest: should not modify the committed wrangler.jsonc config
+    ok 9 - should not modify the committed wrangler.jsonc config
+      ---
+      duration_ms: 0.313001
+      ...
+    # Subtest: should update the PR comment in-place on subsequent pushes
+    ok 10 - should update the PR comment in-place on subsequent pushes
+      ---
+      duration_ms: 0.205459
+      ...
+    # Subtest: should not duplicate the gate/ci pipeline (additive workflow)
+    ok 11 - should not duplicate the gate/ci pipeline (additive workflow)
+      ---
+      duration_ms: 0.175917
+      ...
+    # Subtest: should look up the workers.dev subdomain via JSON output for reliability
+    ok 12 - should look up the workers.dev subdomain via JSON output for reliability
+      ---
+      duration_ms: 0.234709
+      ...
+    1..12
+ok 9 - preview deploy workflow
+  ---
+  duration_ms: 3.286678
+  type: 'suite'
+  ...
+
+Running 4 tests using 3 workers
+
+  ✓  1 a11y.spec.ts:13:3 › accessibility › dist contains at least one page (5ms)
+  ✓  3 a11y.spec.ts:18:5 › accessibility › axe scan: /holding/ (480ms)
+  ✓  4 a11y.spec.ts:18:5 › accessibility › axe scan: / (742ms)
+  ✓  2 a11y.spec.ts:18:5 › accessibility › axe scan: /admin/ (1.1s)
+
+  4 passed (4.0s)
+(node:10030) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:10081) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:10088) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:10087) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
