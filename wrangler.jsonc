@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "bbcc-website",
   "compatibility_date": "2026-07-01",
+  "preview_urls": true,
   "main": "worker.js",
   "assets": {
     "directory": "./dist",

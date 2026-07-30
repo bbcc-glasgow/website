@@ -1,0 +1,124 @@
+# Per-PR Cloudflare Workers preview deploys.
+#
+# Every Decap CMS edit creates a real PR. This workflow gives reviewers a live
+# preview URL on Workers (never the production domain) so they see the actual
+# rendered Astro site with SITE_MODE=live -- not a hand-rolled preview template
+# that would drift from the real layout.
+#
+# Release boundary (ADR-0005): this workflow uses only `wrangler versions upload`,
+# never the deploy command. It does not touch the production domain or the
+# production Worker version. The only path to bbcc.scot is deploy.yml.
+#
+# Prerequisite: the Cloudflare account must have a workers.dev subdomain claimed
+# (Dashboard > Workers & Pages > your subdomain) before this workflow can resolve
+# preview URLs.
+name: preview-deploy
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, closed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  WRANGLER_VERSION: "4.115.0"
+
+jobs:
+  preview:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      - name: Upload preview version to Cloudflare Workers
+        id: upload
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          OUTPUT=$(npx "wrangler@${WRANGLER_VERSION}" versions upload \
+            --var "SITE_MODE:live" \
+            --message "Preview PR #${{ github.event.number }} (${{ github.event.pull_request.head.sha }})" 2>&1)
+          echo "${OUTPUT}"
+          # Extract the preview URL from wrangler's own output.
+          # With preview_urls: true in wrangler.jsonc and a workers.dev subdomain
+          # claimed on the account, wrangler prints:
+          #   Preview URL: https://<uuid>.<worker>.<subdomain>.workers.dev
+          PREVIEW_URL=$(echo "${OUTPUT}" | grep -oE 'https://[a-z0-9.-]+\.workers\.dev' | head -1 || true)
+          if [ -z "${PREVIEW_URL}" ]; then
+            echo "::warning::No preview URL found in wrangler output. Ensure the Cloudflare" \
+              "account has a workers.dev subdomain claimed (Dashboard > Workers & Pages" \
+              "> your subdomain). Skipping preview comment."
+            echo "url=" >> "${GITHUB_OUTPUT}"
+          else
+            echo "url=${PREVIEW_URL}" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Post preview URL as PR comment (create or update in place)
+        if: steps.upload.outputs.url != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > /tmp/preview-comment.md <<COMMENTEOF
+          ## Preview deployment
+
+          A preview of this PR is available at:
+
+          **[${{ steps.upload.outputs.url }}](${{ steps.upload.outputs.url }})**
+
+          This preview renders with \`SITE_MODE=live\` so you can see the real site with this PR's changes.
+
+          > This preview was created from commit ${{ github.event.pull_request.head.sha }}.
+          COMMENTEOF
+
+          # Find existing preview comment posted by this workflow on prior pushes.
+          EXISTING=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("## Preview deployment"))) | .id' | head -1)
+
+          if [ -n "${EXISTING}" ]; then
+            gh api "repos/${{ github.repository }}/issues/comments/${EXISTING}" -X PATCH -f "body@/tmp/preview-comment.md"
+          else
+            gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" -X POST -f "body@/tmp/preview-comment.md"
+          fi
+
+  stale-comment:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Mark preview comment stale on PR close
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > /tmp/stale-comment.md <<COMMENTEOF
+          ## Preview deployment (stale)
+
+          This PR is closed. The preview link below may no longer reflect current \`main\`.
+
+          **Preview no longer available.**
+
+          > This preview was originally created from commit ${{ github.event.pull_request.head.sha }}.
+          COMMENTEOF
+
+          # Find existing preview comment posted by the preview job.
+          EXISTING=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("## Preview deployment"))) | .id' | head -1)
+
+          if [ -n "${EXISTING}" ]; then
+            gh api "repos/${{ github.repository }}/issues/comments/${EXISTING}" -X PATCH -f "body@/tmp/stale-comment.md"
+          fi
