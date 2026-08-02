@@ -1,0 +1,49 @@
+
+> bbcc-website@0.1.0 prebuild /home/agent/workspace
+> cp node_modules/decap-cms/dist/decap-cms.js public/admin/decap-cms.js && cp node_modules/decap-cms/dist/373.decap-cms.js public/admin/373.decap-cms.js && cp node_modules/decap-cms/dist/cms.css public/admin/cms.css
+
+
+> bbcc-website@0.1.0 build /home/agent/workspace
+> astro build
+
+12:22:06 [content] Syncing content
+12:22:06 [content] Synced content
+12:22:06 [types] Generated 251ms
+12:22:06 [build] output: "static"
+12:22:06 [build] mode: "static"
+12:22:06 [build] directory: /home/agent/workspace/dist/
+12:22:06 [build] Collecting build info...
+12:22:06 [build] ✓ Completed in 268ms.
+12:22:06 [build] Building static entrypoints...
+/*! 🌼 daisyUI 5.7.4 */
+12:22:07 [vite] ✓ built in 917ms
+12:22:07 [build] ✓ Completed in 943ms.
+
+ building client (vite) 
+12:22:07 [vite] transforming...
+12:22:07 [vite] ✓ 1 modules transformed.
+12:22:07 [vite] rendering chunks...
+12:22:07 [vite] ✓ built in 9ms
+
+ generating static routes 
+12:22:07 ▶ src/pages/404.astro
+12:22:07   └─ /404.html (+4ms) 
+12:22:07 ▶ src/pages/holding.astro
+12:22:07   └─ /holding/index.html (+5ms) 
+12:22:07 ▶ src/pages/index.astro
+12:22:07   └─ /index.html (+5ms) 
+12:22:07 ✓ Completed in 25ms.
+
+ generating optimized images 
+12:22:07   ▶ /_astro/blythswood-square.CS0mgOCt_Z7yyyn.webp (reused cache entry) (+1ms) (1/7)
+12:22:07   ▶ /_astro/central-aerial.BHD9Iv6R_2sXca5.webp (reused cache entry) (+1ms) (2/7)
+12:22:07   ▶ /_astro/blythswood-square.CS0mgOCt_Z2bPj8L.webp (reused cache entry) (+1ms) (3/7)
+12:22:07   ▶ /_astro/central-aerial.BHD9Iv6R_Z2j6Y4K.webp (reused cache entry) (+1ms) (4/7)
+12:22:07   ▶ /_astro/blythswood-square.CS0mgOCt_1wDebR.webp (reused cache entry) (+1ms) (5/7)
+12:22:07   ▶ /_astro/central-aerial.BHD9Iv6R_Z1LfLGz.webp (reused cache entry) (+1ms) (6/7)
+12:22:07   ▶ /_astro/blythswood-square.CS0mgOCt_1yUJ4c.webp (reused cache entry) (+1ms) (7/7)
+12:22:07 ✓ Completed in 5ms.
+
+12:22:07 [@astrojs/sitemap] `sitemap-index.xml` created at `dist`
+12:22:07 [build] 3 page(s) built in 1.28s
+12:22:07 [build] Complete!
