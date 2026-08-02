@@ -36,7 +36,7 @@ describe("preview.yml — PR preview workflow", () => {
     );
     assert.ok(
       !workflow.includes("wrangler deploy"),
-      "Must not use wrangler deploy (release boundary, ADR-0005)",
+      "Must not use wrangler deploy (production deploys via deploy.yml; previews never touch it)",
     );
   });
 

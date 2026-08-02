@@ -29,9 +29,11 @@ this site.
 
 ## Release boundary
 
-Merges to `main` do **not** publish. Deploys happen only on a `v*` tag or manual dispatch of the
-deploy workflow (ADR-0005 release tap). Requires `CLOUDFLARE_API_TOKEN` and
-`CLOUDFLARE_ACCOUNT_ID` repository secrets.
+Every push to `main` (every merged PR, including Decap CMS publishes) deploys to production
+automatically. Manually dispatching the deploy workflow redeploys current `main` as a
+fallback/redeploy path. A concurrency group serialises back-to-back merges so the newest commit
+is always the one live. Requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository
+secrets.
 
 ## Site mode: holding page vs live site
 
@@ -45,7 +47,7 @@ variable in `wrangler.jsonc`:
 - **`live`**: all requests pass straight through to the built site.
 
 **To go live** (or to switch back): change `SITE_MODE` in `wrangler.jsonc` in a one-line PR, then
-tag / dispatch a deploy. **For an instant emergency maintenance switch**: edit the `SITE_MODE`
+merge it (the merge deploys). **For an instant emergency maintenance switch**: edit the `SITE_MODE`
 variable in the Cloudflare dashboard (Workers → bbcc-website → Settings → Variables) — takes
 effect in seconds, but note the next deploy resets it to the wrangler.jsonc value, which is the
 source of truth.
@@ -82,8 +84,8 @@ DecapBridge, which issues a PR behind the scenes.
 4. **Save and let automation handle the rest** — click **"Save"**, then **"Publish"** (editorial
    workflow). DecapCMS opens a pull request on GitHub against `main` with your changes. The CI
    gates (link integrity, a11y, Lighthouse budgets) run automatically. A maintainer reviews the PR
-   and merges it; after merge, tagging a release dispatches the deploy workflow and your change
-   goes live at https://bbcc.scot.
+   and merges it; the merge deploys to production automatically and your change goes live at
+   https://bbcc.scot.
 
 ### Inviting a new volunteer
 
@@ -109,13 +111,13 @@ never committed to this repository.** The repository stores only the site UUID i
 > DecapBridge invite screen will be added after the first real volunteer login confirms the exact
 > user-facing UI.
 
-## Verify before first release tag
+## Verify before first release
 
 The seed content is ported from the concept page. Project cards draw their title, summary and
 details from `src/content/projects/*.json`; site-level data (stats, boundary description, contact
 email) lives in `src/content/site/index.json`. Items below are placeholders or unverified claims
 deliberately left for the owner to confirm — **each should be resolved via an issue before the
-first `v*` tag**:
+first release**:
 
 - [ ] **Meeting card**: date, time and location are "To be announced" — fill in the real next
       meeting.

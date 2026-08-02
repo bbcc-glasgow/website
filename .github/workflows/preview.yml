@@ -5,9 +5,11 @@
 # rendered Astro site with SITE_MODE=live -- not a hand-rolled preview template
 # that would drift from the real layout.
 #
-# Release boundary (ADR-0005): this workflow uses only `wrangler versions upload`,
-# never the deploy command. It does not touch the production domain or the
-# production Worker version. The only path to bbcc.scot is deploy.yml.
+# Release boundary (continuous deploy; supersedes ADR-0005): production deploys
+# happen on every push to main (see deploy.yml). This preview workflow uses only
+# `wrangler versions upload`, never the deploy command. It does not touch the
+# production domain or the production Worker version. The only path to bbcc.scot
+# is deploy.yml.
 #
 # Prerequisite: the Cloudflare account must have a workers.dev subdomain claimed
 # (Dashboard > Workers & Pages > your subdomain) before this workflow can resolve
