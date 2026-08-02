@@ -1,10 +1,15 @@
 {
   "tag": "Culture",
-  "tagColour": "var(--teal-dark)",
-  "tagBgColour": "rgba(0,168,150,0.1)",
-  "borderColour": "var(--teal)",
+  "variant": "teal",
   "title": "Backing Venues",
   "summary": "Supporting Glasgow's music and arts venues against noise complaints and licensing conditions that threaten their future.",
   "details": "Full details for this project are being prepared. Contact us to find out more or get involved.",
-  "order": 5
+  "order": 5,
+  "ctas": [
+    {
+      "label": "Contact us",
+      "url": "mailto:info@bbcc.scot",
+      "icon": "mail"
+    }
+  ]
 }

@@ -2,6 +2,8 @@
 import { Image, getImage } from "astro:assets";
 import { getCollection, getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
+import ProjectCtaIcon from "../components/ProjectCtaIcon.astro";
+import { resolveProjectVariantColours } from "../lib/projectVariants";
 import centralAerial from "../assets/central-aerial.jpg";
 import blythswoodSquare from "../assets/blythswood-square.jpg";
 
@@ -220,25 +222,46 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="projects-grid">
           {
-            projects.map((p) => (
-              <div class="project-card">
-                <div class="card-top-border" style={`background:${p.borderColour};`}></div>
-                <div class="card-body-custom">
-                  <span class="badge card-tag border-0" style={`background:${p.tagBgColour};color:${p.tagColour};`}>{p.tag}</span>
-                  <h3>{p.title}</h3>
-                  <p>{p.summary}</p>
-                  <div class="collapse collapse-arrow mt-4" style="background:transparent;">
-                    <input type="checkbox" aria-label={`Find out more about the ${p.title}`} />
-                    <div class="collapse-title">Find out more</div>
-                    <div class="collapse-content">
-                      <p class="text-sm leading-relaxed" style="color:#595959;">
-                        {p.details}
-                      </p>
+            projects.map((p) => {
+              const colours = resolveProjectVariantColours(p.variant);
+              return (
+                <div class="project-card">
+                  <div class="card-top-border" style={`background:${colours.borderColour};`}></div>
+                  <div class="card-body-custom">
+                    <span class="badge card-tag border-0" style={`background:${colours.tagBgColour};color:${colours.tagColour};`}>{p.tag}</span>
+                    <h3>{p.title}</h3>
+                    <p>{p.summary}</p>
+                    <div class="collapse collapse-arrow mt-4" style="background:transparent;">
+                      <input type="checkbox" aria-label={`Find out more about the ${p.title}`} />
+                      <div class="collapse-title">Find out more</div>
+                      <div class="collapse-content">
+                        <p class="text-sm leading-relaxed" style="color:#595959;">
+                          {p.details}
+                        </p>
+                      </div>
                     </div>
+                    {
+                      p.ctas && p.ctas.length > 0 && (
+                        <div class="flex flex-wrap gap-2 mt-4">
+                          {
+                            p.ctas.map((cta) => (
+                              <a
+                                href={cta.url}
+                                class="btn btn-sm border-0 text-white font-semibold inline-flex items-center gap-2"
+                                style="background:var(--teal-dark);"
+                              >
+                                {cta.icon && <ProjectCtaIcon name={cta.icon} />}
+                                {cta.label}
+                              </a>
+                            ))
+                          }
+                        </div>
+                      )
+                    }
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           }
 
           <div

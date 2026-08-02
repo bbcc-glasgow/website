@@ -359,14 +359,14 @@ describe("Decap CMS config.yml", () => {
     );
   });
 
-  it("should have a projects collection with fields matching the #4 schema", () => {
+  it("should have a projects collection with fields matching the variant + ctas schema", () => {
     const text = getConfig();
     const projBlock = extractCollectionBlock(text, "projects");
     assert.ok(projBlock, "projects collection must exist");
 
     const fieldNames = extractFieldNames(projBlock);
-    // All required fields from #4 schema must be present
-    const required = ["tag", "tagColour", "tagBgColour", "borderColour", "title", "summary", "details", "order"];
+    // All required fields must be present
+    const required = ["tag", "variant", "title", "summary", "details", "order", "ctas"];
     for (const field of required) {
       assert.ok(
         fieldNames.includes(field),
@@ -374,12 +374,55 @@ describe("Decap CMS config.yml", () => {
       );
     }
 
-    // No extra fields beyond #4 schema at the collection root level
+    // No extra fields at the collection root level
     const extra = fieldNames.filter((f) => !required.includes(f));
     assert.strictEqual(
       extra.length, 0,
-      `projects collection must not have extra fields beyond #4 schema: ${extra.join(", ")}`,
+      `projects collection must not have extra fields beyond the schema: ${extra.join(", ")}`,
     );
+  });
+
+  it("should replace the free-text colour fields with a variant select", () => {
+    const projBlock = extractCollectionBlock(getConfig(), "projects");
+    assert.ok(projBlock, "projects collection must exist");
+
+    // No free-text colour fields remain
+    assert.ok(!/name\s*:\s*tagColour\b/.test(projBlock), "tagColour must be removed");
+    assert.ok(!/name\s*:\s*tagBgColour\b/.test(projBlock), "tagBgColour must be removed");
+    assert.ok(!/name\s*:\s*borderColour\b/.test(projBlock), "borderColour must be removed");
+
+    // variant is a select widget with the named options
+    const variantField = projBlock.split(/name\s*:\s*variant\b/)[1] ?? "";
+    assert.match(variantField, /widget\s*:\s*select/, "variant must use the select widget");
+    for (const option of ["teal", "pink", "amber"]) {
+      assert.ok(variantField.includes(`"${option}"`), `variant select must offer '${option}'`);
+    }
+  });
+
+  it("should offer a ctas list with label, url and icon sub-fields", () => {
+    const projBlock = extractCollectionBlock(getConfig(), "projects");
+    assert.ok(projBlock, "projects collection must exist");
+
+    const ctasSection = projBlock.split(/name\s*:\s*ctas\b/)[1] ?? "";
+    assert.match(ctasSection, /widget\s*:\s*list/, "ctas must use the list widget");
+    for (const subField of ["label", "url", "icon"]) {
+      assert.ok(
+        new RegExp(`name\\s*:\\s*${subField}\\b`).test(ctasSection),
+        `ctas list must have a '${subField}' sub-field`,
+      );
+    }
+  });
+
+  it("should restrict the cta icon choice to the predefined set", () => {
+    const projBlock = extractCollectionBlock(getConfig(), "projects");
+    assert.ok(projBlock, "projects collection must exist");
+
+    const ctasSection = projBlock.split(/name\s*:\s*ctas\b/)[1] ?? "";
+    const iconField = ctasSection.split(/name\s*:\s*icon\b/)[1] ?? "";
+    assert.match(iconField, /widget\s*:\s*select/, "icon must use the select widget");
+    for (const option of ["arrow-right", "external", "mail", "calendar", "map-pin", "download"]) {
+      assert.ok(iconField.includes(`"${option}"`), `icon select must offer '${option}'`);
+    }
   });
 
   // ── Collections: site ─────────────────────────────────────────────
@@ -529,6 +572,10 @@ function extractFieldNames(collectionBlock) {
       if (indent < fieldsIndent - 2) break;
       continue; // still in fields at same level
     }
+
+    // Skip deeper-indented items (sub-fields of a list widget such as ctas),
+    // so only the collection's own root-level fields are collected.
+    if (indent > fieldsIndent) continue;
 
     // Inline format: `- { name: foo, ... }`
     const inlineMatch = trimmed.match(/-\s*\{\s*name\s*:\s*([^,}\s]+)/);

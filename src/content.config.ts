@@ -1,16 +1,31 @@
 import { defineCollection, z } from "astro:content";
+import {
+  DEFAULT_PROJECT_VARIANT,
+  PROJECT_CTA_ICONS,
+  PROJECT_VARIANTS,
+} from "./lib/projectVariants";
 
 const projects = defineCollection({
   type: "data",
   schema: z.object({
     tag: z.string(),
-    tagColour: z.string(),
-    tagBgColour: z.string(),
-    borderColour: z.string(),
+    // Named colour preset. `.catch` coerces a missing or unknown variant to
+    // the default instead of failing the build, so a bad value can never
+    // produce a card with broken styling.
+    variant: z.enum(PROJECT_VARIANTS).catch(DEFAULT_PROJECT_VARIANT),
     title: z.string(),
     summary: z.string(),
     details: z.string(),
     order: z.number(),
+    ctas: z
+      .array(
+        z.object({
+          label: z.string(),
+          url: z.string(),
+          icon: z.enum(PROJECT_CTA_ICONS).optional(),
+        }),
+      )
+      .optional(),
   }),
 });
 
