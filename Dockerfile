@@ -11,6 +11,14 @@ ENV CHROME_PATH=/ms-playwright/chromium-1148/chrome-linux/chrome
 # Chromium revision 1148; update both when the base image tag changes.
 RUN ln -s /ms-playwright/chromium-1148/chrome-linux/chrome /usr/bin/google-chrome
 
-RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+# The playwright base image ships Node 22.12.0 whose bundled corepack (0.29.4)
+# cannot verify the npm registry's rotated signing key, so pnpm invocations at
+# runtime throw 'Cannot find matching keyid' (corepack fetches the pnpm
+# 'latest' dist-tag to build a fallback locator before reading package.json).
+# Upgrade corepack to a version that knows the current key, then enable and
+# pre-cache pnpm@9.15.0 as before.
+RUN npm install -g corepack@0.35.0 \
+ && corepack enable \
+ && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /work
