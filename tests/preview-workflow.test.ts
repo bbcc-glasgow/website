@@ -73,6 +73,26 @@ describe("preview.yml — PR preview workflow", () => {
     );
   });
 
+  it("should pass the comment body via gh's -F field with =@file syntax, not the broken key@file form", () => {
+    // gh api -f "body@<file>" parses the arg as a key with no "=" separator and
+    // fails with `invalid key`; -f "body=<file>" (raw-field) sends the literal
+    // string instead of reading the file. Only -F "body=@<file>" reads the file
+    // content into the field. The preview comment step hit the invalid-key error
+    // on every PR, so the comment never posted.
+    assert.ok(
+      workflow.includes('-F "body=@/tmp/preview-comment.md"'),
+      "preview comment must be passed as -F body=@<file> so gh reads the file",
+    );
+    assert.ok(
+      workflow.includes('-F "body=@/tmp/stale-comment.md"'),
+      "stale comment must use the same -F body=@<file> syntax",
+    );
+    assert.ok(
+      !workflow.includes('"body@/'),
+      "must not use the broken key@file form without an = separator",
+    );
+  });
+
   it("should use the existing CLOUDFLARE_API_TOKEN secret", () => {
     assert.ok(
       workflow.includes("CLOUDFLARE_API_TOKEN"),

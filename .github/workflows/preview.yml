@@ -92,9 +92,9 @@ jobs:
             --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("## Preview deployment"))) | .id' | head -1)
 
           if [ -n "${EXISTING}" ]; then
-            gh api "repos/${{ github.repository }}/issues/comments/${EXISTING}" -X PATCH -f "body@/tmp/preview-comment.md"
+            gh api "repos/${{ github.repository }}/issues/comments/${EXISTING}" -X PATCH -F "body=@/tmp/preview-comment.md"
           else
-            gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" -X POST -f "body@/tmp/preview-comment.md"
+            gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" -X POST -F "body=@/tmp/preview-comment.md"
           fi
 
   stale-comment:
@@ -122,5 +122,5 @@ jobs:
             --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("## Preview deployment"))) | .id' | head -1)
 
           if [ -n "${EXISTING}" ]; then
-            gh api "repos/${{ github.repository }}/issues/comments/${EXISTING}" -X PATCH -f "body@/tmp/stale-comment.md"
+            gh api "repos/${{ github.repository }}/issues/comments/${EXISTING}" -X PATCH -F "body=@/tmp/stale-comment.md"
           fi
