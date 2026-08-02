@@ -350,61 +350,6 @@ input:focus-visible {
   padding-right: 0;
 }
 
-/* ─── Gallery ────────────────────────────────────────────────── */
-#gallery {
-  background: var(--paper);
-}
-.gallery-grid {
-  columns: 3;
-  column-gap: 1rem;
-}
-@media (max-width: 640px) {
-  .gallery-grid {
-    columns: 1 !important;
-  }
-}
-@media (min-width: 641px) and (max-width: 767px) {
-  .gallery-grid {
-    columns: 1;
-  }
-}
-@media (min-width: 768px) and (max-width: 1023px) {
-  .gallery-grid {
-    columns: 2;
-  }
-}
-.gallery-item {
-  break-inside: avoid;
-  margin-bottom: 1rem;
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
-}
-.gallery-item img {
-  width: 100%;
-  height: auto;
-  display: block;
-  transition: transform 0.4s ease;
-}
-.gallery-item:hover img {
-  transform: scale(1.04);
-}
-.gallery-item::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 10px;
-  border: 3px solid transparent;
-  transition: border-color 0.3s ease;
-  pointer-events: none;
-}
-.gallery-item.pink-frame:hover::after {
-  border-color: var(--pink);
-}
-.gallery-item.teal-frame:hover::after {
-  border-color: var(--teal);
-}
-
 /* ─── JAG ────────────────────────────────────────────────────── */
 #jag {
   background: #1a1a2e;
