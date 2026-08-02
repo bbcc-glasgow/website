@@ -150,9 +150,7 @@ favicon).
 | --- | --- |
 | `central-aerial.jpg` | Wikimedia Commons — "Glasgow Central railway station - aerial - 2025-04-17" |
 | `blythswood-square.jpg` | Wikimedia Commons — "Springtime in Blythswood Square, Glasgow" |
-| `rooftops.jpg` | Wikimedia Commons — "Glasgow city centre rooftops panorama" |
-| `squinty-bridge.jpg` | Wikimedia Commons — "The Squinty Bridge, River Clyde, Glasgow" (currently unused; kept for the future gallery/social sections) |
-| `bagpiper.jpg`, `rainy-street.jpg`, `people-make-glasgow.jpg`, `clyde-bridge.jpg` | Flickr / pixael.com (CC), from the project's `creative commons immages` collection |
+| `squinty-bridge.jpg` | Wikimedia Commons — "The Squinty Bridge, River Clyde, Glasgow" (currently unused; kept for the future social section) |
 
 Check licence terms (most are CC BY or CC BY-SA — attribution required) and add a proper credits
 page before the first release.

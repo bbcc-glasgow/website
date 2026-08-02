@@ -4,13 +4,6 @@ import { getCollection, getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
 import centralAerial from "../assets/central-aerial.jpg";
 import blythswoodSquare from "../assets/blythswood-square.jpg";
-import bagpiper from "../assets/bagpiper.jpg";
-import rainyStreet from "../assets/rainy-street.jpg";
-import peopleMakeGlasgow from "../assets/people-make-glasgow.jpg";
-import clydeBridge from "../assets/clyde-bridge.jpg";
-import rooftops from "../assets/rooftops.jpg";
-
-const gallerySizes = "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 420px";
 
 const projects = (await getCollection("projects"))
   .map((p) => p.data)
@@ -257,45 +250,6 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
               Tell us about issues in your neighbourhood that we should prioritise.
             </p>
             <a href="#get-involved" class="btn btn-sm border-0 text-white font-semibold" style="background:var(--ink);">Contact us</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ PHOTO GALLERY — PAPER BACKGROUND ═══ -->
-    <section id="gallery" class="py-20 px-4">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-10">
-          <p class="section-eyebrow mb-3" style="color:var(--teal-dark);">Glasgow</p>
-          <h2 class="font-fraunces font-bold text-ink" style="font-size:clamp(1.75rem,3vw,2.5rem);">
-            The City We Call Home
-          </h2>
-        </div>
-
-        <div class="gallery-grid">
-          <div class="gallery-item pink-frame">
-            <Image src={centralAerial} alt="Aerial view of Glasgow Central station" widths={[420, 640, 960]} sizes={gallerySizes}
-              quality={60} />
-          </div>
-          <div class="gallery-item teal-frame">
-            <Image src={bagpiper} alt="Street bagpiper performing in Glasgow city centre" widths={[420, 640, 960]} sizes={gallerySizes}
-              quality={60} />
-          </div>
-          <div class="gallery-item pink-frame">
-            <Image src={rainyStreet} alt="Rainy street scene in Glasgow" widths={[420, 640, 960]} sizes={gallerySizes}
-              quality={60} />
-          </div>
-          <div class="gallery-item teal-frame">
-            <Image src={peopleMakeGlasgow} alt="Glasgow city centre — 'People Make Glasgow' sign with pedestrians" widths={[420, 640, 960]} sizes={gallerySizes}
-              quality={60} />
-          </div>
-          <div class="gallery-item pink-frame">
-            <Image src={clydeBridge} alt="Suspension bridge over the River Clyde, Glasgow" widths={[420, 640, 960]} sizes={gallerySizes}
-              quality={60} />
-          </div>
-          <div class="gallery-item teal-frame">
-            <Image src={rooftops} alt="Glasgow city centre rooftops panorama" widths={[420, 640, 960]} sizes={gallerySizes}
-              quality={60} />
           </div>
         </div>
       </div>
