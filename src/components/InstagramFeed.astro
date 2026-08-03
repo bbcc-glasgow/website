@@ -1,0 +1,121 @@
+---
+// Instagram feed section for the homepage. The daily fetch workflow writes the
+// committed feed (src/data/instagram/posts.json) and downloads one square photo
+// per post into src/assets/instagram/{id}.jpg; this component renders the
+// section shell plus, once real posts exist, a three-column tile grid linking
+// back to each post.
+//
+// The feed is read with import.meta.glob so a missing or unresolvable file
+// yields an empty feed (rendering just the section shell) instead of failing
+// the build. The section copy comes from the Pages content entry via the
+// `copy` prop; `posts` and `images` are injectable so the populated-feed path
+// can be exercised with fixture data in tests without touching committed
+// site content.
+import { Image, type ImageMetadata } from "astro:assets";
+
+interface FeedPost {
+  id: string;
+  permalink: string;
+  alt?: string;
+}
+
+interface Props {
+  copy: {
+    eyebrow: string;
+    heading: string;
+    body: string;
+    instagramCtaLabel: string;
+    facebookCtaLabel: string;
+  };
+  posts?: FeedPost[];
+  images?: Record<string, ImageMetadata>;
+}
+
+const { copy, posts: postsProp, images: imagesProp } = Astro.props;
+
+const feedModules = import.meta.glob("../data/instagram/posts.json", {
+  eager: true,
+  import: "default",
+});
+const feed = Object.values(feedModules)[0];
+const feedPosts: FeedPost[] = Array.isArray(feed?.posts) ? feed.posts : [];
+
+const imageModules = import.meta.glob("../assets/instagram/*.jpg", {
+  eager: true,
+  import: "default",
+}) as Record<string, ImageMetadata>;
+
+const posts = postsProp ?? feedPosts;
+const images = imagesProp ?? imageModules;
+
+// A post becomes a tile only when its downloaded image resolves; the workflow
+// writes one {id}.jpg per post, so a tile whose image is missing would render
+// a broken square and is dropped instead.
+const tiles = posts
+  .map((post) => ({
+    post,
+    image: images[`../assets/instagram/${post.id}.jpg`],
+  }))
+  .filter((tile) => tile.image);
+---
+
+<section id="instagram" aria-labelledby="instagram-heading">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+      <!-- #b5166d is the pink family darkened enough for AA on the #f2efe8 paper band. -->
+      <p class="section-eyebrow mb-3" style="color:#b5166d;">{copy.eyebrow}</p>
+      <h2 id="instagram-heading" class="font-fraunces font-bold text-ink" style="font-size:clamp(2rem,3.5vw,2.75rem);">
+        {copy.heading}
+      </h2>
+      <p class="mx-auto leading-relaxed" style="color:var(--body-text);max-width:52ch;">
+        {copy.body}
+      </p>
+    </div>
+
+    {
+      tiles.length > 0 && (
+        <div class="insta-grid">
+          {tiles.map(({ post, image }) => (
+            <a
+              href={post.permalink}
+              class="insta-tile"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={post.alt ? undefined : "View post on Instagram"}
+            >
+              <Image
+                src={image}
+                alt={post.alt ?? ""}
+                loading="lazy"
+                widths={[300, 600]}
+                sizes="(max-width: 640px) 100vw, 33vw"
+              />
+              <span class="insta-overlay" aria-hidden="true">View post ↗</span>
+            </a>
+          ))}
+        </div>
+      )
+    }
+
+    <div class="flex flex-wrap gap-3 justify-center mt-10">
+      <a
+        href="https://www.instagram.com/bbccglasgow"
+        class="btn border-0 text-white font-semibold"
+        target="_blank"
+        rel="noopener noreferrer"
+        style="background:var(--pink);"
+      >
+        {copy.instagramCtaLabel}
+      </a>
+      <a
+        href="https://www.facebook.com/bbccglasgow"
+        class="btn border-0 text-white font-semibold"
+        target="_blank"
+        rel="noopener noreferrer"
+        style="background:var(--ink);"
+      >
+        {copy.facebookCtaLabel}
+      </a>
+    </div>
+  </div>
+</section>
