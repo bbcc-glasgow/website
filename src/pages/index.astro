@@ -3,6 +3,7 @@ import { Image, getImage } from "astro:assets";
 import { getCollection, getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
 import ProjectCtaIcon from "../components/ProjectCtaIcon.astro";
+import InstagramFeed from "../components/InstagramFeed.astro";
 import { resolveProjectVariantColours } from "../lib/projectVariants";
 import centralAerial from "../assets/central-aerial.jpg";
 import blythswoodSquare from "../assets/blythswood-square.jpg";
@@ -13,7 +14,7 @@ const projects = (await getCollection("projects"))
 const siteEntry = await getEntry("site", "index");
 const { stats, boundaryDescription, contactEmail } = siteEntry.data;
 const pagesEntry = await getEntry("pages", "index");
-const { hero, ourArea, ourProjects, jag, getInvolved, meetings, newsletter } =
+const { hero, ourArea, ourProjects, jag, getInvolved, meetings, newsletter, instagram } =
   pagesEntry.data;
 
 // Section order, layout and styling stay in code; only the copy lives in the
@@ -293,6 +294,9 @@ const getInvolvedCardStyles = [
         </div>
       </div>
     </section>
+
+    <!-- ═══ INSTAGRAM FEED — PAPER BAND ═══ -->
+    <InstagramFeed copy={instagram} />
 
     <!-- ═══ JAG — NEIGHBOURING COUNCILS ═══ -->
     <section id="jag">
