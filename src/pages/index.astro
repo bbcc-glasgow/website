@@ -12,6 +12,43 @@ const projects = (await getCollection("projects"))
   .sort((a, b) => a.order - b.order);
 const siteEntry = await getEntry("site", "index");
 const { stats, boundaryDescription, contactEmail } = siteEntry.data;
+const pagesEntry = await getEntry("pages", "index");
+const { hero, ourArea, ourProjects, jag, getInvolved, meetings, newsletter } =
+  pagesEntry.data;
+
+// Section order, layout and styling stay in code; only the copy lives in the
+// Pages content entry. These arrays hold the per-card visual treatment so the
+// template can map over the editable card copy without duplicating markup.
+const pillarCardStyles = [
+  { card: "background:var(--pink);", titleClass: "text-white", bodyClass: "text-white" },
+  { card: "background:var(--teal-dark);", titleClass: "text-white", bodyClass: "text-white" },
+  { card: "background:var(--amber);", titleStyle: "color:var(--ink);", bodyStyle: "color:rgba(26,26,46,0.85);" },
+  { card: "background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);", titleClass: "text-white", bodyStyle: "color:rgba(255,255,255,0.75);" },
+];
+
+const getInvolvedCardStyles = [
+  {
+    iconBg: "background:rgba(0,168,150,0.12);",
+    iconColour: "var(--teal-dark)",
+    iconPath: '<path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>',
+    ctaClass: "text-white",
+    ctaStyle: "background:var(--teal-dark);",
+  },
+  {
+    iconBg: "background:rgba(244,161,0,0.12);",
+    iconColour: "#8a5f00",
+    iconPath: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>',
+    ctaClass: "text-ink",
+    ctaStyle: "background:var(--amber);",
+  },
+  {
+    iconBg: "background:rgba(220,26,132,0.08);",
+    iconColour: "var(--pink)",
+    iconPath: '<path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path>',
+    ctaClass: "text-white",
+    ctaStyle: "background:var(--pink);",
+  },
+];
 ---
 
 <Base
@@ -87,25 +124,22 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
       <div class="hero-left">
         <div class="max-w-lg">
           <p class="section-eyebrow mb-5 text-white">
-            Glasgow's City Centre Community Council
+            {hero.eyebrow}
           </p>
-          <h1 class="font-fraunces font-bold text-white leading-tight mb-6">
-            Your City,<br />Our City.
-          </h1>
+          <h1 class="font-fraunces font-bold text-white leading-tight mb-6" set:html={hero.heading}></h1>
           <p class="text-white mb-8 leading-relaxed" style="font-size:1.125rem;max-width:38ch;">
-            Blythswood &amp; Broomielaw Community Council gives residents and workers a democratic
-            voice in shaping the heart of Glasgow.
+            {hero.body}
           </p>
           <div class="flex flex-wrap gap-3">
-            <a href="#get-involved" class="btn font-semibold border-0 shadow-md" style="background:#fff;color:var(--pink);">
-              Get Involved
+            <a href={hero.ctas[0].url} class="btn font-semibold border-0 shadow-md" style="background:#fff;color:var(--pink);">
+              {hero.ctas[0].label}
             </a>
             <a
-              href="#our-area"
+              href={hero.ctas[1].url}
               class="btn font-semibold border-2 bg-transparent text-white"
               style="border-color:rgba(255,255,255,0.7);"
             >
-              Our Area
+              {hero.ctas[1].label}
             </a>
           </div>
         </div>
@@ -153,22 +187,18 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
       <div class="max-w-7xl mx-auto">
         <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start mb-16">
           <div>
-            <p class="section-eyebrow mb-4" style="color:var(--teal);">Our Patch</p>
+            <p class="section-eyebrow mb-4" style="color:var(--teal);">{ourArea.eyebrow}</p>
             <h2 class="font-fraunces font-bold text-white leading-tight mb-6" style="font-size:clamp(2rem,3.5vw,2.75rem);">
-              The Commercial Heart of Glasgow
+              {ourArea.heading}
             </h2>
             <p class="leading-relaxed mb-6" style="color:rgba(255,255,255,0.75);font-size:1rem;">
-              We cover the dense, layered area between the M8 and Renfield Street — home to
-              Blythswood Square, the financial district, Central Station, the Broomielaw riverside,
-              and thousands of people who live, work and pass through every day.
+              {ourArea.body1}
             </p>
             <p class="leading-relaxed mb-8" style="color:rgba(255,255,255,0.75);font-size:1rem;">
-              As a statutory Community Council, we have a right to be consulted on planning,
-              licensing and policy decisions that affect our area. We amplify the voices of those
-              who use this city.
+              {ourArea.body2}
             </p>
             <div class="boundary-box mb-6">
-              <p class="font-semibold mb-1" style="color:var(--teal);">Boundary</p>
+              <p class="font-semibold mb-1" style="color:var(--teal);">{ourArea.boundaryLabel}</p>
               <p style="color:rgba(255,255,255,0.75);font-size:0.9rem;line-height:1.6;">
                 {boundaryDescription}
               </p>
@@ -190,22 +220,17 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
         </div>
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="pillar-card" style="background:var(--pink);">
-            <h3 class="text-white">Planning &amp; Licensing</h3>
-            <p class="text-white">Statutory consultee on applications that reshape our streets.</p>
-          </div>
-          <div class="pillar-card" style="background:var(--teal-dark);">
-            <h3 class="text-white">Public Realm</h3>
-            <p class="text-white">Greening lanes, improving footpaths, reducing clutter.</p>
-          </div>
-          <div class="pillar-card" style="background:var(--amber);">
-            <h3 style="color:var(--ink);">Night-time Economy</h3>
-            <p style="color:rgba(26,26,46,0.85);">Backing venues, culture, and a thriving evening city.</p>
-          </div>
-          <div class="pillar-card" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);">
-            <h3 class="text-white">Heritage</h3>
-            <p style="color:rgba(255,255,255,0.75);">Protecting the Victorian grid and built character.</p>
-          </div>
+          {
+            ourArea.pillars.map((pillar, i) => {
+              const s = pillarCardStyles[i] ?? pillarCardStyles[0];
+              return (
+                <div class="pillar-card" style={s.card}>
+                  <h3 class={s.titleClass} style={s.titleStyle}>{pillar.heading}</h3>
+                  <p class={s.bodyClass} style={s.bodyStyle}>{pillar.body}</p>
+                </div>
+              );
+            })
+          }
         </div>
       </div>
     </section>
@@ -214,9 +239,9 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
     <section id="our-projects" class="py-20 px-4" style="background:#fff;">
       <div class="max-w-7xl mx-auto">
         <div class="text-center mb-12">
-          <p class="section-eyebrow mb-3" style="color:var(--pink);">Active Work</p>
+          <p class="section-eyebrow mb-3" style="color:var(--pink);">{ourProjects.eyebrow}</p>
           <h2 class="font-fraunces font-bold text-ink" style="font-size:clamp(2rem,3.5vw,2.75rem);">
-            What We're Working On
+            {ourProjects.heading}
           </h2>
         </div>
 
@@ -259,11 +284,11 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
             class="project-card flex flex-col items-center justify-center text-center p-8"
             style="opacity:1;transform:none;background:var(--paper);border:2px dashed rgba(26,26,46,0.15);"
           >
-            <p class="font-fraunces font-semibold text-ink text-xl mb-3">Have an idea?</p>
+            <p class="font-fraunces font-semibold text-ink text-xl mb-3">{ourProjects.ideaCard.heading}</p>
             <p class="text-sm text-gray-600 mb-5">
-              Tell us about issues in your neighbourhood that we should prioritise.
+              {ourProjects.ideaCard.body}
             </p>
-            <a href="#get-involved" class="btn btn-sm border-0 text-white font-semibold" style="background:var(--ink);">Contact us</a>
+            <a href={ourProjects.ideaCard.cta.url} class="btn btn-sm border-0 text-white font-semibold" style="background:var(--ink);">{ourProjects.ideaCard.cta.label}</a>
           </div>
         </div>
       </div>
@@ -272,56 +297,28 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
     <!-- ═══ JAG — NEIGHBOURING COUNCILS ═══ -->
     <section id="jag">
       <div style="max-width:72rem;margin:0 auto;">
-        <p class="section-eyebrow" style="color:var(--teal);margin-bottom:0.75rem;">Joint Action Group</p>
+        <p class="section-eyebrow" style="color:var(--teal);margin-bottom:0.75rem;">{jag.eyebrow}</p>
         <h2 class="font-fraunces" style="font-size:clamp(1.75rem,3vw,2.5rem);font-weight:600;color:white;line-height:1.2;margin-bottom:1.25rem;">
-          Working Together Across Glasgow
+          {jag.heading}
         </h2>
         <p style="font-size:1rem;color:rgba(255,255,255,0.75);line-height:1.72;max-width:65ch;margin-bottom:3rem;">
-          Through the Joint Action Group (JAG), we team up with neighbouring community councils to
-          channel community voices directly to Glasgow City Council — because some challenges can
-          only be solved together.
+          {jag.body}
         </p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:rgba(0,168,150,0.2);">
-          <a href="#jag" class="jag-card">
-            <p class="section-eyebrow" style="font-size:0.65rem;color:var(--teal);margin-bottom:6px;">East</p>
-            <h3 class="font-fraunces" style="font-size:1rem;font-weight:600;color:white;margin-bottom:6px;line-height:1.3;">
-              Merchant City &amp; Trongate
-            </h3>
-            <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:14px;">
-              Our immediate neighbours to the east, covering Glasgow's historic merchant quarter.
-            </p>
-            <span style="font-size:0.75rem;font-weight:700;color:var(--pink-on-dark);">Visit council →</span>
-          </a>
-          <a href="#jag" class="jag-card">
-            <p class="section-eyebrow" style="font-size:0.65rem;color:var(--teal);margin-bottom:6px;">North</p>
-            <h3 class="font-fraunces" style="font-size:1rem;font-weight:600;color:white;margin-bottom:6px;line-height:1.3;">
-              Garnethill
-            </h3>
-            <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:14px;">
-              Our northern neighbours above Sauchiehall Street, sharing many of our city-centre concerns.
-            </p>
-            <span style="font-size:0.75rem;font-weight:700;color:var(--pink-on-dark);">Visit council →</span>
-          </a>
-          <a href="#jag" class="jag-card">
-            <p class="section-eyebrow" style="font-size:0.65rem;color:var(--teal);margin-bottom:6px;">West</p>
-            <h3 class="font-fraunces" style="font-size:1rem;font-weight:600;color:white;margin-bottom:6px;line-height:1.3;">
-              Anderston / City / Yorkhill
-            </h3>
-            <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:14px;">
-              Our western neighbours across the motorway, from Anderston to Yorkhill.
-            </p>
-            <span style="font-size:0.75rem;font-weight:700;color:var(--pink-on-dark);">Visit council →</span>
-          </a>
-          <a href="#jag" class="jag-card">
-            <p class="section-eyebrow" style="font-size:0.65rem;color:var(--teal);margin-bottom:6px;">South</p>
-            <h3 class="font-fraunces" style="font-size:1rem;font-weight:600;color:white;margin-bottom:6px;line-height:1.3;">
-              Gorbals
-            </h3>
-            <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:14px;">
-              Our southern neighbours across the Clyde, working on waterfront and regeneration issues.
-            </p>
-            <span style="font-size:0.75rem;font-weight:700;color:var(--pink-on-dark);">Visit council →</span>
-          </a>
+          {
+            jag.cards.map((card) => (
+              <a href="#jag" class="jag-card">
+                <p class="section-eyebrow" style="font-size:0.65rem;color:var(--teal);margin-bottom:6px;">{card.eyebrow}</p>
+                <h3 class="font-fraunces" style="font-size:1rem;font-weight:600;color:white;margin-bottom:6px;line-height:1.3;">
+                  {card.heading}
+                </h3>
+                <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:14px;">
+                  {card.body}
+                </p>
+                <span style="font-size:0.75rem;font-weight:700;color:var(--pink-on-dark);">{card.ctaLabel}</span>
+              </a>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -329,59 +326,32 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
     <!-- ═══ GET INVOLVED — PINK BACKGROUND ═══ -->
     <section id="get-involved" class="py-20 px-4">
       <div class="max-w-7xl mx-auto text-center">
-        <p class="section-eyebrow mb-4 text-white">Participate</p>
+        <p class="section-eyebrow mb-4 text-white">{getInvolved.eyebrow}</p>
         <h2 class="font-fraunces font-bold text-white mb-4" style="font-size:clamp(2.25rem,4vw,3.25rem);">
-          Your City. Your Say.
+          {getInvolved.heading}
         </h2>
         <p class="text-white mb-12 mx-auto" style="font-size:1.0625rem;max-width:52ch;">
-          Community Councils only work when the community shows up. Here's how to make your voice count.
+          {getInvolved.body}
         </p>
 
         <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <div class="card bg-white shadow-lg">
-            <div class="card-body text-left">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background:rgba(0,168,150,0.12);">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--teal-dark);" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-              </div>
-              <h3 class="font-fraunces font-semibold text-ink text-xl mb-2">Attend a Meeting</h3>
-              <p class="text-gray-600 text-sm leading-relaxed mb-4">
-                Our public meetings are open to all. Come along, ask questions, and help set our agenda.
-              </p>
-              <a href="#meetings" class="btn btn-sm border-0 text-white font-semibold" style="background:var(--teal-dark);">See dates</a>
-            </div>
-          </div>
-
-          <div class="card bg-white shadow-lg">
-            <div class="card-body text-left">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background:rgba(244,161,0,0.12);">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:#8a5f00;" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                </svg>
-              </div>
-              <h3 class="font-fraunces font-semibold text-ink text-xl mb-2">Take the Survey</h3>
-              <p class="text-gray-600 text-sm leading-relaxed mb-4">
-                Tell us what matters most to you about living and working in the city centre. Takes 3 minutes.
-              </p>
-              <a href="#get-involved" class="btn btn-sm border-0 font-semibold text-ink" style="background:var(--amber);">Start survey</a>
-            </div>
-          </div>
-
-          <div class="card bg-white shadow-lg">
-            <div class="card-body text-left">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background:rgba(220,26,132,0.08);">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pink);" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path>
-                </svg>
-              </div>
-              <h3 class="font-fraunces font-semibold text-ink text-xl mb-2">Join the Committee</h3>
-              <p class="text-gray-600 text-sm leading-relaxed mb-4">
-                Elections are held annually. Become an elected member and help steer the work of the council.
-              </p>
-              <a href="#newsletter" class="btn btn-sm border-0 text-white font-semibold" style="background:var(--pink);">Find out how</a>
-            </div>
-          </div>
+          {
+            getInvolved.cards.map((card, i) => {
+              const s = getInvolvedCardStyles[i] ?? getInvolvedCardStyles[0];
+              return (
+                <div class="card bg-white shadow-lg">
+                  <div class="card-body text-left">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={s.iconBg}>
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style={`color:${s.iconColour};`} aria-hidden="true" set:html={s.iconPath}></svg>
+                    </div>
+                    <h3 class="font-fraunces font-semibold text-ink text-xl mb-2">{card.heading}</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-4">{card.body}</p>
+                    <a href={card.cta.url} class={`btn btn-sm border-0 font-semibold ${s.ctaClass}`} style={s.ctaStyle}>{card.cta.label}</a>
+                  </div>
+                </div>
+              );
+            })
+          }
         </div>
       </div>
     </section>
@@ -390,9 +360,9 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
     <section id="meetings" class="py-20 px-4">
       <div class="max-w-4xl mx-auto">
         <div class="text-center mb-12">
-          <p class="section-eyebrow mb-3" style="color:var(--teal);">Open Meetings</p>
+          <p class="section-eyebrow mb-3" style="color:var(--teal);">{meetings.eyebrow}</p>
           <h2 class="font-fraunces font-bold text-white" style="font-size:clamp(2rem,3.5vw,2.75rem);">
-            Coming to a Meeting
+            {meetings.heading}
           </h2>
         </div>
 
@@ -436,12 +406,12 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
           </div>
 
           <div class="flex flex-wrap gap-3">
-            <a href="#newsletter" class="btn btn-sm font-semibold" style="background:var(--pink);color:#fff;border:0;">Get notified by email</a>
+            <a href={meetings.cta.url} class="btn btn-sm font-semibold" style="background:var(--pink);color:#fff;border:0;">{meetings.cta.label}</a>
           </div>
         </div>
 
         <p class="text-center text-sm" style="color:rgba(255,255,255,0.65);">
-          All meetings are held in public. No registration required. Agendas published one week in advance.
+          {meetings.body}
         </p>
       </div>
     </section>
@@ -449,13 +419,12 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
     <!-- ═══ NEWSLETTER — AMBER SECTION ═══ -->
     <section id="newsletter" class="py-20 px-4">
       <div class="max-w-2xl mx-auto text-center">
-        <p class="section-eyebrow mb-4" style="color:rgba(26,26,46,0.85);">Stay Informed</p>
+        <p class="section-eyebrow mb-4" style="color:rgba(26,26,46,0.85);">{newsletter.eyebrow}</p>
         <h2 class="font-fraunces font-bold text-ink mb-4" style="font-size:clamp(2rem,4vw,3rem);">
-          Stay in the Loop
+          {newsletter.heading}
         </h2>
         <p class="text-ink mb-8 leading-relaxed" style="font-size:1rem;">
-          For occasional updates on meetings, consultations, and planning decisions that affect your
-          city centre, email us and ask to join the mailing list.
+          {newsletter.body}
         </p>
 
         <a
@@ -463,11 +432,11 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
           class="btn border-0 font-semibold text-white px-8 shadow-lg"
           style="background:var(--ink);"
         >
-          Email us to subscribe
+          {newsletter.ctaLabel}
         </a>
 
         <p class="text-sm mt-4" style="color:rgba(26,26,46,0.85);">
-          No spam. Unsubscribe any time.
+          {newsletter.subtext}
         </p>
       </div>
     </section>

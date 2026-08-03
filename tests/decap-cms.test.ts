@@ -465,6 +465,73 @@ describe("Decap CMS config.yml", () => {
       `site collection must not have extra fields beyond #4 schema: ${extra.join(", ")}`,
     );
   });
+
+  // ── Collections: pages ─────────────────────────────────────────────
+
+  it("should have a pages collection with file at src/content/pages/index.json", () => {
+    const text = getConfig();
+    const pagesBlock = extractCollectionBlock(text, "pages");
+    assert.ok(pagesBlock, "pages collection must exist in config.yml");
+    assert.ok(
+      /file\s*:\s*src\/content\/pages\/index\.json/.test(pagesBlock),
+      "pages collection must reference src/content/pages/index.json",
+    );
+  });
+
+  it("should have a Homepage entry with one object per section in page order", () => {
+    const pagesBlock = extractCollectionBlock(getConfig(), "pages");
+    assert.ok(pagesBlock, "pages collection must exist");
+
+    const sectionNames = extractSiteFieldNames(pagesBlock);
+    assert.deepStrictEqual(sectionNames, [
+      "hero",
+      "ourArea",
+      "ourProjects",
+      "jag",
+      "getInvolved",
+      "meetings",
+      "newsletter",
+    ]);
+  });
+
+  it("should define each section as a collapsible object widget", () => {
+    const pagesBlock = extractCollectionBlock(getConfig(), "pages");
+    assert.ok(pagesBlock, "pages collection must exist");
+
+    const sections = ["hero", "ourArea", "ourProjects", "jag", "getInvolved", "meetings", "newsletter"];
+    for (const section of sections) {
+      const afterName = pagesBlock.split(new RegExp(`name\\s*:\\s*${section}\\b`))[1] ?? "";
+      assert.match(
+        afterName,
+        /widget\s*:\s*object/,
+        `${section} must be defined as an object widget`,
+      );
+      assert.match(
+        afterName,
+        /collapsed\s*:\s*true/,
+        `${section} must be a collapsible (collapsed) object widget`,
+      );
+    }
+  });
+
+  it("should not model meeting event data fields in the meetings section", () => {
+    const pagesBlock = extractCollectionBlock(getConfig(), "pages");
+    assert.ok(pagesBlock, "pages collection must exist");
+
+    const meetingsSection = pagesBlock.split(/name\s*:\s*meetings\b/)[1] ?? "";
+    assert.ok(
+      !/name\s*:\s*date\b/.test(meetingsSection),
+      "meetings must not expose a date field (events come from Google Calendar later)",
+    );
+    assert.ok(
+      !/name\s*:\s*time\b/.test(meetingsSection),
+      "meetings must not expose a time field",
+    );
+    assert.ok(
+      !/name\s*:\s*location\b/.test(meetingsSection),
+      "meetings must not expose a location field",
+    );
+  });
 });
 
 // ── Helper functions ──────────────────────────────────────────────────────

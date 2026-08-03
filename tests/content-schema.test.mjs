@@ -300,3 +300,223 @@ describe("Site schema", () => {
     assert.ok(!result.success);
   });
 });
+
+// ── Pages schema ─────────────────────────────────────────────────────────
+
+const pagesSchema = z.object({
+  hero: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    ctas: z.array(z.object({ label: z.string(), url: z.string() })),
+  }),
+  ourArea: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body1: z.string(),
+    body2: z.string(),
+    boundaryLabel: z.string(),
+    pillars: z.array(z.object({ heading: z.string(), body: z.string() })),
+  }),
+  ourProjects: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    ideaCard: z.object({
+      heading: z.string(),
+      body: z.string(),
+      cta: z.object({ label: z.string(), url: z.string() }),
+    }),
+  }),
+  jag: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    cards: z.array(
+      z.object({
+        eyebrow: z.string(),
+        heading: z.string(),
+        body: z.string(),
+        ctaLabel: z.string(),
+      }),
+    ),
+  }),
+  getInvolved: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    cards: z.array(
+      z.object({
+        heading: z.string(),
+        body: z.string(),
+        cta: z.object({ label: z.string(), url: z.string() }),
+      }),
+    ),
+  }),
+  meetings: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    cta: z.object({ label: z.string(), url: z.string() }),
+  }),
+  newsletter: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    ctaLabel: z.string(),
+    subtext: z.string(),
+  }),
+});
+
+describe("Pages schema", () => {
+  const validPages = {
+    hero: {
+      eyebrow: "Glasgow's City Centre Community Council",
+      heading: "Your City,<br />Our City.",
+      body: "Blythswood & Broomielaw Community Council gives residents and workers a democratic voice.",
+      ctas: [
+        { label: "Get Involved", url: "#get-involved" },
+        { label: "Our Area", url: "#our-area" },
+      ],
+    },
+    ourArea: {
+      eyebrow: "Our Patch",
+      heading: "The Commercial Heart of Glasgow",
+      body1: "We cover the dense, layered area between the M8 and Renfield Street.",
+      body2: "As a statutory Community Council, we have a right to be consulted.",
+      boundaryLabel: "Boundary",
+      pillars: [
+        { heading: "Planning & Licensing", body: "Statutory consultee on applications." },
+        { heading: "Public Realm", body: "Greening lanes, improving footpaths." },
+      ],
+    },
+    ourProjects: {
+      eyebrow: "Active Work",
+      heading: "What We're Working On",
+      ideaCard: {
+        heading: "Have an idea?",
+        body: "Tell us about issues in your neighbourhood.",
+        cta: { label: "Contact us", url: "#get-involved" },
+      },
+    },
+    jag: {
+      eyebrow: "Joint Action Group",
+      heading: "Working Together Across Glasgow",
+      body: "Through the Joint Action Group (JAG), we team up with neighbouring councils.",
+      cards: [
+        { eyebrow: "East", heading: "Merchant City & Trongate", body: "Our immediate neighbours.", ctaLabel: "Visit council →" },
+      ],
+    },
+    getInvolved: {
+      eyebrow: "Participate",
+      heading: "Your City. Your Say.",
+      body: "Community Councils only work when the community shows up.",
+      cards: [
+        { heading: "Attend a Meeting", body: "Our public meetings are open to all.", cta: { label: "See dates", url: "#meetings" } },
+      ],
+    },
+    meetings: {
+      eyebrow: "Open Meetings",
+      heading: "Coming to a Meeting",
+      body: "All meetings are held in public.",
+      cta: { label: "Get notified by email", url: "#newsletter" },
+    },
+    newsletter: {
+      eyebrow: "Stay Informed",
+      heading: "Stay in the Loop",
+      body: "For occasional updates on meetings, consultations, and planning decisions.",
+      ctaLabel: "Email us to subscribe",
+      subtext: "No spam. Unsubscribe any time.",
+    },
+  };
+
+  it("should accept a complete pages object", () => {
+    const result = pagesSchema.safeParse(validPages);
+    assert.ok(result.success);
+  });
+
+  it("should reject a pages object missing a section", () => {
+    for (const key of ["hero", "ourArea", "ourProjects", "jag", "getInvolved", "meetings", "newsletter"]) {
+      const { [key]: _removed, ...rest } = validPages;
+      const result = pagesSchema.safeParse(rest);
+      assert.ok(!result.success, `must reject when ${key} is missing`);
+    }
+  });
+
+  it("should reject hero missing eyebrow", () => {
+    const { hero, ...rest } = validPages;
+    const { eyebrow: _removed, ...heroRest } = hero;
+    const result = pagesSchema.safeParse({ ...rest, hero: heroRest });
+    assert.ok(!result.success);
+  });
+
+  it("should reject hero with a cta missing url", () => {
+    const { hero, ...rest } = validPages;
+    const [first, ...others] = hero.ctas;
+    const { url: _removed, ...ctaRest } = first;
+    const result = pagesSchema.safeParse({
+      ...rest,
+      hero: { ...hero, ctas: [ctaRest, ...others] },
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should reject ourArea missing pillars", () => {
+    const { ourArea, ...rest } = validPages;
+    const { pillars: _removed, ...ourAreaRest } = ourArea;
+    const result = pagesSchema.safeParse({ ...rest, ourArea: ourAreaRest });
+    assert.ok(!result.success);
+  });
+
+  it("should reject a pillar missing heading", () => {
+    const { ourArea, ...rest } = validPages;
+    const [first, ...others] = ourArea.pillars;
+    const { heading: _removed, ...pillarRest } = first;
+    const result = pagesSchema.safeParse({
+      ...rest,
+      ourArea: { ...ourArea, pillars: [pillarRest, ...others] },
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should reject a jag card missing ctaLabel", () => {
+    const { jag, ...rest } = validPages;
+    const [first, ...others] = jag.cards;
+    const { ctaLabel: _removed, ...cardRest } = first;
+    const result = pagesSchema.safeParse({
+      ...rest,
+      jag: { ...jag, cards: [cardRest, ...others] },
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should reject getInvolved with a card missing cta", () => {
+    const { getInvolved, ...rest } = validPages;
+    const [first, ...others] = getInvolved.cards;
+    const { cta: _removed, ...cardRest } = first;
+    const result = pagesSchema.safeParse({
+      ...rest,
+      getInvolved: { ...getInvolved, cards: [cardRest, ...others] },
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should reject newsletter missing subtext", () => {
+    const { newsletter, ...rest } = validPages;
+    const { subtext: _removed, ...newsletterRest } = newsletter;
+    const result = pagesSchema.safeParse({ ...rest, newsletter: newsletterRest });
+    assert.ok(!result.success);
+  });
+
+  it("should reject meetings with a non-string heading", () => {
+    const result = pagesSchema.safeParse({
+      ...validPages,
+      meetings: { ...validPages.meetings, heading: 42 },
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should accept a hero heading with an embedded <br /> tag", () => {
+    const result = pagesSchema.safeParse(validPages);
+    assert.ok(result.success);
+  });
+});
