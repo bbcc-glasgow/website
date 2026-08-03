@@ -165,9 +165,14 @@ the first release**:
       remove the card.
 - [ ] **JAG cards**: "Visit council →" links are placeholders — add the neighbouring councils'
       real sites (or remove the link affordance).
-- [ ] **Social media**: the concept's Instagram feed section and social icons were omitted from
-      the port because no verified account URLs existed. Re-add when BBCC's real accounts are
-      confirmed.
+- [ ] **Instagram feed activation**: the section is built (epic #47; accounts confirmed as
+      @bbccglasgow on Instagram and Facebook) and renders the shell until real posts are
+      committed. To activate: switch the Instagram account to Business/Creator, link the
+      Facebook Page, create a Meta app with a long-lived Graph API token, and add the
+      `IG_ACCESS_TOKEN` and `SECRETS_WRITE_PAT` repo secrets — the daily workflow then keeps
+      the feed current and the token refreshed.
+- [ ] **Footer social icons**: the concept's footer Instagram/Facebook icons were not ported
+      with the section; add them now that the account URLs are confirmed.
 - [ ] **Newsletter**: currently an honest mailto (contact email in `src/content/site/index.json`).
       Wire up a real list (e.g. MailChimp) if wanted — needs a privacy note if so.
 - [ ] **Maintenance cron**: enable the schedule in `.github/workflows/maintenance.yml` after the
