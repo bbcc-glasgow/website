@@ -114,6 +114,13 @@ const homepageSchema = z.object({
     ctaLabel: z.string(),
     subtext: z.string(),
   }),
+  instagram: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    instagramCtaLabel: z.string(),
+    facebookCtaLabel: z.string(),
+  }),
 });
 
 const holdingSchema = z.object({

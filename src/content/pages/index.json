@@ -63,5 +63,12 @@
     "body": "For occasional updates on meetings, consultations, and planning decisions that affect your city centre, email us and ask to join the mailing list.",
     "ctaLabel": "Email us to subscribe",
     "subtext": "No spam. Unsubscribe any time."
+  },
+  "instagram": {
+    "eyebrow": "Social",
+    "heading": "Find Us on Instagram",
+    "body": "Follow us on Instagram @bbccglasgow for updates from the heart of Glasgow city centre.",
+    "instagramCtaLabel": "Follow on Instagram",
+    "facebookCtaLabel": "Follow on Facebook"
   }
 }
