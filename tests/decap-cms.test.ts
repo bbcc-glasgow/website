@@ -502,6 +502,7 @@ describe("Decap CMS config.yml", () => {
       "getInvolved",
       "meetings",
       "newsletter",
+      "instagram",
     ]);
   });
 
@@ -509,7 +510,7 @@ describe("Decap CMS config.yml", () => {
     const pagesBlock = extractCollectionBlock(getConfig(), "pages");
     assert.ok(pagesBlock, "pages collection must exist");
 
-    const sections = ["hero", "ourArea", "ourProjects", "jag", "getInvolved", "meetings", "newsletter"];
+    const sections = ["hero", "ourArea", "ourProjects", "jag", "getInvolved", "meetings", "newsletter", "instagram"];
     for (const section of sections) {
       const afterName = pagesBlock.split(new RegExp(`name\\s*:\\s*${section}\\b`))[1] ?? "";
       assert.match(
@@ -579,6 +580,84 @@ describe("Decap CMS config.yml", () => {
     assert.deepStrictEqual(
       holdingFields,
       ["eyebrow", "heading", "body", "ctaLabel"],
+    );
+  });
+
+  // ── Instagram section ──────────────────────────────────────────────
+
+  it("should define an instagram section on the Homepage entry", () => {
+    const pagesBlock = extractCollectionBlock(getConfig(), "pages");
+    assert.ok(pagesBlock, "pages collection must exist");
+    assert.ok(
+      /name\s*:\s*instagram\b/.test(pagesBlock),
+      "pages collection must define an instagram section",
+    );
+  });
+
+  it("should give the instagram section exactly the five string fields", () => {
+    const pagesBlock = extractCollectionBlock(getConfig(), "pages");
+    assert.ok(pagesBlock, "pages collection must exist");
+
+    const instagramSection =
+      pagesBlock.split(/name\s*:\s*instagram\b/)[1] ?? "";
+    assert.match(
+      instagramSection,
+      /widget\s*:\s*object/,
+      "instagram must be defined as an object widget",
+    );
+    assert.match(
+      instagramSection,
+      /collapsed\s*:\s*true/,
+      "instagram must be a collapsible (collapsed) object widget",
+    );
+
+    const fields = extractFieldNames(instagramSection);
+    assert.deepStrictEqual(fields, [
+      "eyebrow",
+      "heading",
+      "body",
+      "instagramCtaLabel",
+      "facebookCtaLabel",
+    ]);
+  });
+
+  it("should give every instagram field a string-type widget", () => {
+    const pagesBlock = extractCollectionBlock(getConfig(), "pages");
+    assert.ok(pagesBlock, "pages collection must exist");
+
+    const instagramSection =
+      pagesBlock.split(/name\s*:\s*instagram\b/)[1] ?? "";
+    const fields = extractFieldNames(instagramSection);
+    for (const field of fields) {
+      const fieldBlock =
+        instagramSection.split(
+          new RegExp(`name\\s*:\\s*${field}\\b`),
+        )[1] ?? "";
+      assert.match(
+        fieldBlock,
+        /widget\s*:\s*(string|text)\b/,
+        `instagram.${field} must use a string or text widget`,
+      );
+    }
+  });
+
+  it("must not expose feed data (posts.json, images) in the instagram section", () => {
+    const pagesBlock = extractCollectionBlock(getConfig(), "pages");
+    assert.ok(pagesBlock, "pages collection must exist");
+
+    const instagramSection =
+      pagesBlock.split(/name\s*:\s*instagram\b/)[1] ?? "";
+    assert.ok(
+      !/posts\.json/.test(instagramSection),
+      "instagram section must not reference posts.json feed data",
+    );
+    assert.ok(
+      !/feed/i.test(instagramSection),
+      "instagram section must not expose a feed widget or feed data",
+    );
+    assert.ok(
+      !/image|media/.test(instagramSection),
+      "instagram section must not reference image or media files",
     );
   });
 });

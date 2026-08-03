@@ -161,6 +161,16 @@ collections:
               - { name: body, label: Body, widget: text }
               - { name: ctaLabel, label: CTA Label, widget: string }
               - { name: subtext, label: Subtext, widget: string }
+          - name: instagram
+            label: Instagram
+            widget: object
+            collapsed: true
+            fields:
+              - { name: eyebrow, label: Eyebrow, widget: string }
+              - { name: heading, label: Heading, widget: string }
+              - { name: body, label: Body, widget: text }
+              - { name: instagramCtaLabel, label: Instagram CTA Label, widget: string }
+              - { name: facebookCtaLabel, label: Facebook CTA Label, widget: string }
       - file: src/content/pages/holding.json
         name: holding
         label: Holding Page

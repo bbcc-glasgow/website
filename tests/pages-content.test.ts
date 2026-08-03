@@ -77,6 +77,13 @@ const pagesSchema = z.object({
     ctaLabel: z.string(),
     subtext: z.string(),
   }),
+  instagram: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    instagramCtaLabel: z.string(),
+    facebookCtaLabel: z.string(),
+  }),
 });
 
 const SECTION_ORDER = [
@@ -87,6 +94,7 @@ const SECTION_ORDER = [
   "getInvolved",
   "meetings",
   "newsletter",
+  "instagram",
 ];
 
 function readPages() {
@@ -158,6 +166,44 @@ describe("pages content file", () => {
       readPages().hero.heading,
       "Your City,<br />Our City.",
     );
+  });
+});
+
+// ── Instagram section tests ───────────────────────────────────────────────
+
+describe("instagram section", () => {
+  it("should exist as a top-level section of the homepage content", () => {
+    assert.ok(
+      "instagram" in readPages(),
+      "homepage content must have an instagram section",
+    );
+  });
+
+  it("should expose exactly the five instagram fields, all non-empty strings", () => {
+    const instagram = readPages().instagram as Record<string, unknown>;
+    assert.deepStrictEqual(Object.keys(instagram), [
+      "eyebrow",
+      "heading",
+      "body",
+      "instagramCtaLabel",
+      "facebookCtaLabel",
+    ]);
+    for (const [key, value] of Object.entries(instagram)) {
+      assert.ok(
+        typeof value === "string" && value.trim().length > 0,
+        `instagram.${key} must be a non-empty string`,
+      );
+    }
+  });
+
+  it("must not hide any feed data (posts, images) behind the instagram section", () => {
+    const instagram = readPages().instagram as Record<string, unknown>;
+    for (const [key, value] of Object.entries(instagram)) {
+      assert.ok(
+        typeof value === "string",
+        `instagram.${key} must be a plain string, not a nested feed/list/object`,
+      );
+    }
   });
 });
 
