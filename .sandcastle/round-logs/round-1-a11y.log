@@ -1,0 +1,993 @@
+
+> bbcc-website@0.1.0 test:a11y /home/agent/workspace
+> playwright test
+
+TAP version 13
+# Subtest: Project schema
+    # Subtest: should accept a complete project object
+    ok 1 - should accept a complete project object
+      ---
+      duration_ms: 1.127211
+      ...
+    # Subtest: should accept a project with no ctas
+    ok 2 - should accept a project with no ctas
+      ---
+      duration_ms: 0.169917
+      ...
+    # Subtest: should accept a project with an empty ctas array
+    ok 3 - should accept a project with an empty ctas array
+      ---
+      duration_ms: 0.331043
+      ...
+    # Subtest: should accept a cta with no icon
+    ok 4 - should accept a cta with no icon
+      ---
+      duration_ms: 0.229125
+      ...
+    # Subtest: should default a missing variant to teal
+    ok 5 - should default a missing variant to teal
+      ---
+      duration_ms: 0.327209
+      ...
+    # Subtest: should fall back to teal for an invalid variant
+    ok 6 - should fall back to teal for an invalid variant
+      ---
+      duration_ms: 0.143917
+      ...
+    # Subtest: should reject missing tag
+    ok 7 - should reject missing tag
+      ---
+      duration_ms: 0.093625
+      ...
+    # Subtest: should reject missing title
+    ok 8 - should reject missing title
+      ---
+      duration_ms: 0.159834
+      ...
+    # Subtest: should reject missing summary
+    ok 9 - should reject missing summary
+      ---
+      duration_ms: 0.262876
+      ...
+    # Subtest: should reject missing order
+    ok 10 - should reject missing order
+      ---
+      duration_ms: 0.340918
+      ...
+    # Subtest: should reject non-string title
+    ok 11 - should reject non-string title
+      ---
+      duration_ms: 0.120125
+      ...
+    # Subtest: should reject non-numeric order
+    ok 12 - should reject non-numeric order
+      ---
+      duration_ms: 0.072667
+      ...
+    # Subtest: should reject a cta missing label
+    ok 13 - should reject a cta missing label
+      ---
+      duration_ms: 0.18
+      ...
+    # Subtest: should reject a cta missing url
+    ok 14 - should reject a cta missing url
+      ---
+      duration_ms: 0.063042
+      ...
+    # Subtest: should reject a cta with an invalid icon
+    ok 15 - should reject a cta with an invalid icon
+      ---
+      duration_ms: 0.066084
+      ...
+    # Subtest: should reject ctas that is not an array
+    ok 16 - should reject ctas that is not an array
+      ---
+      duration_ms: 0.045042
+      ...
+    1..16
+ok 1 - Project schema
+  ---
+  duration_ms: 4.535929
+  type: 'suite'
+  ...
+# Subtest: Holding Page entry schema
+    # Subtest: should accept a complete holding object
+    ok 1 - should accept a complete holding object
+      ---
+      duration_ms: 0.083459
+      ...
+    # Subtest: should reject missing eyebrow
+    ok 2 - should reject missing eyebrow
+      ---
+      duration_ms: 0.046666
+      ...
+    # Subtest: should reject missing heading
+    ok 3 - should reject missing heading
+      ---
+      duration_ms: 0.04125
+      ...
+    # Subtest: should reject missing body
+    ok 4 - should reject missing body
+      ---
+      duration_ms: 0.051209
+      ...
+    # Subtest: should reject missing ctaLabel
+    ok 5 - should reject missing ctaLabel
+      ---
+      duration_ms: 0.039292
+      ...
+    # Subtest: should reject non-string eyebrow
+    ok 6 - should reject non-string eyebrow
+      ---
+      duration_ms: 0.041209
+      ...
+    # Subtest: should reject non-string heading
+    ok 7 - should reject non-string heading
+      ---
+      duration_ms: 0.049083
+      ...
+    # Subtest: should accept heading with embedded <br /> tag
+    ok 8 - should accept heading with embedded <br /> tag
+      ---
+      duration_ms: 0.039833
+      ...
+    1..8
+ok 2 - Holding Page entry schema
+  ---
+  duration_ms: 0.49421
+  type: 'suite'
+  ...
+# Subtest: Site schema
+    # Subtest: should accept a complete site object
+    ok 1 - should accept a complete site object
+      ---
+      duration_ms: 0.298667
+      ...
+    # Subtest: should accept site object with optional animation fields
+    ok 2 - should accept site object with optional animation fields
+      ---
+      duration_ms: 0.103
+      ...
+    # Subtest: should reject missing stats
+    ok 3 - should reject missing stats
+      ---
+      duration_ms: 0.050625
+      ...
+    # Subtest: should reject missing boundaryDescription
+    ok 4 - should reject missing boundaryDescription
+      ---
+      duration_ms: 0.048459
+      ...
+    # Subtest: should reject missing contactEmail
+    ok 5 - should reject missing contactEmail
+      ---
+      duration_ms: 0.047833
+      ...
+    # Subtest: should reject invalid email format
+    ok 6 - should reject invalid email format
+      ---
+      duration_ms: 0.066584
+      ...
+    # Subtest: should reject non-array stats
+    ok 7 - should reject non-array stats
+      ---
+      duration_ms: 0.050042
+      ...
+    # Subtest: should reject stat object missing value
+    ok 8 - should reject stat object missing value
+      ---
+      duration_ms: 0.073583
+      ...
+    # Subtest: should reject stat object missing label
+    ok 9 - should reject stat object missing label
+      ---
+      duration_ms: 0.070334
+      ...
+    # Subtest: should reject stat object missing desc
+    ok 10 - should reject stat object missing desc
+      ---
+      duration_ms: 0.055458
+      ...
+    1..10
+ok 3 - Site schema
+  ---
+  duration_ms: 1.025544
+  type: 'suite'
+  ...
+# Subtest: Pages schema
+    # Subtest: should accept a complete pages object
+    ok 1 - should accept a complete pages object
+      ---
+      duration_ms: 0.264125
+      ...
+    # Subtest: should reject a pages object missing a section
+    ok 2 - should reject a pages object missing a section
+      ---
+      duration_ms: 0.777253
+      ...
+    # Subtest: should reject hero missing eyebrow
+    ok 3 - should reject hero missing eyebrow
+      ---
+      duration_ms: 0.122625
+      ...
+    # Subtest: should reject hero with a cta missing url
+    ok 4 - should reject hero with a cta missing url
+      ---
+      duration_ms: 0.129334
+      ...
+    # Subtest: should reject ourArea missing pillars
+    ok 5 - should reject ourArea missing pillars
+      ---
+      duration_ms: 0.158126
+      ...
+    # Subtest: should reject a pillar missing heading
+    ok 6 - should reject a pillar missing heading
+      ---
+      duration_ms: 0.135625
+      ...
+    # Subtest: should reject a jag card missing ctaLabel
+    ok 7 - should reject a jag card missing ctaLabel
+      ---
+      duration_ms: 0.182542
+      ...
+    # Subtest: should reject getInvolved with a card missing cta
+    ok 8 - should reject getInvolved with a card missing cta
+      ---
+      duration_ms: 0.131917
+      ...
+    # Subtest: should reject newsletter missing subtext
+    ok 9 - should reject newsletter missing subtext
+      ---
+      duration_ms: 0.149959
+      ...
+    # Subtest: should reject meetings with a non-string heading
+    ok 10 - should reject meetings with a non-string heading
+      ---
+      duration_ms: 0.138126
+      ...
+    # Subtest: should accept a hero heading with an embedded <br /> tag
+    ok 11 - should accept a hero heading with an embedded <br /> tag
+      ---
+      duration_ms: 0.117042
+      ...
+    # Subtest: should accept a holding page entry as the Holding Page file of the pages collection
+    ok 12 - should accept a holding page entry as the Holding Page file of the pages collection
+      ---
+      duration_ms: 0.053626
+      ...
+    # Subtest: should reject an entry that matches neither the homepage nor the holding page shape
+    ok 13 - should reject an entry that matches neither the homepage nor the holding page shape
+      ---
+      duration_ms: 0.085458
+      ...
+    # Subtest: should reject a holding page entry missing a required field
+    ok 14 - should reject a holding page entry missing a required field
+      ---
+      duration_ms: 0.076083
+      ...
+    1..14
+ok 4 - Pages schema
+  ---
+  duration_ms: 2.698341
+  type: 'suite'
+  ...
+# Subtest: Decap CMS vendor setup
+    # Subtest: should have a public/admin/ directory
+    ok 1 - should have a public/admin/ directory
+      ---
+      duration_ms: 0.191
+      ...
+    # Subtest: should have public/admin/index.html
+    ok 2 - should have public/admin/index.html
+      ---
+      duration_ms: 0.10275
+      ...
+    # Subtest: should not reference any external CDN URLs in index.html
+    ok 3 - should not reference any external CDN URLs in index.html
+      ---
+      duration_ms: 0.300459
+      ...
+    # Subtest: should load decap-cms.js from a relative path using ./decap-cms.js
+    ok 4 - should load decap-cms.js from a relative path using ./decap-cms.js
+      ---
+      duration_ms: 0.222417
+      ...
+    # Subtest: should have decap-cms as a dependency in package.json
+    ok 5 - should have decap-cms as a dependency in package.json
+      ---
+      duration_ms: 0.199251
+      ...
+    # Subtest: should pin decap-cms at version 3.11.0
+    ok 6 - should pin decap-cms at version 3.11.0
+      ---
+      duration_ms: 0.199293
+      ...
+    # Subtest: should have a prebuild script in package.json that vendors three decap-cms files
+    ok 7 - should have a prebuild script in package.json that vendors three decap-cms files
+      ---
+      duration_ms: 0.191418
+      ...
+    # Subtest: should have all three generated files listed in .gitignore
+    ok 8 - should have all three generated files listed in .gitignore
+      ---
+      duration_ms: 0.243042
+      ...
+    1..8
+ok 5 - Decap CMS vendor setup
+  ---
+  duration_ms: 1.784797
+  type: 'suite'
+  ...
+# Subtest: Decap CMS config.yml
+    # Subtest: should have a public/admin/config.yml file
+    ok 1 - should have a public/admin/config.yml file
+      ---
+      duration_ms: 0.181792
+      ...
+    # Subtest: should use git-gateway backend
+    ok 2 - should use git-gateway backend
+      ---
+      duration_ms: 0.40621
+      ...
+    # Subtest: should set repo to bbcc-glasgow/website
+    ok 3 - should set repo to bbcc-glasgow/website
+      ---
+      duration_ms: 0.29921
+      ...
+    # Subtest: should set branch to main
+    ok 4 - should set branch to main
+      ---
+      duration_ms: 0.294959
+      ...
+    # Subtest: should set auth_type to pkce
+    ok 5 - should set auth_type to pkce
+      ---
+      duration_ms: 0.734419
+      ...
+    # Subtest: should set base_url to https://auth.decapbridge.com
+    ok 6 - should set base_url to https://auth.decapbridge.com
+      ---
+      duration_ms: 0.233792
+      ...
+    # Subtest: should set auth_endpoint with the DecapBridge site ID
+    ok 7 - should set auth_endpoint with the DecapBridge site ID
+      ---
+      duration_ms: 0.244501
+      ...
+    # Subtest: should set auth_token_endpoint with the DecapBridge site ID
+    ok 8 - should set auth_token_endpoint with the DecapBridge site ID
+      ---
+      duration_ms: 0.239376
+      ...
+    # Subtest: should set gateway_url to https://gateway.decapbridge.com
+    ok 9 - should set gateway_url to https://gateway.decapbridge.com
+      ---
+      duration_ms: 0.205001
+      ...
+    # Subtest: should not contain PLACEHOLDER_SITE_ID (site is already registered)
+    ok 10 - should not contain PLACEHOLDER_SITE_ID (site is already registered)
+      ---
+      duration_ms: 0.191917
+      ...
+    # Subtest: should include commit_messages section in backend
+    ok 11 - should include commit_messages section in backend
+      ---
+      duration_ms: 0.213917
+      ...
+    # Subtest: should have an auth section
+    ok 12 - should have an auth section
+      ---
+      duration_ms: 0.237418
+      ...
+    # Subtest: should set email_claim in auth section
+    ok 13 - should set email_claim in auth section
+      ---
+      duration_ms: 0.228917
+      ...
+    # Subtest: should set first_name_claim in auth section
+    ok 14 - should set first_name_claim in auth section
+      ---
+      duration_ms: 0.212083
+      ...
+    # Subtest: should set last_name_claim in auth section
+    ok 15 - should set last_name_claim in auth section
+      ---
+      duration_ms: 0.199834
+      ...
+    # Subtest: should set avatar_url_claim in auth section
+    ok 16 - should set avatar_url_claim in auth section
+      ---
+      duration_ms: 0.195584
+      ...
+    # Subtest: should set logo_url to the DecapBridge logo
+    ok 17 - should set logo_url to the DecapBridge logo
+      ---
+      duration_ms: 0.240042
+      ...
+    # Subtest: should set site_url to https://bbcc.scot
+    ok 18 - should set site_url to https://bbcc.scot
+      ---
+      duration_ms: 0.233542
+      ...
+    # Subtest: should set publish_mode to editorial_workflow
+    ok 19 - should set publish_mode to editorial_workflow
+      ---
+      duration_ms: 0.219375
+      ...
+    # Subtest: should set media_folder to public/images
+    ok 20 - should set media_folder to public/images
+      ---
+      duration_ms: 0.218292
+      ...
+    # Subtest: should set public_folder to /images
+    ok 21 - should set public_folder to /images
+      ---
+      duration_ms: 0.201584
+      ...
+    # Subtest: should have a projects collection with folder at src/content/projects
+    ok 22 - should have a projects collection with folder at src/content/projects
+      ---
+      duration_ms: 0.442918
+      ...
+    # Subtest: should have a projects collection with fields matching the variant + ctas schema
+    ok 23 - should have a projects collection with fields matching the variant + ctas schema
+      ---
+      duration_ms: 0.418127
+      ...
+    # Subtest: should replace the free-text colour fields with a variant select
+    ok 24 - should replace the free-text colour fields with a variant select
+      ---
+      duration_ms: 0.387626
+      ...
+    # Subtest: should offer a ctas list with label, url and icon sub-fields
+    ok 25 - should offer a ctas list with label, url and icon sub-fields
+      ---
+      duration_ms: 0.351876
+      ...
+    # Subtest: should restrict the cta icon choice to the predefined set
+    ok 26 - should restrict the cta icon choice to the predefined set
+      ---
+      duration_ms: 0.311626
+      ...
+    # Subtest: should have a site collection with file at src/content/site/index.json
+    ok 27 - should have a site collection with file at src/content/site/index.json
+      ---
+      duration_ms: 0.263167
+      ...
+    # Subtest: should have a site collection with fields matching the \#4 schema
+    ok 28 - should have a site collection with fields matching the \#4 schema
+      ---
+      duration_ms: 0.438501
+      ...
+    # Subtest: should label the site collection Site Settings
+    ok 29 - should label the site collection Site Settings
+      ---
+      duration_ms: 0.270209
+      ...
+    # Subtest: should have a pages collection with file at src/content/pages/index.json
+    ok 30 - should have a pages collection with file at src/content/pages/index.json
+      ---
+      duration_ms: 0.257709
+      ...
+    # Subtest: should have a Homepage entry with one object per section in page order
+    ok 31 - should have a Homepage entry with one object per section in page order
+      ---
+      duration_ms: 0.576419
+      ...
+    # Subtest: should define each section as a collapsible object widget
+    ok 32 - should define each section as a collapsible object widget
+      ---
+      duration_ms: 0.454793
+      ...
+    # Subtest: should not model meeting event data fields in the meetings section
+    ok 33 - should not model meeting event data fields in the meetings section
+      ---
+      duration_ms: 0.305417
+      ...
+    # Subtest: should have a Holding Page file entry at src/content/pages/holding.json
+    ok 34 - should have a Holding Page file entry at src/content/pages/holding.json
+      ---
+      duration_ms: 0.268001
+      ...
+    # Subtest: should label the Homepage and Holding Page file entries in the pages collection
+    ok 35 - should label the Homepage and Holding Page file entries in the pages collection
+      ---
+      duration_ms: 0.323792
+      ...
+    # Subtest: should give the Holding Page file entry exactly the holding page fields
+    ok 36 - should give the Holding Page file entry exactly the holding page fields
+      ---
+      duration_ms: 0.327959
+      ...
+    # Subtest: should define an instagram section on the Homepage entry
+    ok 37 - should define an instagram section on the Homepage entry
+      ---
+      duration_ms: 0.261501
+      ...
+    # Subtest: should give the instagram section exactly the five string fields
+    ok 38 - should give the instagram section exactly the five string fields
+      ---
+      duration_ms: 0.324084
+      ...
+    # Subtest: should give every instagram field a string-type widget
+    ok 39 - should give every instagram field a string-type widget
+      ---
+      duration_ms: 0.437668
+      ...
+    # Subtest: must not expose feed data (posts.json, images) in the instagram section
+    ok 40 - must not expose feed data (posts.json, images) in the instagram section
+      ---
+      duration_ms: 0.297459
+      ...
+    1..40
+ok 6 - Decap CMS config.yml
+  ---
+  duration_ms: 12.619327
+  type: 'suite'
+  ...
+# Subtest: deploy workflow — continuous deploy on push to main
+    # Subtest: should exist at .github/workflows/deploy.yml
+    ok 1 - should exist at .github/workflows/deploy.yml
+      ---
+      duration_ms: 0.208667
+      ...
+    # Subtest: should trigger on push to main
+    ok 2 - should trigger on push to main
+      ---
+      duration_ms: 0.255585
+      ...
+    # Subtest: should keep workflow_dispatch as a manual redeploy path
+    ok 3 - should keep workflow_dispatch as a manual redeploy path
+      ---
+      duration_ms: 0.208417
+      ...
+    # Subtest: should NOT trigger on v* tags
+    ok 4 - should NOT trigger on v* tags
+      ---
+      duration_ms: 0.228709
+      ...
+    # Subtest: should define a concurrency group so back-to-back merges cannot race
+    ok 5 - should define a concurrency group so back-to-back merges cannot race
+      ---
+      duration_ms: 0.206292
+      ...
+    # Subtest: should describe continuous deploy (deploy on merge) in its comment
+    ok 6 - should describe continuous deploy (deploy on merge) in its comment
+      ---
+      duration_ms: 0.264334
+      ...
+    1..6
+ok 7 - deploy workflow — continuous deploy on push to main
+  ---
+  duration_ms: 1.481004
+  type: 'suite'
+  ...
+# Subtest: README release boundary
+    # Subtest: should describe continuous deploy (every push to main deploys)
+    ok 1 - should describe continuous deploy (every push to main deploys)
+      ---
+      duration_ms: 0.325709
+      ...
+    # Subtest: should describe manual dispatch as a redeploy fallback
+    ok 2 - should describe manual dispatch as a redeploy fallback
+      ---
+      duration_ms: 0.264667
+      ...
+    # Subtest: should have no remaining text claiming merges do not publish
+    ok 3 - should have no remaining text claiming merges do not publish
+      ---
+      duration_ms: 0.342668
+      ...
+    1..3
+ok 8 - README release boundary
+  ---
+  duration_ms: 0.983961
+  type: 'suite'
+  ...
+# Subtest: per-PR preview deploys remain unchanged
+    # Subtest: preview.yml should still trigger on pull_request against main
+    ok 1 - preview.yml should still trigger on pull_request against main
+      ---
+      duration_ms: 0.271376
+      ...
+    # Subtest: preview.yml should still use wrangler versions upload, never deploy
+    ok 2 - preview.yml should still use wrangler versions upload, never deploy
+      ---
+      duration_ms: 0.230084
+      ...
+    1..2
+ok 9 - per-PR preview deploys remain unchanged
+  ---
+  duration_ms: 0.540085
+  type: 'suite'
+  ...
+# Subtest: fetch-instagram: token absent
+    # Subtest: logs a clear message and exits 0 without writing anything
+    ok 1 - logs a clear message and exits 0 without writing anything
+      ---
+      duration_ms: 18.437135
+      ...
+    1..1
+ok 10 - fetch-instagram: token absent
+  ---
+  duration_ms: 18.509844
+  type: 'suite'
+  ...
+# Subtest: fetch-instagram: happy path
+    # Subtest: writes the feed newest-first, downloads images, and prunes stale ones
+    ok 1 - writes the feed newest-first, downloads images, and prunes stale ones
+      ---
+      duration_ms: 89.220208
+      ...
+    1..1
+ok 11 - fetch-instagram: happy path
+  ---
+  duration_ms: 89.302916
+  type: 'suite'
+  ...
+# Subtest: fetch-instagram: failures leave no files written or modified
+    # Subtest: exits 1 when the Graph API returns a non-2xx status
+    ok 1 - exits 1 when the Graph API returns a non-2xx status
+      ---
+      duration_ms: 39.285568
+      ...
+    # Subtest: exits 1 when the Graph API returns an error body with HTTP 200
+    ok 2 - exits 1 when the Graph API returns an error body with HTTP 200
+      ---
+      duration_ms: 96.913729
+      ...
+
+Running 4 tests using 3 workers
+
+    # Subtest: exits 1 on a network error and writes nothing
+    ok 3 - exits 1 on a network error and writes nothing
+      ---
+      duration_ms: 31.187378
+      ...
+    # Subtest: exits 1 when an image download fails and leaves no files written
+    ok 4 - exits 1 when an image download fails and leaves no files written
+      ---
+      duration_ms: 89.811584
+      ...
+    1..4
+ok 12 - fetch-instagram: failures leave no files written or modified
+  ---
+  duration_ms: 257.419135
+  type: 'suite'
+  ...
+# Subtest: fetch-instagram: image hygiene
+    # Subtest: keeps only .jpg files whose IDs are in the new feed
+    ok 1 - keeps only .jpg files whose IDs are in the new feed
+      ---
+      duration_ms: 95.124057
+      ...
+    1..1
+ok 13 - fetch-instagram: image hygiene
+  ---
+  duration_ms: 95.223183
+  type: 'suite'
+  ...
+# Subtest: .gitignore sandcastle configuration
+    # Subtest: should list .sandcastle/ in .gitignore
+    ok 1 - should list .sandcastle/ in .gitignore
+      ---
+      duration_ms: 0.417542
+      ...
+    # Subtest: should have no tracked files under .sandcastle/
+    ok 2 - should have no tracked files under .sandcastle/
+      ---
+      duration_ms: 5.519765
+      ...
+    # Subtest: should keep .sandcastle/round-logs/ files on disk
+    not ok 3 - should keep .sandcastle/round-logs/ files on disk
+      ---
+      duration_ms: 2.35359
+      location: '/home/agent/workspace/tests/gitignore.test.ts:23:3'
+      failureType: 'testCodeFailure'
+      error: '.sandcastle/round-logs/ must still exist on disk after untracking'
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: true
+      actual: false
+      operator: '=='
+      stack: |-
+        TestContext.<anonymous> (file:///home/agent/workspace/tests/gitignore.test.ts:34:12)
+        Test.runInAsyncScope (node:async_hooks:211:14)
+        Test.run (node:internal/test_runner/test:934:25)
+        Suite.processPendingSubtests (node:internal/test_runner/test:633:18)
+        Test.postRun (node:internal/test_runner/test:1045:19)
+        Test.run (node:internal/test_runner/test:973:12)
+        processTicksAndRejections (node:internal/process/task_queues:105:5)
+        Suite.processPendingSubtests (node:internal/test_runner/test:633:7)
+      ...
+    1..3
+not ok 14 - .gitignore sandcastle configuration
+  ---
+  duration_ms: 8.430066
+  type: 'suite'
+  location: '/home/agent/workspace/tests/gitignore.test.ts:8:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: instagram feed data seed
+    # Subtest: should exist at src/data/instagram/posts.json
+    ok 1 - should exist at src/data/instagram/posts.json
+      ---
+      duration_ms: 0.312251
+      ...
+    # Subtest: should parse as valid JSON
+    ok 2 - should parse as valid JSON
+      ---
+      duration_ms: 0.344751
+      ...
+    # Subtest: should validate against the feed contract schema
+    ok 3 - should validate against the feed contract schema
+      ---
+      duration_ms: 0.322417
+      ...
+    # Subtest: should carry the bbccglasgow account handle
+    ok 4 - should carry the bbccglasgow account handle
+      ---
+      duration_ms: 0.300292
+      ...
+    # Subtest: should start with an empty posts array
+    ok 5 - should start with an empty posts array
+      ---
+      duration_ms: 0.240376
+      ...
+    1..5
+ok 15 - instagram feed data seed
+  ---
+  duration_ms: 1.640338
+  type: 'suite'
+  ...
+# Subtest: instagram feed contract schema
+    # Subtest: should accept the seeded stub
+    ok 1 - should accept the seeded stub
+      ---
+      duration_ms: 0.084292
+      ...
+    # Subtest: should accept a populated posts array
+    ok 2 - should accept a populated posts array
+      ---
+      duration_ms: 0.067542
+      ...
+    # Subtest: should reject a feed missing account
+    ok 3 - should reject a feed missing account
+      ---
+      duration_ms: 0.061083
+      ...
+    # Subtest: should reject a feed with a non-string account
+    ok 4 - should reject a feed with a non-string account
+      ---
+      duration_ms: 0.039292
+      ...
+    # Subtest: should reject a feed missing posts
+    ok 5 - should reject a feed missing posts
+      ---
+      duration_ms: 0.036959
+      ...
+    # Subtest: should reject a feed with non-array posts
+    ok 6 - should reject a feed with non-array posts
+      ---
+      duration_ms: 0.087459
+      ...
+    1..6
+ok 16 - instagram feed contract schema
+  ---
+  duration_ms: 0.457959
+  type: 'suite'
+  ...
+# Subtest: instagram assets directory
+    # Subtest: should exist at src/assets/instagram/
+    ok 1 - should exist at src/assets/instagram/
+      ---
+      duration_ms: 0.191126
+      ...
+    # Subtest: should be tracked by git
+    ok 2 - should be tracked by git
+      ---
+      duration_ms: 5.282432
+      ...
+    1..2
+ok 17 - instagram assets directory
+  ---
+  duration_ms: 5.534557
+  type: 'suite'
+  ...
+# Subtest: instagram-feed workflow — scheduled trigger
+    # Subtest: should exist at .github/workflows/instagram-feed.yml
+    ok 1 - should exist at .github/workflows/instagram-feed.yml
+      ---
+      duration_ms: 0.263209
+      ...
+    # Subtest: should trigger on a daily schedule
+    ok 2 - should trigger on a daily schedule
+      ---
+      duration_ms: 0.385126
+      ...
+    # Subtest: should trigger on workflow_dispatch with no required inputs
+    ok 3 - should trigger on workflow_dispatch with no required inputs
+      ---
+      duration_ms: 0.255335
+      ...
+    # Subtest: should call the Graph API via scripts/fetch-instagram.mjs
+    ok 4 - should call the Graph API via scripts/fetch-instagram.mjs
+      ---
+      duration_ms: 0.315042
+      ...
+    # Subtest: should pass IG_ACCESS_TOKEN to the fetch step
+    ok 5 - should pass IG_ACCESS_TOKEN to the fetch step
+      ---
+      duration_ms: 0.26021
+      ...
+    # Subtest: should detect changes with git diff --quiet (or equivalent)
+    ok 6 - should detect changes with git diff --quiet (or equivalent)
+      ---
+      duration_ms: 0.194542
+      ...
+    # Subtest: should log 'Feed unchanged, skipping commit' and commit only on change
+    ok 7 - should log 'Feed unchanged, skipping commit' and commit only on change
+      ---
+      duration_ms: 0.319334
+      ...
+    # Subtest: should push the feed commit to main
+    ok 8 - should push the feed commit to main
+      ---
+      duration_ms: 0.238834
+      ...
+    # Subtest: should author commits as the github-actions bot
+    ok 9 - should author commits as the github-actions bot
+      ---
+      duration_ms: 0.229334
+      ...
+    # Subtest: should use SECRETS_WRITE_PAT for the push
+    ok 10 - should use SECRETS_WRITE_PAT for the push
+      ---
+      duration_ms: 0.332751
+      ...
+    # Subtest: should request only read contents permission from the default token
+    ok 11 - should request only read contents permission from the default token
+      ---
+      duration_ms: 0.289001
+      ...
+    1..11
+ok 18 - instagram-feed workflow — scheduled trigger
+  ---
+  duration_ms: 3.286426
+  type: 'suite'
+  ...
+# Subtest: instagram-feed workflow — failure and secret-absent handling
+    # Subtest: should fail the run (non-zero) when the fetch script exits 1
+    ok 1 - should fail the run (non-zero) when the fetch script exits 1
+      ---
+      duration_ms: 0.314834
+      ...
+    # Subtest: should keep the feed commit structure so a later step failure cannot roll it back
+    ok 2 - should keep the feed commit structure so a later step failure cannot roll it back
+      ---
+      duration_ms: 0.245251
+      ...
+    # Subtest: should not require secrets to run on forks (script exits 0 when token absent)
+    ok 3 - should not require secrets to run on forks (script exits 0 when token absent)
+      ---
+      duration_ms: 0.315251
+      ...
+    1..3
+ok 19 - instagram-feed workflow — failure and secret-absent handling
+  ---
+  duration_ms: 0.935003
+  type: 'suite'
+  ...
+# Subtest: instagram-feed workflow - token refresh step
+    # Subtest: should run the token-refresh script as its own step
+    ok 1 - should run the token-refresh script as its own step
+      ---
+      duration_ms: 0.294418
+      ...
+    # Subtest: should place the refresh step after the commit/push step
+    ok 2 - should place the refresh step after the commit/push step
+      ---
+      duration_ms: 0.329251
+      ...
+    # Subtest: should reference IG_ACCESS_TOKEN only as a masked step env var, never in a run statement
+    ok 3 - should reference IG_ACCESS_TOKEN only as a masked step env var, never in a run statement
+      ---
+      duration_ms: 0.317376
+      ...
+    # Subtest: should pass SECRETS_WRITE_PAT to the refresh step via env
+    ok 4 - should pass SECRETS_WRITE_PAT to the refresh step via env
+      ---
+      duration_ms: 0.265876
+      ...
+    # Subtest: should fail the run when the refresh script fails (no continue-on-error)
+    ok 5 - should fail the run when the refresh script fails (no continue-on-error)
+      ---
+      duration_ms: 0.299626
+      ...
+    # Subtest: should never log the token value in the refresh script
+    ok 6 - should never log the token value in the refresh script
+      ---
+      duration_ms: 0.349543
+      ...
+    1..6
+ok 20 - instagram-feed workflow - token refresh step
+  ---
+  duration_ms: 1.962964
+  type: 'suite'
+  ...
+# Subtest: instagram-feed workflow — actionlint in CI
+    # Subtest: should add an actionlint step to ci.yml
+    ok 1 - should add an actionlint step to ci.yml
+      ---
+      duration_ms: 0.391376
+      ...
+    # Subtest: should install actionlint via a resolvable reference, not the broken @v1 tag
+    ok 2 - should install actionlint via a resolvable reference, not the broken @v1 tag
+      ---
+      duration_ms: 0.232626
+      ...
+    1..2
+ok 21 - instagram-feed workflow — actionlint in CI
+  ---
+  duration_ms: 0.666794
+  type: 'suite'
+  ...
+# Subtest: README — Feed bot setup
+    # Subtest: should document the required secrets under a Feed bot setup heading
+    ok 1 - should document the required secrets under a Feed bot setup heading
+      ---
+      duration_ms: 0.279876
+      ...
+    # Subtest: should document how to generate a long-lived token, its ~60-day expiry, and the auto-refresh
+    ok 2 - should document how to generate a long-lived token, its ~60-day expiry, and the auto-refresh
+      ---
+      duration_ms: 0.355501
+      ...
+    # Subtest: should document SECRETS_WRITE_PAT scopes: contents write and secrets write
+    ok 3 - should document SECRETS_WRITE_PAT scopes: contents write and secrets write
+      ---
+      duration_ms: 0.250667
+      ...
+    # Subtest: should document what to do when the refresh step fails
+    ok 4 - should document what to do when the refresh step fails
+      ---
+      duration_ms: 0.2515
+      ...
+    1..4
+ok 22 - README — Feed bot setup
+  ---
+  duration_ms: 1.201045
+  type: 'suite'
+  ...
+# Subtest: InstagramFeed populated feed
+    # Subtest: renders six tiles with permalink links, local webp images, alt text and the View post overlay, plus both follow buttons
+    ok 1 - renders six tiles with permalink links, local webp images, alt text and the View post overlay, plus both follow buttons
+      ---
+      duration_ms: 2512.009886
+      ...
+  ✓  1 a11y.spec.ts:18:5 › accessibility › axe scan: /holding/ (466ms)
+  ✓  2 a11y.spec.ts:13:3 › accessibility › dist contains at least one page (5ms)
+  ✓  3 a11y.spec.ts:18:5 › accessibility › axe scan: / (809ms)
+    # Subtest: never renders like counts, captions or fetched-at timestamps
+    ok 2 - never renders like counts, captions or fetched-at timestamps
+      ---
+      duration_ms: 2101.199406
+      ...
+  ✓  4 a11y.spec.ts:18:5 › accessibility › axe scan: /admin/ (1.0s)
+    # Subtest: extends the existing \#instagram/.insta-tile CSS without duplicate rule blocks
+    ok 3 - extends the existing \#instagram/.insta-tile CSS without duplicate rule blocks
+      ---
+      duration_ms: 2306.973981
+      ...
+
+  4 passed (9.5s)
+(node:4972) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5083) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5076) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5077) ExperimentalWarning: globSync is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
