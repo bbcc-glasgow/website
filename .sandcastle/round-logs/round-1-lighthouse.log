@@ -7,16 +7,16 @@
 ✅  Chrome installation found
 Healthcheck passed!
 
-Started a web server on port 37339...
-Running Lighthouse 3 time(s) on http://localhost:37339/404.html
+Started a web server on port 43601...
+Running Lighthouse 3 time(s) on http://localhost:43601/404.html
 Run #1...done.
 Run #2...done.
 Run #3...done.
-Running Lighthouse 3 time(s) on http://localhost:37339/index.html
+Running Lighthouse 3 time(s) on http://localhost:43601/index.html
 Run #1...done.
 Run #2...done.
 Run #3...done.
-Running Lighthouse 3 time(s) on http://localhost:37339/holding/index.html
+Running Lighthouse 3 time(s) on http://localhost:43601/holding/index.html
 Run #1...done.
 Run #2...done.
 Run #3...done.
@@ -24,14 +24,14 @@ Done running Lighthouse!
 
 
 Done running autorun.
-(node:5223) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(node:3168) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:5231) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(node:3176) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 Checking assertions against 3 URL(s), 9 total run(s)
 
 All results processed!
-(node:6484) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(node:4430) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:5211) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(node:3156) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)

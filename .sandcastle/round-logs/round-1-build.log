@@ -6,44 +6,44 @@
 > bbcc-website@0.1.0 build /home/agent/workspace
 > astro build
 
-14:04:55 [content] Syncing content
-14:04:55 [content] Synced content
-14:04:55 [types] Generated 301ms
-14:04:55 [build] output: "static"
-14:04:55 [build] mode: "static"
-14:04:55 [build] directory: /home/agent/workspace/dist/
-14:04:55 [build] Collecting build info...
-14:04:55 [build] ✓ Completed in 317ms.
-14:04:55 [build] Building static entrypoints...
+15:01:29 [content] Syncing content
+15:01:29 [content] Synced content
+15:01:29 [types] Generated 307ms
+15:01:29 [build] output: "static"
+15:01:29 [build] mode: "static"
+15:01:29 [build] directory: /home/agent/workspace/dist/
+15:01:29 [build] Collecting build info...
+15:01:29 [build] ✓ Completed in 327ms.
+15:01:29 [build] Building static entrypoints...
 /*! 🌼 daisyUI 5.7.4 */
-14:04:56 [vite] ✓ built in 967ms
-14:04:56 [build] ✓ Completed in 997ms.
+15:01:30 [vite] ✓ built in 932ms
+15:01:30 [build] ✓ Completed in 961ms.
 
  building client (vite) 
-14:04:56 [vite] transforming...
-14:04:56 [vite] ✓ 1 modules transformed.
-14:04:56 [vite] rendering chunks...
-14:04:56 [vite] ✓ built in 13ms
+15:01:30 [vite] transforming...
+15:01:30 [vite] ✓ 1 modules transformed.
+15:01:30 [vite] rendering chunks...
+15:01:30 [vite] ✓ built in 10ms
 
  generating static routes 
-14:04:56 ▶ src/pages/404.astro
-14:04:56   └─ /404.html (+5ms) 
-14:04:56 ▶ src/pages/holding.astro
-14:04:56   └─ /holding/index.html (+4ms) 
-14:04:56 ▶ src/pages/index.astro
-14:04:56   └─ /index.html (+6ms) 
-14:04:56 ✓ Completed in 48ms.
+15:01:30 ▶ src/pages/404.astro
+15:01:30   └─ /404.html (+4ms) 
+15:01:30 ▶ src/pages/holding.astro
+15:01:30   └─ /holding/index.html (+4ms) 
+15:01:30 ▶ src/pages/index.astro
+15:01:30   └─ /index.html (+6ms) 
+15:01:30 ✓ Completed in 27ms.
 
  generating optimized images 
-14:04:56   ▶ /_astro/blythswood-square.CS0mgOCt_Z7yyyn.webp (reused cache entry) (+1ms) (1/7)
-14:04:56   ▶ /_astro/central-aerial.BHD9Iv6R_2sXca5.webp (reused cache entry) (+2ms) (2/7)
-14:04:56   ▶ /_astro/blythswood-square.CS0mgOCt_Z2bPj8L.webp (reused cache entry) (+2ms) (3/7)
-14:04:56   ▶ /_astro/central-aerial.BHD9Iv6R_Z2j6Y4K.webp (reused cache entry) (+2ms) (4/7)
-14:04:56   ▶ /_astro/blythswood-square.CS0mgOCt_1wDebR.webp (reused cache entry) (+2ms) (5/7)
-14:04:56   ▶ /_astro/central-aerial.BHD9Iv6R_Z1LfLGz.webp (reused cache entry) (+2ms) (6/7)
-14:04:56   ▶ /_astro/blythswood-square.CS0mgOCt_1yUJ4c.webp (reused cache entry) (+1ms) (7/7)
-14:04:56 ✓ Completed in 7ms.
+15:01:30   ▶ /_astro/central-aerial.BHD9Iv6R_2sXca5.webp (reused cache entry) (+2ms) (1/7)
+15:01:30   ▶ /_astro/blythswood-square.CS0mgOCt_Z7yyyn.webp (reused cache entry) (+3ms) (2/7)
+15:01:30   ▶ /_astro/central-aerial.BHD9Iv6R_Z2j6Y4K.webp (reused cache entry) (+2ms) (3/7)
+15:01:30   ▶ /_astro/blythswood-square.CS0mgOCt_Z2bPj8L.webp (reused cache entry) (+1ms) (4/7)
+15:01:30   ▶ /_astro/central-aerial.BHD9Iv6R_Z1LfLGz.webp (reused cache entry) (+2ms) (5/7)
+15:01:30   ▶ /_astro/blythswood-square.CS0mgOCt_1wDebR.webp (reused cache entry) (+2ms) (6/7)
+15:01:30   ▶ /_astro/blythswood-square.CS0mgOCt_1yUJ4c.webp (reused cache entry) (+2ms) (7/7)
+15:01:30 ✓ Completed in 9ms.
 
-14:04:56 [@astrojs/sitemap] `sitemap-index.xml` created at `dist`
-14:04:56 [build] 3 page(s) built in 1.41s
-14:04:56 [build] Complete!
+15:01:30 [@astrojs/sitemap] `sitemap-index.xml` created at `dist`
+15:01:30 [build] 3 page(s) built in 1.36s
+15:01:30 [build] Complete!
