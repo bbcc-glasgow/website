@@ -173,6 +173,95 @@ describe("instagram-feed workflow — failure and secret-absent handling", () =>
   });
 });
 
+describe("instagram-feed workflow - token refresh step", () => {
+  it("should run the token-refresh script as its own step", () => {
+    const content = readWorkflow();
+    assert.ok(
+      content.includes("Refresh Instagram token"),
+      "should have a 'Refresh Instagram token' step",
+    );
+    assert.ok(
+      content.includes("node scripts/refresh-ig-token.mjs"),
+      "refresh step must run the refresh script",
+    );
+  });
+
+  it("should place the refresh step after the commit/push step", () => {
+    const content = readWorkflow();
+    const commitIndex = content.indexOf("Commit and push feed update");
+    const refreshIndex = content.indexOf("Refresh Instagram token");
+    assert.ok(commitIndex !== -1, "commit step must exist");
+    assert.ok(refreshIndex !== -1, "refresh step must exist");
+    assert.ok(
+      refreshIndex > commitIndex,
+      "refresh step must come after the commit step so a refresh failure cannot roll the feed commit back",
+    );
+  });
+
+  it("should reference IG_ACCESS_TOKEN only as a masked step env var, never in a run statement", () => {
+    const content = readWorkflow();
+    const envValue =
+      /^\s*[A-Za-z_][A-Za-z0-9_]*:\s*\$\{\{\s*secrets\.IG_ACCESS_TOKEN\s*\}\}\s*$/;
+    const offending = content
+      .split("\n")
+      .filter(
+        (line) => line.includes("secrets.IG_ACCESS_TOKEN") && !envValue.test(line),
+      );
+    assert.deepStrictEqual(
+      offending,
+      [],
+      "IG_ACCESS_TOKEN must only appear as a step env value, never inside a run command",
+    );
+  });
+
+  it("should pass SECRETS_WRITE_PAT to the refresh step via env", () => {
+    const content = readWorkflow();
+    const step = content.slice(content.indexOf("Refresh Instagram token"));
+    assert.ok(
+      step.includes("SECRETS_WRITE_PAT: ${{ secrets.SECRETS_WRITE_PAT }}"),
+      "refresh step must receive SECRETS_WRITE_PAT as a masked env var",
+    );
+    const run = step.slice(step.indexOf("run:"));
+    assert.ok(
+      !run.includes("${{ secrets."),
+      "secrets must not be interpolated inside the refresh step's run block",
+    );
+  });
+
+  it("should fail the run when the refresh script fails (no continue-on-error)", () => {
+    const content = readWorkflow();
+    const step = content.slice(content.indexOf("Refresh Instagram token"));
+    assert.ok(
+      !/continue-on-error/.test(step),
+      "refresh step must not be allowed to fail silently",
+    );
+  });
+
+  it("should never log the token value in the refresh script", () => {
+    const script = readFileSync(
+      resolve(repoRoot, "scripts/refresh-ig-token.mjs"),
+      "utf-8",
+    );
+    assert.ok(script.includes("Token refreshed successfully"));
+    assert.ok(
+      script.includes("Token refresh failed - MANUAL INTERVENTION REQUIRED"),
+      "must log the required failure message",
+    );
+    assert.ok(
+      script.includes("IG_ACCESS_TOKEN not set - skipping token refresh"),
+      "must keep the fork/preview skip path",
+    );
+    assert.ok(
+      script.includes("input: newToken"),
+      "the new token must be piped to gh on stdin, not logged",
+    );
+    assert.ok(
+      !/console\.(log|error)\(.*newToken/.test(script),
+      "the new token value must never be passed to a logger",
+    );
+  });
+});
+
 describe("instagram-feed workflow — actionlint in CI", () => {
   it("should add an actionlint step to ci.yml", () => {
     const ci = readFileSync(ciPath, "utf-8");
@@ -214,6 +303,53 @@ describe("README — Feed bot setup", () => {
     assert.ok(
       section.includes("SECRETS_WRITE_PAT"),
       "section must document SECRETS_WRITE_PAT",
+    );
+  });
+
+  it("should document how to generate a long-lived token, its ~60-day expiry, and the auto-refresh", () => {
+    const readme = readFileSync(readmePath, "utf-8");
+    const section = readme.slice(readme.indexOf("## Feed bot setup"));
+    assert.ok(
+      section.includes("ig_exchange_token"),
+      "must document the long-lived token exchange endpoint",
+    );
+    assert.ok(
+      /60\s*days|60-day/.test(section),
+      "must document the ~60-day expiry",
+    );
+    assert.ok(
+      /auto-refresh|refreshes/.test(section),
+      "must document that the workflow auto-refreshes the token",
+    );
+  });
+
+  it("should document SECRETS_WRITE_PAT scopes: contents write and secrets write", () => {
+    const readme = readFileSync(readmePath, "utf-8");
+    const section = readme.slice(readme.indexOf("## Feed bot setup"));
+    assert.ok(
+      section.includes("contents: write"),
+      "must document the contents: write scope (feed commit push)",
+    );
+    assert.ok(
+      section.includes("secrets: write"),
+      "must document the secrets: write scope (token refresh)",
+    );
+    assert.ok(
+      /this repository only|scoped to this repository/.test(section),
+      "must state the PAT is scoped to this repository only",
+    );
+  });
+
+  it("should document what to do when the refresh step fails", () => {
+    const readme = readFileSync(readmePath, "utf-8");
+    const section = readme.slice(readme.indexOf("## Feed bot setup"));
+    assert.ok(
+      section.includes("Token refresh failed - MANUAL INTERVENTION REQUIRED"),
+      "must name the failure log line",
+    );
+    assert.ok(
+      section.includes("Update the `IG_ACCESS_TOKEN` secret"),
+      "must instruct regenerating and updating the token",
     );
   });
 });

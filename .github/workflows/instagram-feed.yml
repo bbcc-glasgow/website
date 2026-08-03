@@ -6,6 +6,12 @@
 # images whose post ID is no longer in the latest six. The workflow then
 # commits and pushes when the feed changed.
 #
+# After the commit step, scripts/refresh-ig-token.mjs exchanges the long-lived
+# IG_ACCESS_TOKEN (which expires after ~60 days) for a fresh one at the
+# ig_exchange_token endpoint and writes it back to the IG_ACCESS_TOKEN secret
+# via the GitHub Secrets API. A refresh failure fails the run (exit 1) but does
+# not roll back the already-pushed feed commit.
+#
 # The commit message carries `[skip ci]` so the update does not re-trigger this
 # workflow; the continuous deploy (deploy.yml) picks the commit up via the
 # normal push-to-main trigger and publishes it.
@@ -14,14 +20,12 @@
 #   <41898282+github-actions[bot]@users.noreply.github.com>.
 #
 # Required repository secrets:
-#   IG_ACCESS_TOKEN   - Instagram Graph API token (read-only feed access)
-#   SECRETS_WRITE_PAT - PAT with contents:write on this repository, used to push
-#                       the feed commit (the default GITHUB_TOKEN is read-only
-#                       for schedule events and cannot push to main)
-#
-# The token-refresh API call (slice 5) will run as a later step after the
-# commit step: a refresh failure then fails the run (exit 1) without rolling
-# back the feed commit, which is already pushed.
+#   IG_ACCESS_TOKEN   - long-lived Instagram Graph API token (read-only feed
+#                       access); auto-refreshed after each successful run
+#   SECRETS_WRITE_PAT - fine-grained PAT with contents:write (push the feed
+#                       commit) and secrets:write (update IG_ACCESS_TOKEN) on
+#                       this repository; the default GITHUB_TOKEN is read-only
+#                       for schedule events and cannot push to main
 name: instagram-feed
 
 on:
@@ -81,3 +85,15 @@ jobs:
           git commit -m "chore(instagram): update feed [skip ci]"
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push origin main
+
+      # Exchange the long-lived token for a fresh one and write it back to the
+      # IG_ACCESS_TOKEN secret (scripts/refresh-ig-token.mjs). The step skips
+      # when IG_ACCESS_TOKEN is absent (fork/preview without secrets). The new
+      # token is piped to `gh secret set` on stdin and never appears in the
+      # log. A failure here fails the run (exit 1) without rolling back the
+      # feed commit, which is already pushed.
+      - name: Refresh Instagram token
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          SECRETS_WRITE_PAT: ${{ secrets.SECRETS_WRITE_PAT }}
+        run: node scripts/refresh-ig-token.mjs
