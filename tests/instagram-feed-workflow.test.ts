@@ -181,6 +181,22 @@ describe("instagram-feed workflow — actionlint in CI", () => {
       "ci.yml must lint workflow files with actionlint",
     );
   });
+
+  it("should install actionlint via a resolvable reference, not the broken @v1 tag", () => {
+    const ci = readFileSync(ciPath, "utf-8");
+    // rhysd/actionlint publishes no plain 'v1' major-version tag, so
+    // `uses: rhysd/actionlint@v1` cannot be resolved by GitHub Actions (the
+    // round-1 gate failed with "unable to find version v1"). The step must
+    // install the binary via the official download script instead.
+    assert.ok(
+      !/rhysd\/actionlint@v1/.test(ci),
+      "must not reference rhysd/actionlint@v1 (tag does not exist upstream)",
+    );
+    assert.ok(
+      ci.includes("download-actionlint.bash"),
+      "actionlint step must install the binary via the official download script",
+    );
+  });
 });
 
 describe("README — Feed bot setup", () => {

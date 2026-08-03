@@ -20,8 +20,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # actionlint has no major-version tag (v1 does not exist upstream), so
+      # install the binary with the official download script instead of pinning
+      # a third-party action reference.
       - name: Lint workflow files (actionlint)
-        uses: rhysd/actionlint@v1
+        run: |
+          bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint -color
+        shell: bash
 
       - name: Build
         run: pnpm build
