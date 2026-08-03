@@ -43,17 +43,33 @@ It downloads each post image into `src/assets/instagram/`, writes
 `src/data/instagram/posts.json`, prunes images whose post is no longer in the latest
 six, and commits the feed when it changed with message `chore(instagram): update feed
 [skip ci]` (the `[skip ci]` avoids a redundant redeploy; deploy.yml publishes the commit
-via the normal push-to-main trigger). Two repository secrets are required:
+via the normal push-to-main trigger). After the commit step, the workflow refreshes the
+long-lived token and writes the new value back to the `IG_ACCESS_TOKEN` secret, so the
+token never needs manual rotation while the feed keeps running. Two repository secrets
+are required:
 
 | Secret | Purpose |
 | --- | --- |
-| `IG_ACCESS_TOKEN` | Instagram Graph API token (read-only feed access) for `https://graph.facebook.com/v19.0/me/media`. |
-| `SECRETS_WRITE_PAT` | Fine-grained PAT with `contents: write` on this repository, used to push the feed commit. The default `GITHUB_TOKEN` is read-only for schedule events and cannot push to `main`. |
+| `IG_ACCESS_TOKEN` | Long-lived Instagram Graph API token (read-only feed access) for `https://graph.facebook.com/v19.0/me/media`. To generate one, obtain a short-lived token from the Meta Graph API Explorer or your app's login flow, then exchange it at `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=ig_exchange_token&access_token=<short-lived token>` and store the returned `access_token` value. The long-lived token expires after roughly 60 days; the workflow auto-refreshes it after every successful fetch run. |
+| `SECRETS_WRITE_PAT` | Fine-grained PAT scoped to this repository only, with `contents: write` (to push the feed commit) and `secrets: write` (to update `IG_ACCESS_TOKEN` after each refresh). The default `GITHUB_TOKEN` is read-only for schedule events and cannot push to `main` or write secrets. |
 
 Feed commits are authored as `github-actions[bot]`. On forks or pull-request previews
 where the secrets are absent, the fetch step logs "IG_ACCESS_TOKEN not set - skipping
 feed fetch" and exits 0, so `pnpm build` still succeeds with whatever `posts.json` is
-committed.
+committed; the token-refresh step skips for the same reason.
+
+### If the token-refresh step fails
+
+A red `Refresh Instagram token` step logs `Token refresh failed - MANUAL INTERVENTION REQUIRED`
+and fails the run (exit 1); the feed commit from the same run is not rolled back. To recover:
+
+1. Generate a fresh short-lived token (Meta Graph API Explorer or your app's login flow).
+2. Exchange it for a long-lived token at
+   `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=ig_exchange_token&access_token=<short-lived token>`
+   and copy the returned `access_token` value.
+3. Update the `IG_ACCESS_TOKEN` secret in the repository (Settings > Secrets and
+   variables > Actions) with the new value.
+4. Re-run the workflow from the Actions tab (Workflow dispatch) and confirm it goes green.
 
 ## Site mode: holding page vs live site
 
