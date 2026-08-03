@@ -24,7 +24,6 @@ const projectSchema = z.object({
   variant: z.enum(projectVariants).catch("teal"),
   title: z.string(),
   summary: z.string(),
-  details: z.string(),
   order: z.number(),
   ctas: z
     .array(
@@ -62,7 +61,6 @@ describe("Project schema", () => {
     variant: "pink",
     title: "Local Place Plan",
     summary: "A community-led spatial vision.",
-    details: "Full details here.",
     order: 1,
     ctas: [{ label: "Contact us", url: "mailto:info@bbcc.scot", icon: "mail" }],
   };
@@ -114,12 +112,6 @@ describe("Project schema", () => {
 
   it("should reject missing summary", () => {
     const { summary: _, ...rest } = validProject;
-    const result = projectSchema.safeParse(rest);
-    assert.ok(!result.success);
-  });
-
-  it("should reject missing details", () => {
-    const { details: _, ...rest } = validProject;
     const result = projectSchema.safeParse(rest);
     assert.ok(!result.success);
   });

@@ -114,10 +114,10 @@ never committed to this repository.** The repository stores only the site UUID i
 ## Verify before first release
 
 The seed content is ported from the concept page. Project cards draw their title, summary and
-details from `src/content/projects/*.json`; site-level data (stats, boundary description, contact
-email) lives in `src/content/site/index.json`. Items below are placeholders or unverified claims
-deliberately left for the owner to confirm — **each should be resolved via an issue before the
-first release**:
+calls-to-action from `src/content/projects/*.json`; site-level data (stats, boundary description,
+contact email) lives in `src/content/site/index.json`. Items below are placeholders or unverified
+claims deliberately left for the owner to confirm — **each should be resolved via an issue before
+the first release**:
 
 - [ ] **Meeting card**: date, time and location are "To be announced" — fill in the real next
       meeting.

@@ -231,15 +231,6 @@ const { stats, boundaryDescription, contactEmail } = siteEntry.data;
                     <span class="badge card-tag border-0" style={`background:${colours.tagBgColour};color:${colours.tagColour};`}>{p.tag}</span>
                     <h3>{p.title}</h3>
                     <p>{p.summary}</p>
-                    <div class="collapse collapse-arrow mt-4" style="background:transparent;">
-                      <input type="checkbox" aria-label={`Find out more about the ${p.title}`} />
-                      <div class="collapse-title">Find out more</div>
-                      <div class="collapse-content">
-                        <p class="text-sm leading-relaxed" style="color:#595959;">
-                          {p.details}
-                        </p>
-                      </div>
-                    </div>
                     {
                       p.ctas && p.ctas.length > 0 && (
                         <div class="flex flex-wrap gap-2 mt-4">

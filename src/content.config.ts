@@ -15,7 +15,6 @@ const projects = defineCollection({
     variant: z.enum(PROJECT_VARIANTS).catch(DEFAULT_PROJECT_VARIANT),
     title: z.string(),
     summary: z.string(),
-    details: z.string(),
     order: z.number(),
     ctas: z
       .array(

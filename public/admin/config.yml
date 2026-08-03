@@ -51,7 +51,6 @@ collections:
       - { name: variant, label: Variant, widget: select, options: ["teal", "pink", "amber"], default: "teal" }
       - { name: title, label: Title, widget: string }
       - { name: summary, label: Summary, widget: text }
-      - { name: details, label: Details, widget: text }
       - { name: order, label: Order, widget: number, value_type: int }
       - name: ctas
         label: Call to Action Buttons

@@ -366,7 +366,7 @@ describe("Decap CMS config.yml", () => {
 
     const fieldNames = extractFieldNames(projBlock);
     // All required fields must be present
-    const required = ["tag", "variant", "title", "summary", "details", "order", "ctas"];
+    const required = ["tag", "variant", "title", "summary", "order", "ctas"];
     for (const field of required) {
       assert.ok(
         fieldNames.includes(field),
