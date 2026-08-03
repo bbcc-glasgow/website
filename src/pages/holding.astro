@@ -2,8 +2,15 @@
 import { getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
 
-const holdingEntry = await getEntry("holding", "index");
-const { eyebrow, heading, body, ctaLabel } = holdingEntry.data;
+// The Holding Page is the second file entry in the Pages collection, distinct
+// from the Homepage entry; this route always reads the Holding Page shape.
+const holdingEntry = await getEntry("pages", "holding");
+const { eyebrow, heading, body, ctaLabel } = holdingEntry.data as {
+  eyebrow: string;
+  heading: string;
+  body: string;
+  ctaLabel: string;
+};
 
 const siteEntry = await getEntry("site", "index");
 const { contactEmail } = siteEntry.data;

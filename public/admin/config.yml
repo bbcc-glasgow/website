@@ -36,69 +36,6 @@ media_folder: public/images
 public_folder: /images
 
 collections:
-  - name: projects
-    label: Projects
-    label_singular: Project
-    description: Community council projects and initiatives
-    folder: src/content/projects
-    extension: .json
-    format: json
-    create: true
-    delete: true
-    slug: "{{slug}}"
-    fields:
-      - { name: tag, label: Tag, widget: string }
-      - { name: variant, label: Variant, widget: select, options: ["teal", "pink", "amber"], default: "teal" }
-      - { name: title, label: Title, widget: string }
-      - { name: summary, label: Summary, widget: text }
-      - { name: order, label: Order, widget: number, value_type: int }
-      - name: ctas
-        label: Call to Action Buttons
-        widget: list
-        required: false
-        summary: "{{fields.label}}"
-        fields:
-          - { name: label, label: Label, widget: string }
-          - { name: url, label: URL, widget: string }
-          - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download"], required: false }
-
-  - name: site
-    label: Site Facts
-    description: Site-wide configuration data, statistics, and contact information
-    files:
-      - file: src/content/site/index.json
-        name: index
-        label: Site Facts
-        fields:
-          - name: stats
-            label: Statistics
-            widget: list
-            summary: "{{fields.value}} {{fields.label}}"
-            fields:
-              - { name: value, label: Value, widget: string }
-              - { name: label, label: Label, widget: string }
-              - { name: desc, label: Description, widget: string }
-              - { name: countValue, label: Count Value, widget: number, value_type: int, required: false }
-              - { name: prefix, label: Prefix, widget: string, required: false }
-              - { name: suffix, label: Suffix, widget: string, required: false }
-              - { name: valueStyle, label: Value Style, widget: string, required: false }
-              - { name: duration, label: Duration (ms), widget: number, value_type: int, required: false }
-          - { name: boundaryDescription, label: Boundary Description, widget: text }
-          - { name: contactEmail, label: Contact Email, widget: string }
-
-  - name: holding
-    label: Holding Page
-    description: Editable content for the site's holding page
-    files:
-      - file: src/content/holding/index.json
-        name: index
-        label: Holding Page
-        fields:
-          - { name: eyebrow, label: Eyebrow, widget: string }
-          - { name: heading, label: Heading, widget: string }
-          - { name: body, label: Body, widget: text }
-          - { name: ctaLabel, label: CTA Label, widget: string }
-
   - name: pages
     label: Pages
     description: Page copy for the public site
@@ -224,3 +161,62 @@ collections:
               - { name: body, label: Body, widget: text }
               - { name: ctaLabel, label: CTA Label, widget: string }
               - { name: subtext, label: Subtext, widget: string }
+      - file: src/content/pages/holding.json
+        name: holding
+        label: Holding Page
+        fields:
+          - { name: eyebrow, label: Eyebrow, widget: string }
+          - { name: heading, label: Heading, widget: string }
+          - { name: body, label: Body, widget: text }
+          - { name: ctaLabel, label: CTA Label, widget: string }
+
+  - name: projects
+    label: Projects
+    label_singular: Project
+    description: Community council projects and initiatives
+    folder: src/content/projects
+    extension: .json
+    format: json
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    fields:
+      - { name: tag, label: Tag, widget: string }
+      - { name: variant, label: Variant, widget: select, options: ["teal", "pink", "amber"], default: "teal" }
+      - { name: title, label: Title, widget: string }
+      - { name: summary, label: Summary, widget: text }
+      - { name: order, label: Order, widget: number, value_type: int }
+      - name: ctas
+        label: Call to Action Buttons
+        widget: list
+        required: false
+        summary: "{{fields.label}}"
+        fields:
+          - { name: label, label: Label, widget: string }
+          - { name: url, label: URL, widget: string }
+          - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download"], required: false }
+
+  - name: site
+    label: Site Settings
+    description: Site-wide configuration data, statistics, and contact information
+    files:
+      - file: src/content/site/index.json
+        name: index
+        label: Site Settings
+        fields:
+          - name: stats
+            label: Statistics
+            widget: list
+            summary: "{{fields.value}} {{fields.label}}"
+            fields:
+              - { name: value, label: Value, widget: string }
+              - { name: label, label: Label, widget: string }
+              - { name: desc, label: Description, widget: string }
+              - { name: countValue, label: Count Value, widget: number, value_type: int, required: false }
+              - { name: prefix, label: Prefix, widget: string, required: false }
+              - { name: suffix, label: Suffix, widget: string, required: false }
+              - { name: valueStyle, label: Value Style, widget: string, required: false }
+              - { name: duration, label: Duration (ms), widget: number, value_type: int, required: false }
+          - { name: boundaryDescription, label: Boundary Description, widget: text }
+          - { name: contactEmail, label: Contact Email, widget: string }
+

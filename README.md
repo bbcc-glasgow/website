@@ -77,7 +77,7 @@ DecapBridge, which issues a PR behind the scenes.
    point.
 
 3. **Find the entry you want to edit** — the sidebar lists the available collections. For example,
-   click **"Site Facts"** to open `src/content/site/index.json`, then scroll to the **Statistics**
+   click **"Site Settings"** to open `src/content/site/index.json`, then scroll to the **Statistics**
    section to update a date, a contact email, or a boundary description. (The exact fields vary by
    collection — see the full list below.)
 

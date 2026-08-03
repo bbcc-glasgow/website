@@ -466,6 +466,17 @@ describe("Decap CMS config.yml", () => {
     );
   });
 
+  it("should label the site collection Site Settings", () => {
+    const text = getConfig();
+    const siteBlock = extractCollectionBlock(text, "site");
+    assert.ok(siteBlock, "site collection must exist");
+    assert.match(
+      siteBlock,
+      /label\s*:\s*Site Settings/,
+      "site collection must be labelled Site Settings",
+    );
+  });
+
   // ── Collections: pages ─────────────────────────────────────────────
 
   it("should have a pages collection with file at src/content/pages/index.json", () => {
@@ -530,6 +541,44 @@ describe("Decap CMS config.yml", () => {
     assert.ok(
       !/name\s*:\s*location\b/.test(meetingsSection),
       "meetings must not expose a location field",
+    );
+  });
+
+  it("should have a Holding Page file entry at src/content/pages/holding.json", () => {
+    const text = getConfig();
+    const pagesBlock = extractCollectionBlock(text, "pages");
+    assert.ok(pagesBlock, "pages collection must exist");
+    assert.ok(
+      /file\s*:\s*src\/content\/pages\/holding\.json/.test(pagesBlock),
+      "pages collection must reference src/content/pages/holding.json",
+    );
+  });
+
+  it("should label the Homepage and Holding Page file entries in the pages collection", () => {
+    const pagesBlock = extractCollectionBlock(getConfig(), "pages");
+    assert.ok(pagesBlock, "pages collection must exist");
+    assert.match(
+      pagesBlock,
+      /label\s*:\s*Homepage/,
+      "pages collection must label the Homepage file entry",
+    );
+    assert.match(
+      pagesBlock,
+      /label\s*:\s*Holding Page/,
+      "pages collection must label the Holding Page file entry",
+    );
+  });
+
+  it("should give the Holding Page file entry exactly the holding page fields", () => {
+    const pagesBlock = extractCollectionBlock(getConfig(), "pages");
+    assert.ok(pagesBlock, "pages collection must exist");
+    const holdingFields = extractFileEntryFields(
+      pagesBlock,
+      "src/content/pages/holding.json",
+    );
+    assert.deepStrictEqual(
+      holdingFields,
+      ["eyebrow", "heading", "body", "ctaLabel"],
     );
   });
 });
@@ -732,6 +781,64 @@ function extractSiteFieldNames(siteBlock) {
     }
 
     // Multi-line format: `- name: foo`
+    const multiMatch = trimmed.match(/^\s*-\s*name\s*:\s*(.+)/);
+    if (multiMatch) {
+      result.push(multiMatch[1].trim());
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Extract the top-level field names from a specific file entry within a
+ * files collection block, identified by its `- file:` path. Used to verify
+ * each file entry in the pages collection (Homepage, Holding Page) exposes
+ * exactly the fields its content file requires.
+ */
+function extractFileEntryFields(collectionBlock, filePath) {
+  const lines = collectionBlock.split("\n");
+
+  const fileLineIdx = lines.findIndex(
+    (l) => l.trim() === `- file: ${filePath}`,
+  );
+  if (fileLineIdx < 0) return [];
+  const fileLine = lines[fileLineIdx];
+
+  const fileEntryIndent = fileLine.length - fileLine.trimStart().length;
+
+  // Search for the file entry's own `fields:` key only after its `- file:` line,
+  // so an earlier file entry's fields are never picked up.
+  let fieldsLine = null;
+  let fieldsIdx = -1;
+  for (let i = fileLineIdx + 1; i < lines.length; i++) {
+    const trimmed = lines[i].trimEnd();
+    if (/^\s*fields:$/.test(trimmed)) {
+      const indent = trimmed.length - trimmed.trimStart().length;
+      if (indent === fileEntryIndent + 2) {
+        fieldsLine = trimmed;
+        fieldsIdx = i;
+        break;
+      }
+    }
+  }
+  if (!fieldsLine || fieldsIdx < 0) return [];
+
+  const fieldsIndent = fieldsLine.length - fieldsLine.trimStart().length + 2;
+
+  const result = [];
+  for (let i = fieldsIdx + 1; i < lines.length; i++) {
+    const trimmed = lines[i].trimEnd();
+    const indent = trimmed.length - trimmed.trimStart().length;
+    if (indent < fieldsIndent) break;
+    if (indent > fieldsIndent) continue;
+
+    const inlineMatch = trimmed.match(/^\s*-\s*\{\s*name\s*:\s*([^,}\s]+)/);
+    if (inlineMatch) {
+      result.push(inlineMatch[1]);
+      continue;
+    }
+
     const multiMatch = trimmed.match(/^\s*-\s*name\s*:\s*(.+)/);
     if (multiMatch) {
       result.push(multiMatch[1].trim());

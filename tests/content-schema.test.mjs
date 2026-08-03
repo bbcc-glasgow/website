@@ -165,16 +165,19 @@ const holdingSchema = z.object({
   ctaLabel: z.string(),
 });
 
-// ── Holding schema tests ──────────────────────────────────────────────
+// The Holding Page is the second file entry in the pages collection. Its
+// shape is distinct from the Homepage entry, so the two are combined into the
+// pages schema via a union below.
+const validHolding = {
+  eyebrow: "Glasgow's City Centre Community Council",
+  heading: "Your City,<br />Our City.",
+  body: "Blythswood & Broomielaw Community Council gives residents and workers a democratic voice in shaping the heart of Glasgow. Our website is under construction — in the meantime, we'd love to hear from you.",
+  ctaLabel: "Email us",
+};
 
-describe("Holding schema", () => {
-  const validHolding = {
-    eyebrow: "Glasgow's City Centre Community Council",
-    heading: "Your City,<br />Our City.",
-    body: "Blythswood & Broomielaw Community Council gives residents and workers a democratic voice in shaping the heart of Glasgow. Our website is under construction — in the meantime, we'd love to hear from you.",
-    ctaLabel: "Email us",
-  };
+// ── Holding Page entry schema tests ───────────────────────────────────
 
+describe("Holding Page entry schema", () => {
   it("should accept a complete holding object", () => {
     const result = holdingSchema.safeParse(validHolding);
     assert.ok(result.success);
@@ -302,8 +305,12 @@ describe("Site schema", () => {
 });
 
 // ── Pages schema ─────────────────────────────────────────────────────────
+//
+// The pages collection holds two file entries: the Homepage (one object per
+// section, in page order) and the Holding Page (eyebrow/heading/body/ctaLabel).
+// A union lets both files validate against the same collection schema.
 
-const pagesSchema = z.object({
+const homepageSchema = z.object({
   hero: z.object({
     eyebrow: z.string(),
     heading: z.string(),
@@ -366,6 +373,8 @@ const pagesSchema = z.object({
     subtext: z.string(),
   }),
 });
+
+const pagesSchema = z.union([homepageSchema, holdingSchema]);
 
 describe("Pages schema", () => {
   const validPages = {
@@ -518,5 +527,21 @@ describe("Pages schema", () => {
   it("should accept a hero heading with an embedded <br /> tag", () => {
     const result = pagesSchema.safeParse(validPages);
     assert.ok(result.success);
+  });
+
+  it("should accept a holding page entry as the Holding Page file of the pages collection", () => {
+    const result = pagesSchema.safeParse(validHolding);
+    assert.ok(result.success);
+  });
+
+  it("should reject an entry that matches neither the homepage nor the holding page shape", () => {
+    const result = pagesSchema.safeParse({ heading: "Just a heading" });
+    assert.ok(!result.success);
+  });
+
+  it("should reject a holding page entry missing a required field", () => {
+    const { ctaLabel: _removed, ...holdingWithoutCta } = validHolding;
+    const result = pagesSchema.safeParse(holdingWithoutCta);
+    assert.ok(!result.success);
   });
 });

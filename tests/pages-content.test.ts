@@ -194,3 +194,66 @@ describe("homepage copy source", () => {
     }
   });
 });
+
+// ── Holding page content file tests ──────────────────────────────────────
+
+describe("holding page content file", () => {
+  const holdingFile = resolve(repoRoot, "src/content/pages/holding.json");
+
+  it("should exist at src/content/pages/holding.json", () => {
+    assert.ok(
+      existsSync(holdingFile),
+      "src/content/pages/holding.json must exist",
+    );
+  });
+
+  it("should hold exactly the holding page fields, all non-empty", () => {
+    const data = JSON.parse(readFileSync(holdingFile, "utf-8"));
+    assert.deepStrictEqual(
+      Object.keys(data),
+      ["eyebrow", "heading", "body", "ctaLabel"],
+    );
+    for (const [key, value] of Object.entries(data)) {
+      assert.ok(
+        typeof value === "string" && value.trim().length > 0,
+        `${key} must be a non-empty string`,
+      );
+    }
+  });
+
+  it("should keep the holding page copy unchanged from the original entry", () => {
+    const data = JSON.parse(readFileSync(holdingFile, "utf-8"));
+    assert.strictEqual(data.eyebrow, "Glasgow's City Centre Community Council");
+    assert.strictEqual(data.heading, "Your City,<br />Our City.");
+    assert.strictEqual(
+      data.body,
+      "Blythswood & Broomielaw Community Council gives residents and workers a democratic voice in shaping the heart of Glasgow. Our website is under construction. In the meantime, we'd love to hear from you.",
+    );
+    assert.strictEqual(data.ctaLabel, "Email us");
+  });
+});
+
+// ── Holding page copy source tests ───────────────────────────────────────
+
+describe("holding page copy source", () => {
+  const holdingAstro = readFileSync(
+    resolve(repoRoot, "src/pages/holding.astro"),
+    "utf-8",
+  );
+
+  it("should read the holding page entry from the pages collection", () => {
+    assert.ok(
+      holdingAstro.includes('getEntry("pages", "holding")'),
+      "holding.astro must load the holding entry from the pages content collection",
+    );
+  });
+
+  it("should render each field from the pages content entry", () => {
+    for (const ref of ["eyebrow", "heading", "body", "ctaLabel"]) {
+      assert.ok(
+        holdingAstro.includes(ref),
+        `holding.astro must render ${ref} from the pages content entry`,
+      );
+    }
+  });
+});
