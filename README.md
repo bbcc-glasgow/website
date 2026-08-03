@@ -35,6 +35,26 @@ fallback/redeploy path. A concurrency group serialises back-to-back merges so th
 is always the one live. Requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository
 secrets.
 
+## Feed bot setup
+
+The `instagram-feed` workflow fetches the six most recent posts from the council's
+Instagram account every day at 06:00 UTC (and on manual dispatch from the Actions tab).
+It downloads each post image into `src/assets/instagram/`, writes
+`src/data/instagram/posts.json`, prunes images whose post is no longer in the latest
+six, and commits the feed when it changed with message `chore(instagram): update feed
+[skip ci]` (the `[skip ci]` avoids a redundant redeploy; deploy.yml publishes the commit
+via the normal push-to-main trigger). Two repository secrets are required:
+
+| Secret | Purpose |
+| --- | --- |
+| `IG_ACCESS_TOKEN` | Instagram Graph API token (read-only feed access) for `https://graph.facebook.com/v19.0/me/media`. |
+| `SECRETS_WRITE_PAT` | Fine-grained PAT with `contents: write` on this repository, used to push the feed commit. The default `GITHUB_TOKEN` is read-only for schedule events and cannot push to `main`. |
+
+Feed commits are authored as `github-actions[bot]`. On forks or pull-request previews
+where the secrets are absent, the fetch step logs "IG_ACCESS_TOKEN not set - skipping
+feed fetch" and exits 0, so `pnpm build` still succeeds with whatever `posts.json` is
+committed.
+
 ## Site mode: holding page vs live site
 
 A small Worker (`worker.js`, `run_worker_first`) gates the static assets on the `SITE_MODE`

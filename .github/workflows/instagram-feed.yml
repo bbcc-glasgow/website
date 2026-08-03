@@ -1,0 +1,83 @@
+# Daily Instagram feed fetch.
+#
+# Pulls the six most recent posts from BBCC's Instagram account via the Graph
+# API (scripts/fetch-instagram.mjs): downloads each post image into
+# src/assets/instagram/, writes src/data/instagram/posts.json, and prunes
+# images whose post ID is no longer in the latest six. The workflow then
+# commits and pushes when the feed changed.
+#
+# The commit message carries `[skip ci]` so the update does not re-trigger this
+# workflow; the continuous deploy (deploy.yml) picks the commit up via the
+# normal push-to-main trigger and publishes it.
+#
+# Bot identity: commits are authored as github-actions[bot]
+#   <41898282+github-actions[bot]@users.noreply.github.com>.
+#
+# Required repository secrets:
+#   IG_ACCESS_TOKEN   - Instagram Graph API token (read-only feed access)
+#   SECRETS_WRITE_PAT - PAT with contents:write on this repository, used to push
+#                       the feed commit (the default GITHUB_TOKEN is read-only
+#                       for schedule events and cannot push to main)
+#
+# The token-refresh API call (slice 5) will run as a later step after the
+# commit step: a refresh failure then fails the run (exit 1) without rolling
+# back the feed commit, which is already pushed.
+name: instagram-feed
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-feed:
+    runs-on: ubuntu-latest
+    steps:
+      # persist-credentials: false keeps checkout's read-only GITHUB_TOKEN from
+      # being injected as an http.extraheader, which would override the PAT
+      # credentials used for the push below.
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # The fetch script is dependency-free (Node built-ins only), so no
+      # package install is needed.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # When IG_ACCESS_TOKEN is absent (fork/preview without secrets) the
+      # script logs "IG_ACCESS_TOKEN not set - skipping feed fetch" and exits
+      # 0, so this step never fails the run.
+      - name: Fetch Instagram feed
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: node scripts/fetch-instagram.mjs
+
+      # Feed is unchanged when neither tracked paths nor untracked new images
+      # show a diff across the feed data and the images directory.
+      - name: Detect feed changes
+        id: feed
+        run: |
+          if ! git diff --quiet -- src/data/instagram/posts.json src/assets/instagram/ || \
+             [ -n "$(git ls-files --others --exclude-standard -- src/data/instagram/posts.json src/assets/instagram/)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Feed unchanged, skipping commit"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push feed update
+        if: steps.feed.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SECRETS_WRITE_PAT }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/instagram/posts.json src/assets/instagram/
+          git commit -m "chore(instagram): update feed [skip ci]"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin main
