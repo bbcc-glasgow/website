@@ -9,15 +9,31 @@ const { z } = require("zod");
 
 // ── Schemas (mirror src/content.config.ts) ──────────────────────────────
 
+const projectVariants = ["teal", "pink", "amber"];
+const projectCtaIcons = [
+  "arrow-right",
+  "external",
+  "mail",
+  "calendar",
+  "map-pin",
+  "download",
+];
+
 const projectSchema = z.object({
   tag: z.string(),
-  tagColour: z.string(),
-  tagBgColour: z.string(),
-  borderColour: z.string(),
+  variant: z.enum(projectVariants).catch("teal"),
   title: z.string(),
   summary: z.string(),
-  details: z.string(),
   order: z.number(),
+  ctas: z
+    .array(
+      z.object({
+        label: z.string(),
+        url: z.string(),
+        icon: z.enum(projectCtaIcons).optional(),
+      }),
+    )
+    .optional(),
 });
 
 const siteSchema = z.object({
@@ -42,13 +58,11 @@ const siteSchema = z.object({
 describe("Project schema", () => {
   const validProject = {
     tag: "Strategy",
-    tagColour: "var(--pink)",
-    tagBgColour: "rgba(220,26,132,0.1)",
-    borderColour: "var(--pink)",
+    variant: "pink",
     title: "Local Place Plan",
     summary: "A community-led spatial vision.",
-    details: "Full details here.",
     order: 1,
+    ctas: [{ label: "Contact us", url: "mailto:info@bbcc.scot", icon: "mail" }],
   };
 
   it("should accept a complete project object", () => {
@@ -56,26 +70,36 @@ describe("Project schema", () => {
     assert.ok(result.success);
   });
 
+  it("should accept a project with no ctas", () => {
+    const { ctas: _, ...rest } = validProject;
+    const result = projectSchema.safeParse(rest);
+    assert.ok(result.success);
+  });
+
+  it("should accept a project with an empty ctas array", () => {
+    const result = projectSchema.safeParse({ ...validProject, ctas: [] });
+    assert.ok(result.success);
+  });
+
+  it("should accept a cta with no icon", () => {
+    const { icon: _, ...ctaNoIcon } = validProject.ctas[0];
+    const result = projectSchema.safeParse({ ...validProject, ctas: [ctaNoIcon] });
+    assert.ok(result.success);
+  });
+
+  it("should default a missing variant to teal", () => {
+    const { variant: _, ...rest } = validProject;
+    const result = projectSchema.parse(rest);
+    assert.strictEqual(result.variant, "teal");
+  });
+
+  it("should fall back to teal for an invalid variant", () => {
+    const result = projectSchema.parse({ ...validProject, variant: "purple" });
+    assert.strictEqual(result.variant, "teal");
+  });
+
   it("should reject missing tag", () => {
     const { tag: _, ...rest } = validProject;
-    const result = projectSchema.safeParse(rest);
-    assert.ok(!result.success);
-  });
-
-  it("should reject missing tagColour", () => {
-    const { tagColour: _, ...rest } = validProject;
-    const result = projectSchema.safeParse(rest);
-    assert.ok(!result.success);
-  });
-
-  it("should reject missing tagBgColour", () => {
-    const { tagBgColour: _, ...rest } = validProject;
-    const result = projectSchema.safeParse(rest);
-    assert.ok(!result.success);
-  });
-
-  it("should reject missing borderColour", () => {
-    const { borderColour: _, ...rest } = validProject;
     const result = projectSchema.safeParse(rest);
     assert.ok(!result.success);
   });
@@ -88,12 +112,6 @@ describe("Project schema", () => {
 
   it("should reject missing summary", () => {
     const { summary: _, ...rest } = validProject;
-    const result = projectSchema.safeParse(rest);
-    assert.ok(!result.success);
-  });
-
-  it("should reject missing details", () => {
-    const { details: _, ...rest } = validProject;
     const result = projectSchema.safeParse(rest);
     assert.ok(!result.success);
   });
@@ -111,6 +129,31 @@ describe("Project schema", () => {
 
   it("should reject non-numeric order", () => {
     const result = projectSchema.safeParse({ ...validProject, order: "first" });
+    assert.ok(!result.success);
+  });
+
+  it("should reject a cta missing label", () => {
+    const { label: _, ...ctaNoLabel } = validProject.ctas[0];
+    const result = projectSchema.safeParse({ ...validProject, ctas: [ctaNoLabel] });
+    assert.ok(!result.success);
+  });
+
+  it("should reject a cta missing url", () => {
+    const { url: _, ...ctaNoUrl } = validProject.ctas[0];
+    const result = projectSchema.safeParse({ ...validProject, ctas: [ctaNoUrl] });
+    assert.ok(!result.success);
+  });
+
+  it("should reject a cta with an invalid icon", () => {
+    const result = projectSchema.safeParse({
+      ...validProject,
+      ctas: [{ label: "Contact us", url: "mailto:info@bbcc.scot", icon: "sparkles" }],
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should reject ctas that is not an array", () => {
+    const result = projectSchema.safeParse({ ...validProject, ctas: "none" });
     assert.ok(!result.success);
   });
 });

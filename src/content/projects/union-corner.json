@@ -1,10 +1,14 @@
 {
   "tag": "Place-making",
-  "tagColour": "var(--pink)",
-  "tagBgColour": "rgba(220,26,132,0.1)",
-  "borderColour": "var(--pink)",
+  "variant": "pink",
   "title": "Union Corner",
   "summary": "Advocating for the sensitive redevelopment of the Union Street / Argyle Street corner — a gateway to the city centre.",
-  "details": "Full details for this project are being prepared. Contact us to find out more or get involved.",
-  "order": 4
+  "order": 4,
+  "ctas": [
+    {
+      "label": "Contact us",
+      "url": "mailto:info@bbcc.scot",
+      "icon": "mail"
+    }
+  ]
 }
