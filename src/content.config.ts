@@ -48,81 +48,84 @@ const site = defineCollection({
   }),
 });
 
-const holding = defineCollection({
-  type: "data",
-  schema: z.object({
+// The pages collection holds two file entries: the Homepage (one object per
+// section, in page order) and the Holding Page (eyebrow/heading/body/ctaLabel).
+// A union lets both files validate against the same collection schema; each
+// entry matches exactly one member.
+const homepageSchema = z.object({
+  hero: z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    ctaLabel: z.string(),
+    ctas: z.array(z.object({ label: z.string(), url: z.string() })),
   }),
-});
-
-const pages = defineCollection({
-  type: "data",
-  schema: z.object({
-    hero: z.object({
-      eyebrow: z.string(),
-      heading: z.string(),
-      body: z.string(),
-      ctas: z.array(z.object({ label: z.string(), url: z.string() })),
-    }),
-    ourArea: z.object({
-      eyebrow: z.string(),
-      heading: z.string(),
-      body1: z.string(),
-      body2: z.string(),
-      boundaryLabel: z.string(),
-      pillars: z.array(z.object({ heading: z.string(), body: z.string() })),
-    }),
-    ourProjects: z.object({
-      eyebrow: z.string(),
-      heading: z.string(),
-      ideaCard: z.object({
-        heading: z.string(),
-        body: z.string(),
-        cta: z.object({ label: z.string(), url: z.string() }),
-      }),
-    }),
-    jag: z.object({
-      eyebrow: z.string(),
-      heading: z.string(),
-      body: z.string(),
-      cards: z.array(
-        z.object({
-          eyebrow: z.string(),
-          heading: z.string(),
-          body: z.string(),
-          ctaLabel: z.string(),
-        }),
-      ),
-    }),
-    getInvolved: z.object({
-      eyebrow: z.string(),
-      heading: z.string(),
-      body: z.string(),
-      cards: z.array(
-        z.object({
-          heading: z.string(),
-          body: z.string(),
-          cta: z.object({ label: z.string(), url: z.string() }),
-        }),
-      ),
-    }),
-    meetings: z.object({
-      eyebrow: z.string(),
+  ourArea: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body1: z.string(),
+    body2: z.string(),
+    boundaryLabel: z.string(),
+    pillars: z.array(z.object({ heading: z.string(), body: z.string() })),
+  }),
+  ourProjects: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    ideaCard: z.object({
       heading: z.string(),
       body: z.string(),
       cta: z.object({ label: z.string(), url: z.string() }),
     }),
-    newsletter: z.object({
-      eyebrow: z.string(),
-      heading: z.string(),
-      body: z.string(),
-      ctaLabel: z.string(),
-      subtext: z.string(),
-    }),
+  }),
+  jag: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    cards: z.array(
+      z.object({
+        eyebrow: z.string(),
+        heading: z.string(),
+        body: z.string(),
+        ctaLabel: z.string(),
+      }),
+    ),
+  }),
+  getInvolved: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    cards: z.array(
+      z.object({
+        heading: z.string(),
+        body: z.string(),
+        cta: z.object({ label: z.string(), url: z.string() }),
+      }),
+    ),
+  }),
+  meetings: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    cta: z.object({ label: z.string(), url: z.string() }),
+  }),
+  newsletter: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    ctaLabel: z.string(),
+    subtext: z.string(),
   }),
 });
 
-export const collections = { projects, site, holding, pages };
+const holdingSchema = z.object({
+  eyebrow: z.string(),
+  heading: z.string(),
+  body: z.string(),
+  ctaLabel: z.string(),
+});
+
+const pages = defineCollection({
+  type: "data",
+  schema: z.union([homepageSchema, holdingSchema]),
+});
+
+export const collections = { projects, site, pages };
