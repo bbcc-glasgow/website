@@ -19,7 +19,7 @@
     "test:instagram-feed": "node --experimental-strip-types --test tests/instagram-feed.test.ts",
     "test:instagram-refresh": "node --test tests/refresh-ig-token.test.mjs",
     "test:lighthouse": "lhci autorun",
-    "gate": "pnpm build && pnpm test:sitemap && pnpm test:links && pnpm test:a11y && pnpm test:lighthouse"
+    "gate": "./gate.sh"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

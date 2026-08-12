@@ -29,17 +29,8 @@ jobs:
           ./actionlint -color
         shell: bash
 
-      - name: Build
-        run: pnpm build
-
-      - name: Link integrity
-        run: pnpm test:links
-
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Accessibility (axe, zero violations)
-        run: pnpm test:a11y
-
-      - name: Lighthouse budgets
-        run: pnpm test:lighthouse
+      - name: Gate
+        run: ./gate.sh
