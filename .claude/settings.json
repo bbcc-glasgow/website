@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(//Users/gkanitz/Claude/collaudo-orchestrator-core/**)",
+      "Write(//Users/gkanitz/Claude/collaudo-orchestrator-core/**)",
+      "NotebookEdit(//Users/gkanitz/Claude/collaudo-orchestrator-core/**)"
+    ]
+  }
+}
