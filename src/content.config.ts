@@ -61,30 +61,24 @@ const site = defineCollection({
       addressCountry: z.string(),
       accessNote: z.string(),
     }),
-    // The rule, not a list of dates: `src/lib/meetings.ts` derives the
-    // next few concrete meetings at build time, so nothing goes stale.
-    meetingRule: z.object({
-      weekOfMonth: z.number().int().min(1).max(5),
-      weekday: z.enum([
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ]),
-      exceptMonths: z.array(z.string()),
+    // Where the meeting dates come from. Not dates, and no longer a rule
+    // either: `src/lib/gcal.ts` reads the council's Google Calendar at build
+    // time and `src/lib/meetings.ts` derives the standing pattern from what it
+    // finds, so cancelling a meeting in Google is the whole job.
+    meetingCalendar: z.object({
+      /**
+       * The calendar's public iCal address, from Google Calendar settings under
+       * "Integrate calendar". Must be the public address, not the secret one:
+       * this file is in a public repo, and the secret address is a credential.
+       */
+      icsUrl: z.string().url(),
+    }),
+    // The two facts about the meetings that a calendar entry cannot hold.
+    meetingDetails: z.object({
+      /** Google has one start time per event; "doors at 7 for 7.30" is two. */
       doorsOpen: z.string(),
-      startTime: z.string(),
-      endTime: z.string(),
       attendanceNote: z.string(),
     }),
-    // One-off cancellations, as ISO yyyy-mm-dd dates that the rule would
-    // otherwise produce. Defaulted rather than required: Decap drops an empty
-    // list from the JSON entirely, and "no cancellations" is the normal state,
-    // so an absent key must not fail the build.
-    meetingExceptions: z.array(z.string()).default([]),
     areaPartnership: z.object({
       name: z.string(),
       parentBody: z.string(),

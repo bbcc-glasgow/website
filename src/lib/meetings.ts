@@ -1,35 +1,38 @@
-// Meeting dates are derived, never stored (#37).
+// Turning calendar occurrences into the things the site says about them (#37).
 //
-// Content holds the standing rule ("third Tuesday of every month except July,
-// August and December") plus a list of one-off cancellations. This module turns
-// that into concrete dates at build time, so the page and the structured data
-// always name a meeting that has not happened yet without anyone editing a list
-// of dates. The weekly cron in .github/workflows/deploy.yml keeps the output
-// ahead of the calendar.
+// The dates themselves come from the council's Google Calendar and are fetched
+// and expanded in ./gcal.ts. This module does the other half: given the
+// occurrences, it works out what the standing pattern is, so the sentence "The
+// third Tuesday of every month except August, 7pm for a 7.30pm start, until
+// 10pm" is read off the calendar rather than typed next to it.
 //
-// A crawler will not run JavaScript to work the date out, so this has to happen
-// during the build and land in the static HTML.
+// Deriving that sentence is the point. A hand-written one is a second copy of a
+// fact the calendar already holds, and the copy is wrong from the moment
+// somebody changes the meeting in Google and does not think to edit the repo.
+//
+// A crawler will not run JavaScript to work any of this out, so it all happens
+// during the build and lands in the static HTML.
 
 export const MEETING_TIME_ZONE = "Europe/London";
 
 /**
- * How many meetings /meetings.ics publishes: two years of a monthly rule with
- * three months off. Long enough that a subscription stays useful if the weekly
- * rebuild ever stops, short enough that we are not publishing dates nobody has
- * committed to. Lives here rather than in the endpoint because the page quotes
- * the count back to the reader, and the two must agree.
+ * How many occurrences to pull from the calendar and publish in /meetings.ics.
+ * Eighteen is about two years of a monthly meeting with a month or two off:
+ * long enough that a subscription stays useful if the rebuild ever stops, short
+ * enough that we are not publishing dates nobody has committed to. Also the
+ * window the standing pattern is derived from, which needs a clear year in it.
  */
 export const CALENDAR_HORIZON = 18;
 
-const WEEKDAY_INDEX: Record<string, number> = {
-  Sunday: 0,
-  Monday: 1,
-  Tuesday: 2,
-  Wednesday: 3,
-  Thursday: 4,
-  Friday: 5,
-  Saturday: 6,
-};
+const WEEKDAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 const MONTH_NAMES = [
   "January",
@@ -46,26 +49,46 @@ const MONTH_NAMES = [
   "December",
 ];
 
-export interface MeetingRule {
-  weekOfMonth: number;
-  weekday: string;
-  exceptMonths: string[];
-  doorsOpen: string;
-  startTime: string;
-  endTime: string;
-  attendanceNote: string;
-}
-
-export interface Meeting {
+/** One expanded occurrence, as the calendar has it. Produced by ./gcal.ts. */
+export interface MeetingInstance {
   /** Calendar date as yyyy-mm-dd, in the meeting's own time zone. */
   date: string;
   /** ISO 8601 start instant with the correct UTC offset for that date. */
   startIso: string;
-  /** ISO 8601 end instant with the correct UTC offset for that date. */
+  endIso: string;
+  /** Wall-clock "HH:MM" in Europe/London, which is what the prose quotes. */
+  startTime: string;
+  endTime: string;
+  summary: string;
+  location: string;
+}
+
+/**
+ * The facts about the meetings that the calendar cannot carry, so content does.
+ * Deliberately small: anything Google knows is read from Google.
+ */
+export interface MeetingDetails {
+  /** Google has one start time per event. "Doors at 7 for a 7.30 start" is two. */
+  doorsOpen: string;
+  attendanceNote: string;
+}
+
+/** The standing pattern, read back off the occurrences rather than declared. */
+export interface MeetingRule {
+  weekOfMonth: number;
+  weekday: string;
+  exceptMonths: string[];
+  startTime: string;
+  endTime: string;
+}
+
+export interface Meeting {
+  date: string;
+  startIso: string;
   endIso: string;
   /** "Tuesday 15 September 2026" */
   longDate: string;
-  /** "7pm for 7.30 start, to 9pm" style label built from the rule's times. */
+  /** "7pm for a 7.30pm start, until 10pm" */
   timeLabel: string;
 }
 
@@ -100,31 +123,8 @@ function zoneOffsetMs(instant: Date, timeZone: string): number {
   return wallAsUtc - instant.getTime();
 }
 
-/**
- * Turn a wall-clock time in `timeZone` into the UTC instant it names.
- *
- * Two passes: guess that the wall time is UTC, measure the offset there, then
- * correct. One correction settles every case except the hour that DST skips,
- * which no meeting in this rule can land on.
- */
-function wallTimeToInstant(
-  year: number,
-  month0: number,
-  day: number,
-  hours: number,
-  minutes: number,
-  timeZone: string,
-): Date {
-  const naive = Date.UTC(year, month0, day, hours, minutes);
-  let instant = new Date(naive);
-  for (let pass = 0; pass < 2; pass++) {
-    instant = new Date(naive - zoneOffsetMs(instant, timeZone));
-  }
-  return instant;
-}
-
 /** Format an instant as ISO 8601 with the wall time and offset of `timeZone`. */
-function isoWithOffset(instant: Date, timeZone: string): string {
+export function isoWithOffset(instant: Date, timeZone: string = MEETING_TIME_ZONE): string {
   const offsetMs = zoneOffsetMs(instant, timeZone);
   const wall = new Date(instant.getTime() + offsetMs);
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -156,84 +156,122 @@ export function nthWeekdayOfMonth(
   return day > daysInMonth ? 0 : day;
 }
 
-function parseClock(value: string): [number, number] {
-  const [h, m] = value.split(":").map(Number);
-  return [h, m ?? 0];
-}
-
 /** "19:30" -> "7.30pm", "19:00" -> "7pm". */
 export function formatClock(value: string): string {
-  const [h, m] = parseClock(value);
+  const [h, m] = value.split(":").map(Number);
   const suffix = h >= 12 ? "pm" : "am";
   const hour12 = h % 12 === 0 ? 12 : h % 12;
-  return m === 0 ? `${hour12}${suffix}` : `${hour12}.${String(m).padStart(2, "0")}${suffix}`;
+  return m ? `${hour12}.${String(m).padStart(2, "0")}${suffix}` : `${hour12}${suffix}`;
+}
+
+/** The value that appears most often, first past the post on ties. */
+function modal(values: string[]): string {
+  const counts = new Map<string, number>();
+  for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
 }
 
 /**
- * The next `count` meetings the rule produces, skipping excluded months and
- * cancelled dates, starting from the first one that has not yet ended.
+ * Read the standing pattern off the occurrences.
+ *
+ * Fails loudly rather than describing the meetings wrongly. If the calendar
+ * stops being "the nth <weekday> of the month" the sentence this produces would
+ * be false, and a false sentence about when a public body meets is worse than a
+ * build that stops and says so.
+ *
+ * Times are the modal ones rather than required to be identical, because a
+ * single meeting that runs late is a normal thing to record in Google and is no
+ * reason to refuse to describe the pattern. Each meeting still carries its own
+ * times; only this summary sentence uses the typical ones.
  */
-export function nextMeetings(
-  rule: MeetingRule,
-  exceptions: string[] = [],
-  count = 3,
-  now: Date = new Date(),
-  timeZone: string = MEETING_TIME_ZONE,
-): Meeting[] {
-  const weekdayIndex = WEEKDAY_INDEX[rule.weekday];
-  if (weekdayIndex === undefined) {
-    throw new Error(`Unknown weekday in meeting rule: ${rule.weekday}`);
+export function deriveMeetingRule(instances: MeetingInstance[]): MeetingRule {
+  if (instances.length === 0) {
+    throw new Error("Meeting calendar: cannot describe a pattern with no meetings in it.");
   }
 
-  const skipped = new Set(rule.exceptMonths);
-  const cancelled = new Set(exceptions);
-  const [startH, startM] = parseClock(rule.startTime);
-  const [endH, endM] = parseClock(rule.endTime);
-  const timeLabel =
-    `${formatClock(rule.doorsOpen)} for a ${formatClock(rule.startTime)} start, ` +
-    `until ${formatClock(rule.endTime)}`;
-
-  const meetings: Meeting[] = [];
-  // Start from the month `now` falls in, in the meeting's own zone.
-  const nowWall = new Date(now.getTime() + zoneOffsetMs(now, timeZone));
-  let year = nowWall.getUTCFullYear();
-  let month0 = nowWall.getUTCMonth();
-
-  // Two years of lookahead is far more than the three meetings anyone asks for;
-  // it exists so a pathological rule terminates rather than spinning.
-  for (let step = 0; step < 24 && meetings.length < count; step++, month0++) {
-    if (month0 > 11) {
-      month0 -= 12;
-      year++;
-    }
-    if (skipped.has(MONTH_NAMES[month0])) continue;
-
-    const day = nthWeekdayOfMonth(year, month0, weekdayIndex, rule.weekOfMonth);
-    if (day === 0) continue;
-
-    const pad = (n: number) => String(n).padStart(2, "0");
-    const date = `${year}-${pad(month0 + 1)}-${pad(day)}`;
-    if (cancelled.has(date)) continue;
-
-    const start = wallTimeToInstant(year, month0, day, startH, startM, timeZone);
-    const end = wallTimeToInstant(year, month0, day, endH, endM, timeZone);
-    // A meeting still counts as "next" while it is running.
-    if (end.getTime() <= now.getTime()) continue;
-
-    meetings.push({
-      date,
-      startIso: isoWithOffset(start, timeZone),
-      endIso: isoWithOffset(end, timeZone),
-      longDate: `${rule.weekday} ${day} ${MONTH_NAMES[month0]} ${year}`,
-      timeLabel,
-    });
+  const weekdays = new Set<number>();
+  const weeksOfMonth = new Set<number>();
+  for (const instance of instances) {
+    const [year, month, day] = instance.date.split("-").map(Number);
+    weekdays.add(new Date(Date.UTC(year, month - 1, day)).getUTCDay());
+    // Which occurrence of that weekday within its month: days 1-7 are the
+    // first, 8-14 the second, and so on.
+    weeksOfMonth.add(Math.ceil(day / 7));
   }
 
-  return meetings;
+  if (weekdays.size !== 1 || weeksOfMonth.size !== 1) {
+    throw new Error(
+      "Meeting calendar: the meetings no longer fall on the same weekday of the same " +
+        "week each month, so the standing rule quoted on the site cannot be derived " +
+        "from them. Dates seen: " +
+        instances.map((i) => i.date).join(", ") +
+        ". Either restore the pattern in Google Calendar, or the site needs to stop " +
+        "claiming there is one.",
+    );
+  }
+
+  return {
+    weekday: WEEKDAY_NAMES[[...weekdays][0]],
+    weekOfMonth: [...weeksOfMonth][0],
+    exceptMonths: monthsWithoutMeetings(instances),
+    startTime: modal(instances.map((i) => i.startTime)),
+    endTime: modal(instances.map((i) => i.endTime)),
+  };
 }
 
-/** Human-readable statement of the rule itself, e.g. for prose and llms.txt. */
-export function describeMeetingRule(rule: MeetingRule): string {
+/**
+ * Month names in the first full year of the horizon that hold no meeting.
+ *
+ * A full year, because "except August" is a claim about a year and cannot be
+ * read off a shorter window. If the horizon does not span twelve months the
+ * honest answer is that we cannot tell, and an empty list means the sentence
+ * says "every month" rather than naming months off on thin evidence.
+ */
+function monthsWithoutMeetings(instances: MeetingInstance[]): string[] {
+  const [firstYear, firstMonth] = instances[0].date.split("-").map(Number);
+  const [lastYear, lastMonth] = instances[instances.length - 1].date.split("-").map(Number);
+  const monthsSpanned = (lastYear - firstYear) * 12 + (lastMonth - firstMonth) + 1;
+  if (monthsSpanned < 12) return [];
+
+  const occupied = new Set(instances.map((i) => i.date.slice(0, 7)));
+  const missing: string[] = [];
+  for (let step = 0; step < 12; step++) {
+    const month0 = firstMonth - 1 + step;
+    const year = firstYear + Math.floor(month0 / 12);
+    const key = `${year}-${String((month0 % 12) + 1).padStart(2, "0")}`;
+    if (!occupied.has(key)) missing.push(MONTH_NAMES[month0 % 12]);
+  }
+  // Calendar order reads better than horizon order: "July, August and December"
+  // rather than "December, July and August" when the horizon starts in autumn.
+  return missing.sort((a, b) => MONTH_NAMES.indexOf(a) - MONTH_NAMES.indexOf(b));
+}
+
+/** Dress the raw occurrences up for display. */
+export function toMeetings(instances: MeetingInstance[], details: MeetingDetails): Meeting[] {
+  return instances.map((instance) => {
+    const [year, month, day] = instance.date.split("-").map(Number);
+    const weekday = WEEKDAY_NAMES[new Date(Date.UTC(year, month - 1, day)).getUTCDay()];
+    return {
+      date: instance.date,
+      startIso: instance.startIso,
+      endIso: instance.endIso,
+      longDate: `${weekday} ${day} ${MONTH_NAMES[month - 1]} ${year}`,
+      timeLabel: timeLabel(instance.startTime, instance.endTime, details.doorsOpen),
+    };
+  });
+}
+
+function timeLabel(startTime: string, endTime: string, doorsOpen: string): string {
+  const start = formatClock(startTime);
+  const opening =
+    doorsOpen && doorsOpen !== startTime
+      ? `${formatClock(doorsOpen)} for a ${start} start`
+      : `${start} start`;
+  return `${opening}, until ${formatClock(endTime)}`;
+}
+
+/** Human-readable statement of the pattern itself, for prose and llms.txt. */
+export function describeMeetingRule(rule: MeetingRule, details: MeetingDetails): string {
   const ordinals = ["", "first", "second", "third", "fourth", "fifth"];
   const ordinal = ordinals[rule.weekOfMonth] ?? `${rule.weekOfMonth}th`;
   const months = rule.exceptMonths;
@@ -245,13 +283,12 @@ export function describeMeetingRule(rule: MeetingRule): string {
         }${months[months.length - 1]}`;
   return (
     `The ${ordinal} ${rule.weekday} of ${except}, ` +
-    `${formatClock(rule.doorsOpen)} for a ${formatClock(rule.startTime)} start, ` +
-    `until ${formatClock(rule.endTime)}.`
+    `${timeLabel(rule.startTime, rule.endTime, details.doorsOpen)}.`
   );
 }
 
 /**
- * schema.org `Schedule` for the standing rule. Unlike a list of dates this
+ * schema.org `Schedule` for the standing pattern. Unlike a list of dates this
  * never goes stale, which is why it is emitted alongside the concrete events
  * rather than instead of them.
  */

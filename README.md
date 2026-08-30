@@ -204,14 +204,32 @@ contact email) lives in `src/content/site/index.json`. Items below are placehold
 claims deliberately left for the owner to confirm — **each should be resolved via an issue before
 the first release**:
 
-- [x] **Meeting card**: resolved in #37. The rule (third Tuesday, except July, August and
-      December) and the venue live in `src/content/site/index.json`; the dates are computed at
-      build time by `src/lib/meetings.ts` and a weekly cron rebuilds so "next meeting" is never
-      in the past. One-off cancellations go in `meetingExceptions` as `YYYY-MM-DD`.
+- [x] **Meeting card**: resolved in #37. **Meeting dates come from the council's Google Calendar
+      ("BBCC Public Events"), and nothing else.** To add, move or cancel a meeting, change it in
+      Google. There is no date anywhere in this repo, and no rule to keep in step with the
+      calendar either: `src/lib/gcal.ts` reads the public iCal feed at build time, expands the
+      recurrence with `ical.js`, and `src/lib/meetings.ts` derives the standing pattern from the
+      occurrences it finds. So the sentence on the page — "The third Tuesday of every month
+      except…, 7pm for a 7.30pm start, until 10pm" — is read off the calendar rather than typed
+      next to it, and cannot drift from it. A daily cron rebuilds, which is the delay between a
+      change in Google and the site showing it.
 
-      The same rule generates `/meetings.ics` (`src/pages/meetings.ics.ts`), so a subscriber and a
-      reader can never be told different dates. It publishes `CALENDAR_HORIZON` meetings — 18,
-      about two years of the rule — and the count quoted on the page is derived, not typed.
+      Content keeps only what a calendar entry cannot hold, in `meetingDetails`: `doorsOpen`
+      (Google has one start time per event; "doors at 7 for a 7.30 start" is two) and
+      `attendanceNote`. The structured venue address stays in content too, because schema.org
+      needs its parts and the calendar's `LOCATION` is prose — but the build refuses to publish
+      an address whose postcode the calendar disagrees with, so the venue cannot move in one
+      place only.
+
+      **Failure is loud, deliberately.** A build that cannot reach the calendar, cannot parse it,
+      finds no future meetings, or finds meetings that no longer fall on a consistent nth-weekday
+      stops with an error naming the problem. The deployed site keeps serving the last good
+      build, which still has real dates on it. The alternative — falling back to a hardcoded rule
+      — would quietly publish dates nobody had agreed to and look exactly like working.
+
+      That same read generates `/meetings.ics` (`src/pages/meetings.ics.ts`), so a subscriber and
+      a reader can never be told different dates. It publishes `CALENDAR_HORIZON` meetings — 18,
+      about two years — and the count quoted on the page is derived, not typed.
 
       Both pages offer that feed through an "Add to your calendar" disclosure built from
       `src/lib/calendar.ts`, not as a bare `.ics` link. A bare link is a download, and a download
@@ -219,7 +237,7 @@ the first release**:
       URL as a query parameter and subscribe on the reader's behalf, so they get handed that
       instead. Google (`calendar.google.com/calendar/r?cid=`), Outlook.com
       (`outlook.live.com/calendar/0/addfromweb?url=`) and anything registered for `webcal://`
-      (Apple, iOS, Thunderbird) all track the feed, so the weekly cron carries new and cancelled
+      (Apple, iOS, Thunderbird) all track the feed, so the daily cron carries new and cancelled
       dates to them on its own. The download is offered last and labelled as the one-off it is.
       The URLs are built from `Astro.site`, so a preview deployment offers its own feed rather
       than pointing subscribers at production. Work and school Microsoft accounts use
@@ -229,6 +247,11 @@ the first release**:
       Cancelled meetings are dropped from the feed rather than published as `STATUS:CANCELLED`.
       A subscribing client reconciles against the whole feed and removes what is no longer in it;
       an importing client would never see the update whatever we emitted.
+
+      `tests/seo.test.mjs` derives its expectations from `dist/meetings.ics` rather than from
+      content, and checks that the prose sentence, the JSON-LD `Schedule`, the concrete `Event`
+      nodes and the feed all still agree. Asserting against a rule in content would be asserting
+      against a fact nobody maintains any more.
 - [ ] **Stats strip**: "200,000+ daily visitors" and "~30 lanes & closes" need a source or
       revised wording; "1820s Blythswood grid" and "UNESCO City of Music" are on solid ground.
       Values and wording are in `src/content/site/index.json` (same file holds the boundary

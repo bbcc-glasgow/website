@@ -19,7 +19,8 @@
 
 import type { APIRoute } from "astro";
 import { getEntry } from "astro:content";
-import { CALENDAR_HORIZON, MEETING_TIME_ZONE, nextMeetings } from "../lib/meetings";
+import { loadMeetings } from "../lib/gcal";
+import { MEETING_TIME_ZONE } from "../lib/meetings";
 
 /** RFC 5545 wants UTC as yyyymmddThhmmssZ, with the punctuation stripped. */
 function icsStamp(value: string | Date): string {
@@ -68,7 +69,11 @@ function fold(line: string): string {
 export const GET: APIRoute = async ({ site }) => {
   const base = site!.href.replace(/\/$/, "");
   const facts = (await getEntry("site", "index")).data;
-  const meetings = nextMeetings(facts.meetingRule, facts.meetingExceptions, CALENDAR_HORIZON);
+  const { meetings } = await loadMeetings(
+    facts.meetingCalendar.icsUrl,
+    facts.meetingDetails,
+    facts.venue.postalCode,
+  );
 
   const venueLine = [
     facts.venue.name,
@@ -82,7 +87,7 @@ export const GET: APIRoute = async ({ site }) => {
   // description rather than being lost.
   const description = [
     meetings[0] ? `${meetings[0].timeLabel}.` : "",
-    facts.meetingRule.attendanceNote,
+    facts.meetingDetails.attendanceNote,
     facts.venue.accessNote,
     `Details and any changes: ${base}/#meetings`,
   ]

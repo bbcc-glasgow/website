@@ -2,7 +2,8 @@
 import { getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
 import { calendarLinks } from "../lib/calendar";
-import { describeMeetingRule, nextMeetings } from "../lib/meetings";
+import { loadMeetings } from "../lib/gcal";
+import { describeMeetingRule } from "../lib/meetings";
 
 // The Holding Page is the second file entry in the Pages collection, distinct
 // from the Homepage entry; this route always reads the Holding Page shape.
@@ -21,8 +22,8 @@ const {
   description,
   boundaryDescription,
   venue,
-  meetingRule,
-  meetingExceptions,
+  meetingCalendar,
+  meetingDetails,
   areaPartnership,
 } = siteEntry.data;
 
@@ -32,8 +33,13 @@ const {
 // it carries the same fact set as the homepage instead of an apology for being
 // unfinished (#37). The `/holding/` URL itself is noindexed and kept out of the
 // sitemap; `/` is where this content is meant to be found.
-const upcomingMeetings = nextMeetings(meetingRule, meetingExceptions, 2);
-const meetingRuleText = describeMeetingRule(meetingRule);
+const { meetings: calendarMeetings, rule: meetingRule } = await loadMeetings(
+  meetingCalendar.icsUrl,
+  meetingDetails,
+  venue.postalCode,
+);
+const upcomingMeetings = calendarMeetings.slice(0, 2);
+const meetingRuleText = describeMeetingRule(meetingRule, meetingDetails);
 const venueLine = `${venue.name}, ${venue.streetAddress}, ${venue.addressLocality} ${venue.postalCode}`;
 const isHoldingUrl = Astro.url.pathname.startsWith("/holding");
 const addToCalendar = calendarLinks(Astro.site!);
@@ -100,7 +106,7 @@ const addToCalendar = calendarLinks(Astro.site!);
 
         <p class="text-ink leading-relaxed mb-4">
           {meetingRuleText} Meetings are held at {venueLine}, and they are open to
-          everyone. {meetingRule.attendanceNote} {venue.accessNote}
+          everyone. {meetingDetails.attendanceNote} {venue.accessNote}
         </p>
 
         {

@@ -3,6 +3,7 @@
 // tags and the site-wide JSON-LD graph, so a new page gets both by default
 // rather than by someone remembering to add them (#37).
 import { getEntry } from "astro:content";
+import { loadMeetings } from "../lib/gcal";
 import { buildGraph } from "../lib/jsonld";
 import "../styles/global.css";
 
@@ -22,7 +23,14 @@ const canonical = new URL(Astro.url.pathname, site);
 const ogImage = new URL("/images/og-card.png", site);
 
 const facts = (await getEntry("site", "index")).data;
-const graph = buildGraph(facts, site.href);
+// The same cached calendar read the pages use, so the structured data cannot
+// name a different "next meeting" than the prose a few hundred lines below it.
+const { meetings, rule } = await loadMeetings(
+  facts.meetingCalendar.icsUrl,
+  facts.meetingDetails,
+  facts.venue.postalCode,
+);
+const graph = buildGraph(facts, site.href, meetings.slice(0, 3), rule);
 ---
 
 <!doctype html>

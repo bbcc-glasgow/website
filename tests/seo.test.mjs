@@ -35,6 +35,88 @@ const OG_IMAGE_HEIGHT = 630;
 // `twitter:site`. That is easy to undo by accident, hence the assertion.
 const DISOWNED_PROFILE = "x.com/babccglasgow";
 
+// The Google Calendar is the source of the meeting dates, and dist/meetings.ics
+// is the build's own record of what it said. Every other published form of
+// those dates — the prose sentence, the JSON-LD Schedule, the list on each page
+// — is derived from the same read, so the check that matters is that they all
+// still agree with the feed. Deriving the expectations here rather than reading
+// them from content is the point: content no longer holds a meeting date, and a
+// test that asserted against a hardcoded rule would be asserting against a fact
+// nobody maintains any more.
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+const WEEKDAY_NAMES = [
+  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+];
+
+/** "20260915T183000Z" -> Date. iCalendar drops the punctuation ISO 8601 keeps. */
+function icsToDate(value) {
+  const m = value.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/);
+  assert.ok(m, `not a UTC iCalendar stamp: ${value}`);
+  const [, y, mo, d, h, mi, sec] = m.map(Number);
+  return new Date(Date.UTC(y, mo - 1, d, h, mi, sec));
+}
+
+function londonParts(date) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London",
+    weekday: "long", year: "numeric", month: "long", day: "numeric",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).formatToParts(date);
+  const get = (type) => parts.find((p) => p.type === type).value;
+  return {
+    weekday: get("weekday"),
+    month: get("month"),
+    year: Number(get("year")),
+    day: Number(get("day")),
+    clock: `${get("hour")}:${get("minute")}`,
+  };
+}
+
+/** What the published feed actually says the pattern is. */
+function publishedPattern() {
+  const raw = fs.readFileSync(path.join(distDir, "meetings.ics"), "utf-8");
+  const unfolded = raw.replace(/\r\n[ \t]/g, "");
+  const read = (key) =>
+    unfolded.split("\r\n").filter((l) => l.startsWith(`${key}:`)).map((l) => l.slice(key.length + 1));
+
+  const starts = read("DTSTART").map(icsToDate);
+  const ends = read("DTEND").map(icsToDate);
+  assert.ok(starts.length > 0, "dist/meetings.ics publishes no meetings");
+
+  const local = starts.map(londonParts);
+  const weekdays = new Set(local.map((l) => l.weekday));
+  const weeks = new Set(local.map((l) => Math.ceil(l.day / 7)));
+  assert.equal(weekdays.size, 1, `the feed mixes weekdays: ${[...weekdays].join(", ")}`);
+  assert.equal(weeks.size, 1, `the feed mixes weeks of the month: ${[...weeks].join(", ")}`);
+
+  // Months with no meeting, over the first clear year of the horizon. The same
+  // window src/lib/meetings.ts uses, so the sentence and this agree or the
+  // derivation is broken.
+  const first = local[0];
+  const occupied = new Set(local.map((l) => `${l.year}-${l.month}`));
+  const monthsOff = [];
+  for (let step = 0; step < 12; step++) {
+    const index = MONTH_NAMES.indexOf(first.month) + step;
+    const year = first.year + Math.floor(index / 12);
+    const month = MONTH_NAMES[index % 12];
+    if (!occupied.has(`${year}-${month}`)) monthsOff.push(month);
+  }
+
+  return {
+    starts,
+    ends,
+    local,
+    weekday: [...weekdays][0],
+    weekOfMonth: [...weeks][0],
+    startClock: local[0].clock,
+    endClock: londonParts(ends[0]).clock,
+    monthsOff: monthsOff.sort((a, b) => MONTH_NAMES.indexOf(a) - MONTH_NAMES.indexOf(b)),
+  };
+}
+
 const ROUTES = [
   { url: "/", file: path.join(distDir, "index.html") },
   { url: "/holding/", file: path.join(distDir, "holding", "index.html") },
@@ -117,14 +199,6 @@ const fakeAssets = {
 async function call(url, mode) {
   const { default: worker } = await import("../worker.js");
   return worker.fetch(new Request(url), { SITE_MODE: mode, ASSETS: fakeAssets });
-}
-
-/** "20260915T183000Z" -> Date. iCalendar drops the punctuation ISO 8601 keeps. */
-function icsToDate(value) {
-  const m = value.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/);
-  assert.ok(m, `not a UTC iCalendar timestamp: ${value}`);
-  const [, y, mo, d, h, mi, s] = m.map(Number);
-  return new Date(Date.UTC(y, mo - 1, d, h, mi, s));
 }
 
 // ── Per-route head tags ────────────────────────────────────────────────
@@ -358,21 +432,31 @@ describe("GEO - JSON-LD", () => {
 
     const schedule = series.eventSchedule;
     assert.ok(schedule, "EventSeries has no eventSchedule");
-    assert.equal(schedule.byDay, `https://schema.org/${siteFacts.meetingRule.weekday}`);
+
+    const feed = publishedPattern();
+    assert.equal(schedule.byDay, `https://schema.org/${feed.weekday}`);
     assert.equal(
       schedule.byMonthWeek,
-      siteFacts.meetingRule.weekOfMonth,
+      feed.weekOfMonth,
       "The nth-weekday rule must be published as byMonthWeek, a real schema.org property",
     );
+    assert.equal(schedule.startTime, `${feed.startClock}:00`);
+    assert.equal(schedule.endTime, `${feed.endClock}:00`);
 
-    const months = {
-      January: 1, February: 2, March: 3, April: 4, May: 5, June: 6,
-      July: 7, August: 8, September: 9, October: 10, November: 11, December: 12,
-    };
-    for (const month of siteFacts.meetingRule.exceptMonths) {
+    // A month the council does not meet in must not be claimed in byMonth, and
+    // a month it does meet in must not be missing from it. Both directions:
+    // the schedule is what an answer engine quotes when nobody asked for a
+    // specific date, so a wrong one is wrong for a year.
+    for (const month of feed.monthsOff) {
       assert.ok(
-        !schedule.byMonth.includes(months[month]),
-        `${month} is an exception month but appears in byMonth`,
+        !schedule.byMonth.includes(MONTH_NAMES.indexOf(month) + 1),
+        `${month} has no meeting in the feed but appears in byMonth`,
+      );
+    }
+    for (const { month } of feed.local) {
+      assert.ok(
+        schedule.byMonth.includes(MONTH_NAMES.indexOf(month) + 1),
+        `${month} has a meeting in the feed but is missing from byMonth`,
       );
     }
   });
@@ -390,15 +474,10 @@ describe("GEO - the next meeting is a real future meeting", () => {
     const events = graph["@graph"].filter((node) => node["@type"] === "Event");
     assert.ok(events.length > 0, "No concrete Event in the @graph");
 
-    const { weekOfMonth, weekday, exceptMonths } = siteFacts.meetingRule;
-    const weekdayNames = [
-      "Sunday", "Monday", "Tuesday", "Wednesday",
-      "Thursday", "Friday", "Saturday",
-    ];
-    const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December",
-    ];
+    const feed = publishedPattern();
+    const published = new Set(
+      feed.starts.map((d) => d.toISOString().slice(0, 10)),
+    );
 
     for (const event of events) {
       const start = new Date(event.startDate);
@@ -411,22 +490,24 @@ describe("GEO - the next meeting is a real future meeting", () => {
       const local = new Date(Date.UTC(year, month - 1, day));
 
       assert.equal(
-        weekdayNames[local.getUTCDay()],
-        weekday,
-        `${event.startDate} is not a ${weekday}`,
+        WEEKDAY_NAMES[local.getUTCDay()],
+        feed.weekday,
+        `${event.startDate} is not a ${feed.weekday}`,
       );
       assert.equal(
-        Math.floor((day - 1) / 7) + 1,
-        weekOfMonth,
-        `${event.startDate} is not the ${weekOfMonth}th ${weekday} of the month`,
+        Math.ceil(day / 7),
+        feed.weekOfMonth,
+        `${event.startDate} is not the ${feed.weekOfMonth}th ${feed.weekday} of the month`,
       );
       assert.ok(
-        !exceptMonths.includes(monthNames[month - 1]),
-        `${event.startDate} falls in ${monthNames[month - 1]}, an exception month`,
+        !feed.monthsOff.includes(MONTH_NAMES[month - 1]),
+        `${event.startDate} falls in ${MONTH_NAMES[month - 1]}, a month with no meeting in the feed`,
       );
+      // The JSON-LD and the subscribable file are two publications of one read
+      // of the calendar. If they can disagree, one of them is lying.
       assert.ok(
-        !(siteFacts.meetingExceptions ?? []).includes(event.startDate.slice(0, 10)),
-        `${event.startDate} is listed as cancelled`,
+        published.has(event.startDate.slice(0, 10)),
+        `${event.startDate} is in the JSON-LD but not in meetings.ics`,
       );
     }
 
@@ -537,7 +618,7 @@ describe("Meetings - the calendar feed", () => {
         weekday: "long",
         timeZone: "Europe/London",
       }).format(start);
-      assert.equal(weekday, siteFacts.meetingRule.weekday);
+      assert.equal(weekday, publishedPattern().weekday);
     }
   });
 
@@ -545,7 +626,7 @@ describe("Meetings - the calendar feed", () => {
     // The whole reason DTSTART is in UTC: a fixed offset would move the
     // meeting by an hour every spring. Read each start back in London and
     // it must be the same clock time all year.
-    const expected = siteFacts.meetingRule.startTime;
+    const expected = publishedPattern().startClock;
     for (const start of valuesOf("DTSTART").map(icsToDate)) {
       const local = new Intl.DateTimeFormat("en-GB", {
         hour: "2-digit",
@@ -565,7 +646,7 @@ describe("Meetings - the calendar feed", () => {
   });
 
   it("excludes the months the council does not meet", () => {
-    const skipped = new Set(siteFacts.meetingRule.exceptMonths);
+    const skipped = new Set(publishedPattern().monthsOff);
     for (const start of valuesOf("DTSTART").map(icsToDate)) {
       const month = new Intl.DateTimeFormat("en-GB", {
         month: "long",

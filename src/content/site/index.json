@@ -17,16 +17,13 @@
     "addressCountry": "GB",
     "accessNote": "Step-free access, with a lift to the first floor."
   },
-  "meetingRule": {
-    "weekOfMonth": 3,
-    "weekday": "Tuesday",
-    "exceptMonths": ["July", "August", "December"],
+  "meetingCalendar": {
+    "icsUrl": "https://calendar.google.com/calendar/ical/c_8312048adf0623aaed2b340a71384e1fc2ae9fc1548c68fc028674c4c96a7841%40group.calendar.google.com/public/basic.ics"
+  },
+  "meetingDetails": {
     "doorsOpen": "19:00",
-    "startTime": "19:30",
-    "endTime": "21:00",
     "attendanceNote": "Meetings are hybrid: come along in person or join on Zoom."
   },
-  "meetingExceptions": [],
   "areaPartnership": {
     "name": "Anderston/City/Yorkhill Area Partnership",
     "parentBody": "Glasgow Community Planning Partnership"

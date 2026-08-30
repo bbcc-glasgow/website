@@ -245,31 +245,33 @@ collections:
               - { name: postalCode, label: Postcode, widget: string }
               - { name: addressCountry, label: Country Code, widget: string, hint: "Two letters, e.g. GB" }
               - { name: accessNote, label: Accessibility Note, widget: text }
-          - name: meetingRule
-            label: When We Meet
+          - name: meetingCalendar
+            label: Meeting Calendar
             widget: object
             collapsed: true
-            hint: The standing rule. Meeting dates are worked out from this automatically, so there is no list of dates to keep up to date.
+            hint: >-
+              Meeting dates come from the council's Google Calendar and are read
+              afresh every time the site is built. To add, move or cancel a
+              meeting, change it in Google Calendar - there is nothing to edit
+              here. This address only changes if the council moves to a
+              different calendar.
             fields:
-              - { name: weekOfMonth, label: Which Week Of The Month, widget: number, value_type: int, min: 1, max: 5 }
-              - name: weekday
-                label: Day Of The Week
-                widget: select
-                options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-              - name: exceptMonths
-                label: Months With No Meeting
-                widget: list
-                field: { name: month, label: Month, widget: string }
-              - { name: doorsOpen, label: Doors Open, widget: string, hint: "24-hour clock, e.g. 19:00" }
-              - { name: startTime, label: Start Time, widget: string, hint: "24-hour clock, e.g. 19:30" }
-              - { name: endTime, label: End Time, widget: string, hint: "24-hour clock, e.g. 21:00" }
+              - name: icsUrl
+                label: Public iCal Address
+                widget: string
+                pattern: ["^https://.*\\.ics$", "Must be an https address ending in .ics"]
+                hint: >-
+                  From Google Calendar settings, under "Integrate calendar": the
+                  PUBLIC address in iCal format. Not the secret one - that is a
+                  password, and this file is public.
+          - name: meetingDetails
+            label: Meeting Details
+            widget: object
+            collapsed: true
+            hint: The two things about a meeting that a calendar entry cannot hold. Everything else comes from Google Calendar.
+            fields:
+              - { name: doorsOpen, label: Doors Open, widget: string, hint: "24-hour clock, e.g. 19:00. The calendar holds the start time; this is when people can arrive." }
               - { name: attendanceNote, label: How To Attend, widget: text }
-          - name: meetingExceptions
-            label: Cancelled Meetings
-            widget: list
-            required: false
-            hint: One-off cancellations only, as yyyy-mm-dd. Leave empty if the standing rule holds.
-            field: { name: date, label: Date, widget: string }
           - name: areaPartnership
             label: Area Partnership
             widget: object

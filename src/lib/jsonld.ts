@@ -13,7 +13,7 @@
 // who holds a post cannot leave a wrong claim about a real person in the
 // structured data. Names appear as ordinary page text instead.
 
-import { meetingSchedule, nextMeetings, type MeetingRule, type Meeting } from "./meetings";
+import { meetingSchedule, type MeetingDetails, type MeetingRule, type Meeting } from "./meetings";
 
 export interface SiteFacts {
   legalName: string;
@@ -28,8 +28,8 @@ export interface SiteFacts {
     addressCountry: string;
     accessNote: string;
   };
-  meetingRule: MeetingRule;
-  meetingExceptions: string[];
+  meetingCalendar: { icsUrl: string };
+  meetingDetails: MeetingDetails;
   areaPartnership: { name: string; parentBody: string };
   officeBearers: { role: string; name?: string }[];
   socialProfiles: string[];
@@ -38,13 +38,15 @@ export interface SiteFacts {
 /**
  * Build the graph for a site rooted at `siteUrl`.
  *
- * `meetings` is passed in rather than computed here so a page and its markup
- * cannot disagree about which meeting is next, and so tests can pin a date.
+ * `meetings` and `rule` are passed in rather than fetched here: the calendar is
+ * read once per build, and a page and its own markup must not be able to
+ * disagree about which meeting is next. It also lets tests pin a date.
  */
 export function buildGraph(
   facts: SiteFacts,
   siteUrl: string,
-  meetings: Meeting[] = nextMeetings(facts.meetingRule, facts.meetingExceptions, 3),
+  meetings: Meeting[],
+  rule: MeetingRule,
 ) {
   const base = siteUrl.replace(/\/$/, "");
   const orgId = `${base}/#organization`;
@@ -115,9 +117,9 @@ export function buildGraph(
     "@type": "EventSeries",
     "@id": seriesId,
     name: `${facts.legalName} public meetings`,
-    description: `${facts.meetingRule.attendanceNote} ${facts.venue.accessNote}`,
+    description: `${facts.meetingDetails.attendanceNote} ${facts.venue.accessNote}`,
     url: `${base}/#meetings`,
-    eventSchedule: meetingSchedule(facts.meetingRule),
+    eventSchedule: meetingSchedule(rule),
     ...eventDefaults,
   };
 

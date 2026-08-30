@@ -12,12 +12,18 @@
 
 import type { APIRoute } from "astro";
 import { getEntry } from "astro:content";
-import { describeMeetingRule, nextMeetings } from "../lib/meetings";
+import { loadMeetings } from "../lib/gcal";
+import { describeMeetingRule } from "../lib/meetings";
 
 export const GET: APIRoute = async ({ site }) => {
   const base = site!.href.replace(/\/$/, "");
   const facts = (await getEntry("site", "index")).data;
-  const meetings = nextMeetings(facts.meetingRule, facts.meetingExceptions, 3);
+  const { meetings: all, rule } = await loadMeetings(
+    facts.meetingCalendar.icsUrl,
+    facts.meetingDetails,
+    facts.venue.postalCode,
+  );
+  const meetings = all.slice(0, 3);
 
   const venueLine = [
     facts.venue.name,
@@ -36,9 +42,9 @@ export const GET: APIRoute = async ({ site }) => {
     `- Website: ${base}/`,
     `- Contact: ${facts.contactEmail}`,
     `- Area covered: ${facts.boundaryDescription}.`,
-    `- Meetings: ${describeMeetingRule(facts.meetingRule)}`,
+    `- Meetings: ${describeMeetingRule(rule, facts.meetingDetails)}`,
     `- Venue: ${venueLine}.`,
-    `- Attending: ${facts.meetingRule.attendanceNote} ${facts.venue.accessNote}`,
+    `- Attending: ${facts.meetingDetails.attendanceNote} ${facts.venue.accessNote}`,
     `- Part of the ${facts.areaPartnership.name}, under the ${facts.areaPartnership.parentBody}.`,
     `- Office bearers: ${facts.officeBearers.map((b) => b.role).join(", ")}. Reach any of them at ${facts.contactEmail}.`,
     "",

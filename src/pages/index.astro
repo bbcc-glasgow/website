@@ -6,7 +6,8 @@ import ProjectCtaIcon from "../components/ProjectCtaIcon.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
 import { resolveProjectVariantColours } from "../lib/projectVariants";
 import { calendarLinks } from "../lib/calendar";
-import { CALENDAR_HORIZON, describeMeetingRule, nextMeetings } from "../lib/meetings";
+import { loadMeetings } from "../lib/gcal";
+import { describeMeetingRule } from "../lib/meetings";
 import { FACEBOOK_HOST, INSTAGRAM_HOST, socialProfileUrl } from "../lib/social";
 // Mark Ynys-Mon (Flickr: mym) gave permission on the condition that the page
 // credits him with a link to his profile. The credit is in the footer; if this
@@ -28,8 +29,8 @@ const {
   contactEmail,
   description,
   venue,
-  meetingRule,
-  meetingExceptions,
+  meetingCalendar,
+  meetingDetails,
   areaPartnership,
   officeBearers,
   socialProfiles,
@@ -38,18 +39,24 @@ const {
 const instagramUrl = socialProfileUrl(socialProfiles, INSTAGRAM_HOST);
 const facebookUrl = socialProfileUrl(socialProfiles, FACEBOOK_HOST);
 
-// Meeting dates are derived from the standing rule at build time, so the page
-// never shows a date that has passed and nobody maintains a list of them (#37).
-// The weekly rebuild in .github/workflows/deploy.yml keeps this moving.
-const upcomingMeetings = nextMeetings(meetingRule, meetingExceptions, 3);
+// Meeting dates are read from the council's Google Calendar at build time, so
+// the page never shows a date that has passed and nobody maintains a list of
+// them here (#37). Cancelling a meeting in Google is the whole job. The daily
+// rebuild in .github/workflows/deploy.yml is what carries a change across.
+const { meetings: calendarMeetings, rule: meetingRule } = await loadMeetings(
+  meetingCalendar.icsUrl,
+  meetingDetails,
+  venue.postalCode,
+);
+const upcomingMeetings = calendarMeetings.slice(0, 3);
 const nextMeeting = upcomingMeetings[0];
 const laterMeetings = upcomingMeetings.slice(1);
 // What /meetings.ics actually contains, counted rather than assumed: a run of
 // cancellations would make it fewer than CALENDAR_HORIZON, and the page should
 // not promise a number the file does not hold.
-const calendarCount = nextMeetings(meetingRule, meetingExceptions, CALENDAR_HORIZON).length;
+const calendarCount = calendarMeetings.length;
 const addToCalendar = calendarLinks(Astro.site!);
-const meetingRuleText = describeMeetingRule(meetingRule);
+const meetingRuleText = describeMeetingRule(meetingRule, meetingDetails);
 const venueLine = `${venue.name}, ${venue.streetAddress}, ${venue.addressLocality} ${venue.postalCode}`;
 // A name is optional in content and is usually unconfirmed in an election year,
 // so only office bearers who have one get named.
@@ -481,7 +488,7 @@ const getInvolvedCardStyles = [
           </div>
 
           <p class="text-sm mb-5" style="color:rgba(255,255,255,0.75);line-height:1.7;">
-            {meetingRule.attendanceNote} {venue.accessNote}
+            {meetingDetails.attendanceNote} {venue.accessNote}
           </p>
 
           <div class="flex flex-wrap gap-3">

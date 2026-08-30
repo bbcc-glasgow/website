@@ -3,18 +3,21 @@
 # publishes) goes live with no further human action. Manual dispatch redeploys
 # current main as a fallback/redeploy path. A v* tag does not trigger a deploy.
 #
-# The weekly schedule redeploys unchanged main on purpose (#37). Meeting dates
-# are computed at build time from the standing rule in the site content, so the
-# "next meeting" in the HTML and in the JSON-LD only moves on when the site is
-# rebuilt. Wednesday because meetings are Tuesday evenings: the rebuild lands
-# within hours of one finishing rather than a week later.
+# The daily schedule redeploys unchanged main on purpose (#37). Meeting dates
+# are read from the council's Google Calendar at build time, so a meeting added,
+# moved or cancelled in Google does not reach the site, the JSON-LD or
+# /meetings.ics until the next build. Daily rather than weekly because that gap
+# is how long a cancellation stays invisible, and because anyone subscribed to
+# /meetings.ics is downstream of it: a week would mean a subscriber could turn
+# up to a meeting cancelled six days earlier. 05:00 UTC is after the overnight
+# lull and well before anyone would act on the day's dates.
 name: deploy
 
 on:
   push:
     branches: [main]
   schedule:
-    - cron: "0 5 * * 3"
+    - cron: "0 5 * * *"
   workflow_dispatch:
 
 # Serialise production deploys: back-to-back merges (e.g. several CMS publishes)

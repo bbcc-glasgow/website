@@ -25,7 +25,8 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
     "astro": "^5.1.0",
-    "decap-cms": "3.11.0"
+    "decap-cms": "3.11.0",
+    "ical.js": "^2.2.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
