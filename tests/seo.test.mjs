@@ -103,6 +103,30 @@ function pngSize(file) {
   return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
 }
 
+// Workers' ASSETS binding takes a Request or a URL; the worker uses both. Two
+// suites drive the worker - routing, and whether the calendar survives holding
+// mode - so this sits at module scope rather than inside either of them.
+const fakeAssets = {
+  fetch: async (input) =>
+    new Response("asset", {
+      status: 200,
+      headers: { "x-url": new URL(input.url ?? input).pathname },
+    }),
+};
+
+async function call(url, mode) {
+  const { default: worker } = await import("../worker.js");
+  return worker.fetch(new Request(url), { SITE_MODE: mode, ASSETS: fakeAssets });
+}
+
+/** "20260915T183000Z" -> Date. iCalendar drops the punctuation ISO 8601 keeps. */
+function icsToDate(value) {
+  const m = value.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/);
+  assert.ok(m, `not a UTC iCalendar timestamp: ${value}`);
+  const [, y, mo, d, h, mi, s] = m.map(Number);
+  return new Date(Date.UTC(y, mo - 1, d, h, mi, s));
+}
+
 // ── Per-route head tags ────────────────────────────────────────────────
 
 describe("SEO - head tags on every built route", () => {
@@ -438,6 +462,136 @@ describe("GEO - robots.txt", () => {
   });
 });
 
+// ── The calendar feed ──────────────────────────────────────────────────
+//
+// A calendar is the one artefact here that keeps being consulted after the
+// person stops looking at the site, which makes a silent fault in it worse
+// than a silent fault anywhere else: a subscriber turns up on the wrong day
+// and never learns why. So this checks the file parses, that the dates are
+// the same ones the page is publishing, and that the offsets are right for
+// British Summer Time rather than fixed at Greenwich.
+
+describe("Meetings - the calendar feed", () => {
+  const icsPath = path.join(distDir, "meetings.ics");
+  const ics = () => fs.readFileSync(icsPath, "utf-8");
+
+  /** Unfold first: RFC 5545 continuations start with a space. */
+  const unfolded = () => ics().replace(/\r\n[ \t]/g, "");
+  const valuesOf = (key) =>
+    unfolded()
+      .split("\r\n")
+      .filter((line) => line.startsWith(`${key}:`))
+      .map((line) => line.slice(key.length + 1));
+
+  it("is generated and well formed", () => {
+    assert.ok(fs.existsSync(icsPath), "dist/meetings.ics not found");
+    const raw = ics();
+
+    assert.match(raw, /^BEGIN:VCALENDAR\r\n/);
+    assert.match(raw, /\r\nEND:VCALENDAR\r\n$/);
+    // Every line CRLF-terminated, and none over the 75-octet limit. Both are
+    // things strict clients reject outright.
+    const lines = raw.split("\r\n").slice(0, -1);
+    assert.ok(!raw.split("\r\n").some((l) => l.includes("\n")), "a bare LF slipped in");
+    for (const line of lines) {
+      assert.ok(
+        new TextEncoder().encode(line).length <= 75,
+        `line exceeds 75 octets: ${line.slice(0, 40)}...`,
+      );
+    }
+    assert.equal(
+      valuesOf("BEGIN").filter((v) => v === "VEVENT").length,
+      valuesOf("END").filter((v) => v === "VEVENT").length,
+      "unbalanced VEVENT blocks",
+    );
+  });
+
+  it("publishes the venue, the contact page and a stable id per meeting", () => {
+    const raw = unfolded();
+    assert.ok(raw.includes(siteFacts.venue.postalCode), "the venue postcode is missing");
+    assert.match(raw, /^X-WR-CALNAME:/m);
+    // Without stable UIDs a re-import duplicates every event instead of
+    // updating it, which is how a subscriber ends up with two of everything.
+    const uids = valuesOf("UID");
+    assert.ok(uids.length > 0, "no events");
+    assert.equal(new Set(uids).size, uids.length, "duplicate UIDs");
+    for (const uid of uids) assert.match(uid, /^meeting-\d{4}-\d{2}-\d{2}@bbcc\.scot$/);
+  });
+
+  it("starts with the same meeting the homepage is advertising", () => {
+    const pageDate = readRoute(ROUTES[0]).match(/<time datetime="(\d{4}-\d{2}-\d{2})"/);
+    assert.ok(pageDate, "the homepage names no next meeting");
+    assert.match(valuesOf("UID")[0], new RegExp(`^meeting-${pageDate[1]}@`));
+  });
+
+  it("puts every meeting in the future, in order, on the rule's weekday", () => {
+    const starts = valuesOf("DTSTART").map(icsToDate);
+    assert.ok(starts.length >= 2, "a calendar worth subscribing to needs more than one date");
+    assert.ok(starts[0] > new Date(), "the first event has already happened");
+
+    for (let i = 1; i < starts.length; i++) {
+      assert.ok(starts[i] > starts[i - 1], "events are not in chronological order");
+    }
+    for (const start of starts) {
+      const weekday = new Intl.DateTimeFormat("en-GB", {
+        weekday: "long",
+        timeZone: "Europe/London",
+      }).format(start);
+      assert.equal(weekday, siteFacts.meetingRule.weekday);
+    }
+  });
+
+  it("keeps the wall-clock time across the DST boundary", () => {
+    // The whole reason DTSTART is in UTC: a fixed offset would move the
+    // meeting by an hour every spring. Read each start back in London and
+    // it must be the same clock time all year.
+    const expected = siteFacts.meetingRule.startTime;
+    for (const start of valuesOf("DTSTART").map(icsToDate)) {
+      const local = new Intl.DateTimeFormat("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+        timeZone: "Europe/London",
+      }).format(start);
+      assert.equal(local, expected, `${start.toISOString()} is not ${expected} in London`);
+    }
+
+    // And the file has to actually span a clock change, or the assertion
+    // above proves nothing.
+    const offsets = new Set(
+      valuesOf("DTSTART").map((v) => icsToDate(v).getUTCHours()),
+    );
+    assert.ok(offsets.size > 1, "the horizon does not cross a DST boundary");
+  });
+
+  it("excludes the months the council does not meet", () => {
+    const skipped = new Set(siteFacts.meetingRule.exceptMonths);
+    for (const start of valuesOf("DTSTART").map(icsToDate)) {
+      const month = new Intl.DateTimeFormat("en-GB", {
+        month: "long",
+        timeZone: "Europe/London",
+      }).format(start);
+      assert.ok(!skipped.has(month), `${month} is an excepted month but has a meeting`);
+    }
+  });
+
+  it("is offered on both pages, and survives holding mode", async () => {
+    for (const route of ROUTES) {
+      const html = readRoute(route);
+      assert.match(html, /href="\/meetings\.ics"/, `${route.url} does not offer the calendar`);
+      assert.match(
+        html,
+        /href="webcal:\/\/bbcc\.scot\/meetings\.ics"/,
+        `${route.url} offers no way to subscribe`,
+      );
+    }
+    // The holding page advertises it, so the worker has to serve it while the
+    // site is still in holding mode or the link 503s.
+    const res = await call("https://bbcc.scot/meetings.ics", "holding");
+    assert.equal(res.status, 200);
+  });
+});
+
 describe("GEO - llms.txt", () => {
   const llmsPath = path.join(distDir, "llms.txt");
 
@@ -524,19 +678,6 @@ describe("GEO - sitemap", () => {
 
 describe("SEO - worker routing", () => {
   // Both of these are invisible from dist/ and easy to undo without noticing.
-  // Workers' ASSETS binding takes a Request or a URL; the worker uses both.
-  const fakeAssets = {
-    fetch: async (input) =>
-      new Response("asset", {
-        status: 200,
-        headers: { "x-url": new URL(input.url ?? input).pathname },
-      }),
-  };
-
-  async function call(url, mode) {
-    const { default: worker } = await import("../worker.js");
-    return worker.fetch(new Request(url), { SITE_MODE: mode, ASSETS: fakeAssets });
-  }
 
   it("301s www to the apex, preserving the path and query", async () => {
     const response = await call("https://www.bbcc.scot/some/page?ref=x", "live");

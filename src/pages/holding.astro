@@ -113,6 +113,12 @@ const isHoldingUrl = Astro.url.pathname.startsWith("/holding");
           )
         }
 
+        <p class="text-ink leading-relaxed mb-6">
+          <a href="/meetings.ics" style="color:var(--pink);text-decoration:underline;">Add the meetings to your calendar</a>,
+          or <a href="webcal://bbcc.scot/meetings.ics" style="color:var(--pink);text-decoration:underline;">subscribe</a>
+          so new dates arrive on their own.
+        </p>
+
         <p class="text-ink leading-relaxed">
           To ask a question, raise an issue or join the mailing list, email{" "}
           <a

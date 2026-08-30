@@ -124,9 +124,11 @@ variable in `wrangler.jsonc`:
 
   `/robots.txt`, `/sitemap-index.xml`, `/sitemap-0.xml` and `/llms.txt` are in the passthrough
   because a policy file behind a 503 is the same as no policy file, and holding mode is exactly
-  when the site needs to be legible to crawlers. The `/holding/` URL itself is noindexed and kept
-  out of the sitemap: the worker serves that content at `/`, so `/` is the URL that should be
-  found, and nothing needs unwinding at launch.
+  when the site needs to be legible to crawlers. `/meetings.ics` is in it for a different reason:
+  the holding page offers the calendar, so a 503 there would be a broken promise on a page people
+  are being asked to trust. The `/holding/` URL itself is noindexed and kept out of the sitemap:
+  the worker serves that content at `/`, so `/` is the URL that should be found, and nothing needs
+  unwinding at launch.
 - **`live`**: all requests pass straight through to the built site.
 
 **To go live** (or to switch back): change `SITE_MODE` in `wrangler.jsonc` in a one-line PR, then
@@ -206,6 +208,19 @@ the first release**:
       December) and the venue live in `src/content/site/index.json`; the dates are computed at
       build time by `src/lib/meetings.ts` and a weekly cron rebuilds so "next meeting" is never
       in the past. One-off cancellations go in `meetingExceptions` as `YYYY-MM-DD`.
+
+      The same rule generates `/meetings.ics` (`src/pages/meetings.ics.ts`), so a subscriber and a
+      reader can never be told different dates. Both pages offer it twice, because the two ways of
+      using a calendar file behave differently and only one of them keeps working: downloading from
+      `https://bbcc.scot/meetings.ics` is a snapshot that never updates again, while subscribing to
+      `webcal://bbcc.scot/meetings.ics` tracks the feed, so the weekly cron carries new and
+      cancelled dates to people who did it that way. The page says so rather than letting anyone
+      find out the hard way. It publishes `CALENDAR_HORIZON` meetings — 18, about two years of the
+      rule — and the count in the prose is derived, not typed.
+
+      Cancelled meetings are dropped from the feed rather than published as `STATUS:CANCELLED`.
+      A subscribing client reconciles against the whole feed and removes what is no longer in it;
+      an importing client would never see the update whatever we emitted.
 - [ ] **Stats strip**: "200,000+ daily visitors" and "~30 lanes & closes" need a source or
       revised wording; "1820s Blythswood grid" and "UNESCO City of Music" are on solid ground.
       Values and wording are in `src/content/site/index.json` (same file holds the boundary

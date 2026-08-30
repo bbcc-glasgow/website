@@ -12,6 +12,15 @@
 
 export const MEETING_TIME_ZONE = "Europe/London";
 
+/**
+ * How many meetings /meetings.ics publishes: two years of a monthly rule with
+ * three months off. Long enough that a subscription stays useful if the weekly
+ * rebuild ever stops, short enough that we are not publishing dates nobody has
+ * committed to. Lives here rather than in the endpoint because the page quotes
+ * the count back to the reader, and the two must agree.
+ */
+export const CALENDAR_HORIZON = 18;
+
 const WEEKDAY_INDEX: Record<string, number> = {
   Sunday: 0,
   Monday: 1,

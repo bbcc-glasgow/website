@@ -18,15 +18,20 @@
 // not fix it (#37).
 const CANONICAL_HOST = "bbcc.scot";
 
-// Crawler-facing files that must resolve even in holding mode. A robots.txt or
-// sitemap behind a 503 is the same as no robots.txt or sitemap: the policy this
-// site publishes about itself only counts if it can be fetched now, while the
-// holding page is what accrues the signals.
+// Files that must resolve even in holding mode. Mostly crawler-facing: a
+// robots.txt or sitemap behind a 503 is the same as no robots.txt or sitemap,
+// because the policy this site publishes about itself only counts if it can be
+// fetched now, while the holding page is what accrues the signals.
+//
+// /meetings.ics is here for a different reason. The holding page publishes the
+// meeting rule and the next dates, and it offers the calendar alongside them, so
+// the file has to be fetchable or that offer is a broken link.
 const CRAWLER_PATHS = new Set([
   "/robots.txt",
   "/sitemap-index.xml",
   "/sitemap-0.xml",
   "/llms.txt",
+  "/meetings.ics",
   "/favicon.ico",
 ]);
 
