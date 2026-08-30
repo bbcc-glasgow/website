@@ -229,4 +229,70 @@ collections:
               - { name: duration, label: Duration (ms), widget: number, value_type: int, required: false }
           - { name: boundaryDescription, label: Boundary Description, widget: text }
           - { name: contactEmail, label: Contact Email, widget: string }
+          - { name: legalName, label: Full Legal Name, widget: string }
+          - name: description
+            label: What The Council Is
+            widget: text
+            hint: One paragraph. Used in the page text and in the structured data search engines read.
+          - name: venue
+            label: Meeting Venue
+            widget: object
+            collapsed: true
+            fields:
+              - { name: name, label: Venue Name, widget: string }
+              - { name: streetAddress, label: Street Address, widget: string }
+              - { name: addressLocality, label: Town or City, widget: string }
+              - { name: postalCode, label: Postcode, widget: string }
+              - { name: addressCountry, label: Country Code, widget: string, hint: "Two letters, e.g. GB" }
+              - { name: accessNote, label: Accessibility Note, widget: text }
+          - name: meetingRule
+            label: When We Meet
+            widget: object
+            collapsed: true
+            hint: The standing rule. Meeting dates are worked out from this automatically, so there is no list of dates to keep up to date.
+            fields:
+              - { name: weekOfMonth, label: Which Week Of The Month, widget: number, value_type: int, min: 1, max: 5 }
+              - name: weekday
+                label: Day Of The Week
+                widget: select
+                options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+              - name: exceptMonths
+                label: Months With No Meeting
+                widget: list
+                field: { name: month, label: Month, widget: string }
+              - { name: doorsOpen, label: Doors Open, widget: string, hint: "24-hour clock, e.g. 19:00" }
+              - { name: startTime, label: Start Time, widget: string, hint: "24-hour clock, e.g. 19:30" }
+              - { name: endTime, label: End Time, widget: string, hint: "24-hour clock, e.g. 21:00" }
+              - { name: attendanceNote, label: How To Attend, widget: text }
+          - name: meetingExceptions
+            label: Cancelled Meetings
+            widget: list
+            required: false
+            hint: One-off cancellations only, as yyyy-mm-dd. Leave empty if the standing rule holds.
+            field: { name: date, label: Date, widget: string }
+          - name: areaPartnership
+            label: Area Partnership
+            widget: object
+            collapsed: true
+            fields:
+              - { name: name, label: Partnership Name, widget: string }
+              - { name: parentBody, label: Parent Body, widget: string }
+          - name: officeBearers
+            label: Office Bearers
+            widget: list
+            summary: "{{fields.role}}"
+            hint: Roles are always shown. A name is optional, appears as ordinary page text, and is never put into the structured data.
+            fields:
+              - { name: role, label: Role, widget: string }
+              - { name: name, label: Name, widget: string, required: false }
+          - name: socialProfiles
+            label: Social Profiles
+            widget: list
+            hint: Full URLs of accounts the council currently runs. These are published as the council's official profiles, so do not list an account that has been handed over or abandoned.
+            field: { name: url, label: Profile URL, widget: string }
+          - name: predecessorSite
+            label: Previous Website
+            widget: string
+            required: false
+            hint: The old site this one replaces. Naming it tells anyone who finds both which is current.
 

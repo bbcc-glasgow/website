@@ -1,0 +1,11 @@
+# Blythswood & Broomielaw Community Council — https://bbcc.scot
+#
+# This is public-interest information published by a statutory body. It is meant
+# to be found, quoted and answered from, by search engines and by AI assistants
+# alike, so everything is open to everyone, including model training.
+
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+Allow: /
+
+Sitemap: https://bbcc.scot/sitemap-index.xml

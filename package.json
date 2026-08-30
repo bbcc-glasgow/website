@@ -15,6 +15,7 @@
     "test:links": "linkinator ./dist --recurse --verbosity error --skip \"^https?://\"",
     "test:a11y": "playwright test",
     "test:sitemap": "node --test tests/sitemap.test.mjs",
+    "test:seo": "node --test tests/seo.test.mjs",
     "test:gitignore": "node --experimental-strip-types --test tests/gitignore.test.ts",
     "test:instagram-feed": "node --experimental-strip-types --test tests/instagram-feed.test.ts",
     "test:instagram-refresh": "node --test tests/refresh-ig-token.test.mjs",

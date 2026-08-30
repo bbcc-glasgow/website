@@ -8,6 +8,30 @@ Design: the settled **Vibrant Poppy** direction (concept v9), ported from
 [weebuilts](https://github.com/gkanitz/weebuilts), which served as the deployment rehearsal for
 this site.
 
+### The share card
+
+The concept covers the page. It does not cover what the site looks like when somebody pastes a
+link into WhatsApp or Slack, so `public/images/og-card.png` extends the direction to a 1200x630
+share card: a split composition with the council's full name on the left and a brand-pink panel
+carrying the logo and `bbcc.scot` on the right (#37).
+
+Two departures from the concept are deliberate:
+
+- **The left half is a flat ink panel, not a photograph.** It is meant to hold the coned Duke of
+  Wellington from Flickr user [mym](https://www.flickr.com/photos/mymuk). The source is portrait
+  1067x1600, which fills the left half at full height without a crop, but it is not in the
+  repository and permission has not been confirmed to cover cropped derivatives and
+  redistribution as a share thumbnail. The panel is the right shape for it, so the photo drops in
+  by replacing one function in `scripts/build-og-card.mjs` and nothing else changes.
+- **The card is drawn in Georgia and Helvetica, not Fraunces and Inter.** `sharp` renders the SVG
+  through librsvg, which resolves fonts against the system rather than against
+  `node_modules`. Rather than ship a font-loading dance for one image, the card uses a serif and a
+  sans that sit close to the pairing. A share card is seen at thumbnail size, away from the site,
+  and pinning the output to a committed PNG is worth more than an exact type match.
+
+Run `node scripts/build-og-card.mjs` to regenerate it. The PNG is committed rather than built, so
+the URL is stable and unhashed and CI never has to reproduce font rendering.
+
 ## Stack
 
 - **Astro 5** (+ Sharp via `astro:assets` for build-time image optimisation) — static output, no
@@ -17,7 +41,7 @@ this site.
 - **Self-hosted fonts** (Fraunces + Inter variable, via Fontsource). No external requests at
   runtime; no analytics or tracking of any kind.
 - **Cloudflare Workers static assets** (`wrangler.jsonc`), served at **https://bbcc.scot**
-  (apex + www as Workers custom domains; canonical is the apex).
+  (apex + www as Workers custom domains; the apex is canonical and `worker.js` 301s www to it).
 
 ## Commands
 
@@ -25,7 +49,10 @@ this site.
 | --- | --- |
 | `pnpm dev` | Local dev server |
 | `pnpm build` | Static build to `dist/` |
-| `pnpm gate` | All four gates: build → link integrity → axe a11y (zero violations) → Lighthouse budgets (perf ≥95, a11y =100, bp ≥95, seo ≥95) |
+| `pnpm gate` | Every step in `gate.d/`, in filename order: build → sitemap → link integrity → axe a11y (zero violations) → Lighthouse budgets (perf ≥95, a11y =100, bp ≥95, seo ≥95) → SEO/GEO invariants |
+
+Adding a check to CI is one new `gate.d/NN-name.sh`; `gate.sh` and `.github/workflows/ci.yml`
+need no edit.
 
 ## Release boundary
 
@@ -77,9 +104,16 @@ A small Worker (`worker.js`, `run_worker_first`) gates the static assets on the 
 variable in `wrangler.jsonc`:
 
 - **`holding`** (current): every route serves `src/pages/holding.astro` — the branded holding
-  page with the contact email. Nothing under development is publicly reachable (only hashed
-  `/_astro/` assets and `/images/` pass through). `/` returns 200; all other paths return 503 so
-  crawlers don't index half-built URLs.
+  page, which carries the council's facts as plain prose and the same structured data as the
+  homepage. Nothing under development is publicly reachable (only hashed `/_astro/` assets,
+  `/images/`, `/admin` and the crawler files pass through). `/` returns 200; all other paths
+  return 503 so crawlers don't index half-built URLs.
+
+  `/robots.txt`, `/sitemap-index.xml`, `/sitemap-0.xml` and `/llms.txt` are in the passthrough
+  because a policy file behind a 503 is the same as no policy file, and holding mode is exactly
+  when the site needs to be legible to crawlers. The `/holding/` URL itself is noindexed and kept
+  out of the sitemap: the worker serves that content at `/`, so `/` is the URL that should be
+  found, and nothing needs unwinding at launch.
 - **`live`**: all requests pass straight through to the built site.
 
 **To go live** (or to switch back): change `SITE_MODE` in `wrangler.jsonc` in a one-line PR, then
@@ -155,8 +189,10 @@ contact email) lives in `src/content/site/index.json`. Items below are placehold
 claims deliberately left for the owner to confirm — **each should be resolved via an issue before
 the first release**:
 
-- [ ] **Meeting card**: date, time and location are "To be announced" — fill in the real next
-      meeting.
+- [x] **Meeting card**: resolved in #37. The rule (third Tuesday, except July, August and
+      December) and the venue live in `src/content/site/index.json`; the dates are computed at
+      build time by `src/lib/meetings.ts` and a weekly cron rebuilds so "next meeting" is never
+      in the past. One-off cancellations go in `meetingExceptions` as `YYYY-MM-DD`.
 - [ ] **Stats strip**: "200,000+ daily visitors" and "~30 lanes & closes" need a source or
       revised wording; "1820s Blythswood grid" and "UNESCO City of Music" are on solid ground.
       Values and wording are in `src/content/site/index.json` (same file holds the boundary
@@ -165,8 +201,9 @@ the first release**:
       remove the card.
 - [ ] **JAG cards**: "Visit council →" links are placeholders — add the neighbouring councils'
       real sites (or remove the link affordance).
-- [ ] **Instagram feed activation**: the section is built (epic #47; accounts confirmed as
-      @bbccglasgow on Instagram and Facebook) and renders the shell until real posts are
+- [ ] **Instagram feed activation**: the section is built (epic #47; the accounts are
+      `instagram.com/bbccglasgow` and `facebook.com/glasgowbbcc` — the Facebook handle is *not*
+      `bbccglasgow`, which is not a page, see #37) and renders the shell until real posts are
       committed. To activate: switch the Instagram account to Business/Creator, link the
       Facebook Page, create a Meta app with a long-lived Graph API token, and add the
       `IG_ACCESS_TOKEN` and `SECRETS_WRITE_PAT` repo secrets — the daily workflow then keeps
@@ -179,6 +216,37 @@ the first release**:
       first successful production deploy (domain configs already point at bbcc.scot).
 - [ ] **Privacy / accessibility statements**: the concept footer linked to Privacy Policy and
       Accessibility pages that don't exist yet; add them as pages, then link them.
+
+### Off-repo tasks from the SEO/GEO pass (#37)
+
+The code side of #37 is done and gated. These are the parts no commit can carry, and the first
+two are the difference between the work shipping and not shipping:
+
+- [ ] **Turn off Cloudflare's managed robots.txt / AI Crawl Control.** Cloudflare serves a
+      `robots.txt` at the edge, ahead of the Worker, so `public/robots.txt` is inert until that
+      is switched off. The edge file currently does `Disallow: /` for GPTBot, ClaudeBot,
+      Google-Extended, CCBot, Applebot-Extended, Bytespider, Amazonbot and meta-externalagent,
+      with `ai-train=no` — the exact opposite of what this repo publishes. After the change,
+      check that `https://bbcc.scot/robots.txt` serves the repo's file.
+- [ ] **Point `babcc.wordpress.com` at this site.** It is live, carries an identical `<title>`,
+      and still advertises the old Instagram, Facebook and X accounts plus
+      `babccglasgow@gmail.com`. While it stands unedited it re-asserts the old identity more
+      loudly than this site's silence denies it.
+- [ ] **Confirm the office bearers.** `officeBearers` in `src/content/site/index.json` holds
+      roles with no names, because the legacy list (Irene Loundon, Rowan Evenstar, Joy Laughlin)
+      sits on a page that also says "this is our election year". Names render as ordinary prose
+      and never enter the JSON-LD, so adding them is one JSON edit.
+- [ ] **Supply the 2026/27 meeting exceptions**, if any beyond the standing July/August/December
+      break. The published dates stop at January 2026.
+- [ ] **Ask mym** for a higher-resolution or landscape original of the Duke of Wellington photo,
+      and confirm the permission covers cropped derivatives and redistribution as a share
+      thumbnail. Until then the share card's left half is a flat brand panel.
+- [ ] **Add `bbcc.scot` as the website link** on the Instagram and Facebook profiles.
+- [ ] **Decide the fate of `x.com/babccglasgow`** — delete, rename, or post a handover pointing
+      here. The site claims neither the account nor a `twitter:site` tag, which is as far as
+      markup can go; the rest is on the account.
+- [ ] **Decide about `community-council.org.uk/blythswoodandbroomielaw`**, which has minutes
+      indexed back to 2018: consolidate here, or leave it and accept the split.
 
 ## Image credits
 

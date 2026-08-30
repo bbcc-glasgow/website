@@ -2,11 +2,19 @@
 # every push to main deploys to production, so a merged PR (including Decap CMS
 # publishes) goes live with no further human action. Manual dispatch redeploys
 # current main as a fallback/redeploy path. A v* tag does not trigger a deploy.
+#
+# The weekly schedule redeploys unchanged main on purpose (#37). Meeting dates
+# are computed at build time from the standing rule in the site content, so the
+# "next meeting" in the HTML and in the JSON-LD only moves on when the site is
+# rebuilt. Wednesday because meetings are Tuesday evenings: the rebuild lands
+# within hours of one finishing rather than a week later.
 name: deploy
 
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "0 5 * * 3"
   workflow_dispatch:
 
 # Serialise production deploys: back-to-back merges (e.g. several CMS publishes)

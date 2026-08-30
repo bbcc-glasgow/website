@@ -45,6 +45,60 @@ const site = defineCollection({
     ),
     boundaryDescription: z.string(),
     contactEmail: z.string().email(),
+
+    // ── Civic fact set (#37) ──────────────────────────────────────────
+    // One source for the facts a reader or an answer engine asks for:
+    // who we are, where we meet, when, and under whose partnership. The
+    // same fields drive the visible prose, the JSON-LD and llms.txt, so
+    // the three cannot drift apart.
+    legalName: z.string(),
+    description: z.string(),
+    venue: z.object({
+      name: z.string(),
+      streetAddress: z.string(),
+      addressLocality: z.string(),
+      postalCode: z.string(),
+      addressCountry: z.string(),
+      accessNote: z.string(),
+    }),
+    // The rule, not a list of dates: `src/lib/meetings.ts` derives the
+    // next few concrete meetings at build time, so nothing goes stale.
+    meetingRule: z.object({
+      weekOfMonth: z.number().int().min(1).max(5),
+      weekday: z.enum([
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ]),
+      exceptMonths: z.array(z.string()),
+      doorsOpen: z.string(),
+      startTime: z.string(),
+      endTime: z.string(),
+      attendanceNote: z.string(),
+    }),
+    // One-off cancellations, as ISO yyyy-mm-dd dates that the rule would
+    // otherwise produce. Defaulted rather than required: Decap drops an empty
+    // list from the JSON entirely, and "no cancellations" is the normal state,
+    // so an absent key must not fail the build.
+    meetingExceptions: z.array(z.string()).default([]),
+    areaPartnership: z.object({
+      name: z.string(),
+      parentBody: z.string(),
+    }),
+    // Roles only. Names are deliberately absent from structured data so a
+    // post-election gap never asserts a wrong fact about a real person.
+    officeBearers: z.array(z.object({ role: z.string(), name: z.string().optional() })),
+    // Drives `sameAs`. Only profiles the council currently owns belong
+    // here; the superseded X account is intentionally not listed.
+    socialProfiles: z.array(z.string().url()),
+    // The old site this one replaces. Named in llms.txt so a reader who
+    // finds both knows which one is current; three sources claiming the
+    // same name is the reason bbcc.scot is hard to identify at all.
+    predecessorSite: z.string().url().optional(),
   }),
 });
 

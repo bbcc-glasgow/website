@@ -11,6 +11,11 @@
 // `copy` prop; `posts` and `images` are injectable so the populated-feed path
 // can be exercised with fixture data in tests without touching committed
 // site content.
+//
+// The two follow buttons take their URLs from props, resolved by the page from
+// `socialProfiles` in the site content (#37). They used to be written into this
+// file, and the Facebook one pointed at a page that does not exist. A button
+// with no URL is not rendered rather than rendered pointing nowhere.
 import { Image, type ImageMetadata } from "astro:assets";
 
 interface FeedPost {
@@ -27,11 +32,19 @@ interface Props {
     instagramCtaLabel: string;
     facebookCtaLabel: string;
   };
+  instagramUrl?: string;
+  facebookUrl?: string;
   posts?: FeedPost[];
   images?: Record<string, ImageMetadata>;
 }
 
-const { copy, posts: postsProp, images: imagesProp } = Astro.props;
+const {
+  copy,
+  instagramUrl,
+  facebookUrl,
+  posts: postsProp,
+  images: imagesProp,
+} = Astro.props;
 
 const feedModules = import.meta.glob("../data/instagram/posts.json", {
   eager: true,
@@ -98,24 +111,32 @@ const tiles = posts
     }
 
     <div class="flex flex-wrap gap-3 justify-center mt-10">
-      <a
-        href="https://www.instagram.com/bbccglasgow"
-        class="btn border-0 text-white font-semibold"
-        target="_blank"
-        rel="noopener noreferrer"
-        style="background:var(--pink);"
-      >
-        {copy.instagramCtaLabel}
-      </a>
-      <a
-        href="https://www.facebook.com/bbccglasgow"
-        class="btn border-0 text-white font-semibold"
-        target="_blank"
-        rel="noopener noreferrer"
-        style="background:var(--ink);"
-      >
-        {copy.facebookCtaLabel}
-      </a>
+      {
+        instagramUrl && (
+          <a
+            href={instagramUrl}
+            class="btn border-0 text-white font-semibold"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="background:var(--pink);"
+          >
+            {copy.instagramCtaLabel}
+          </a>
+        )
+      }
+      {
+        facebookUrl && (
+          <a
+            href={facebookUrl}
+            class="btn border-0 text-white font-semibold"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="background:var(--ink);"
+          >
+            {copy.facebookCtaLabel}
+          </a>
+        )
+      }
     </div>
   </div>
 </section>

@@ -6,5 +6,35 @@
     { "value": "UNESCO<br />City of Music", "label": "Glasgow", "desc": "our cultural designation", "valueStyle": "font-size:1.75rem;line-height:1.2;" }
   ],
   "boundaryDescription": "North: Sauchiehall Street · East: Renfield / Queen / Jamaica St · South: River Clyde · West: The M8",
-  "contactEmail": "info@bbcc.scot"
+  "contactEmail": "info@bbcc.scot",
+  "legalName": "Blythswood & Broomielaw Community Council",
+  "description": "Blythswood & Broomielaw Community Council is the statutory community council for Glasgow's city centre. It is consulted on planning, licensing and policy decisions affecting the area, and represents the people who live, work and travel through it.",
+  "venue": {
+    "name": "Novotel",
+    "streetAddress": "181 Pitt Street",
+    "addressLocality": "Glasgow",
+    "postalCode": "G2 4DT",
+    "addressCountry": "GB",
+    "accessNote": "Step-free access, with a lift to the first floor."
+  },
+  "meetingRule": {
+    "weekOfMonth": 3,
+    "weekday": "Tuesday",
+    "exceptMonths": ["July", "August", "December"],
+    "doorsOpen": "19:00",
+    "startTime": "19:30",
+    "endTime": "21:00",
+    "attendanceNote": "Meetings are hybrid: come along in person or join on Zoom."
+  },
+  "meetingExceptions": [],
+  "areaPartnership": {
+    "name": "Anderston/City/Yorkhill Area Partnership",
+    "parentBody": "Glasgow Community Planning Partnership"
+  },
+  "officeBearers": [{ "role": "Chair" }, { "role": "Secretary" }, { "role": "Treasurer" }],
+  "socialProfiles": [
+    "https://www.instagram.com/bbccglasgow",
+    "https://www.facebook.com/glasgowbbcc"
+  ],
+  "predecessorSite": "https://babcc.wordpress.com"
 }

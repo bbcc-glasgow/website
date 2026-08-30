@@ -439,7 +439,7 @@ describe("Decap CMS config.yml", () => {
     );
   });
 
-  it("should have a site collection with fields matching the #4 schema", () => {
+  it("should have a site collection whose fields match the content schema", () => {
     const text = getConfig();
     const siteBlock = extractCollectionBlock(text, "site");
     assert.ok(siteBlock, "site collection must exist");
@@ -448,8 +448,27 @@ describe("Decap CMS config.yml", () => {
     // Strategy: find the `fields:` line inside the file entry (after `- file:`),
     // then collect `name:` values from subsequent lines at indent >= file-entry fields indent + 2,
     // stopping when we encounter a line at the same indent as `fields:` itself.
+    //
+    // The list below is the site collection's root schema in
+    // src/content.config.ts. Anything editable in the CMS must be in the
+    // schema and vice versa, so an editor can never be shown a field the
+    // build ignores, and a fact the page needs is never uneditable.
     const siteFields = extractSiteFieldNames(siteBlock);
-    const required = ["stats", "boundaryDescription", "contactEmail"];
+    const required = [
+      "stats",
+      "boundaryDescription",
+      "contactEmail",
+      // Civic fact set (#37) - drives the visible prose, the JSON-LD and llms.txt
+      "legalName",
+      "description",
+      "venue",
+      "meetingRule",
+      "meetingExceptions",
+      "areaPartnership",
+      "officeBearers",
+      "socialProfiles",
+      "predecessorSite",
+    ];
 
     for (const field of required) {
       assert.ok(
@@ -458,11 +477,10 @@ describe("Decap CMS config.yml", () => {
       );
     }
 
-    // No extra root-level fields beyond #4 schema
     const extra = siteFields.filter((f) => !required.includes(f));
     assert.strictEqual(
       extra.length, 0,
-      `site collection must not have extra fields beyond #4 schema: ${extra.join(", ")}`,
+      `site collection must not have fields absent from the content schema: ${extra.join(", ")}`,
     );
   });
 

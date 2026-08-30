@@ -6,7 +6,8 @@
       "url": ["/404.html", "/index.html", "/holding/index.html"],
       "settings": {
         "chromePath": "/ms-playwright/chromium-1148/chrome-linux/chrome",
-        "chromeFlags": "--no-sandbox --headless=new --disable-dev-shm-usage"
+        "chromeFlags": "--no-sandbox --headless=new --disable-dev-shm-usage",
+        "skipAudits": ["robots-txt", "is-crawlable"]
       }
     },
     "assert": {

@@ -1,6 +1,7 @@
 ---
 import { getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
+import { describeMeetingRule, nextMeetings } from "../lib/meetings";
 
 // The Holding Page is the second file entry in the Pages collection, distinct
 // from the Homepage entry; this route always reads the Holding Page shape.
@@ -13,14 +14,35 @@ const { eyebrow, heading, body, ctaLabel } = holdingEntry.data as {
 };
 
 const siteEntry = await getEntry("site", "index");
-const { contactEmail } = siteEntry.data;
+const {
+  contactEmail,
+  legalName,
+  description,
+  boundaryDescription,
+  venue,
+  meetingRule,
+  meetingExceptions,
+  areaPartnership,
+} = siteEntry.data;
+
+// While the site is in holding mode the worker serves this content at `/`, so
+// whatever search and answer engines learn about the council now accrues to the
+// URL that survives launch. That only pays off if the page states the facts, so
+// it carries the same fact set as the homepage instead of an apology for being
+// unfinished (#37). The `/holding/` URL itself is noindexed and kept out of the
+// sitemap; `/` is where this content is meant to be found.
+const upcomingMeetings = nextMeetings(meetingRule, meetingExceptions, 2);
+const meetingRuleText = describeMeetingRule(meetingRule);
+const venueLine = `${venue.name}, ${venue.streetAddress}, ${venue.addressLocality} ${venue.postalCode}`;
+const isHoldingUrl = Astro.url.pathname.startsWith("/holding");
 ---
 
 <Base
-  title="Blythswood & Broomielaw Community Council"
-  description="Blythswood & Broomielaw Community Council — the statutory community council for Glasgow's city centre. Our new website is on its way; contact us by email."
+  title={`${legalName} | Glasgow City Centre`}
+  description={`The statutory community council for Glasgow's city centre. Public meetings: ${meetingRuleText.toLowerCase().replace(/\.$/, "")} at ${venueLine}.`}
+  noindex={isHoldingUrl}
 >
-  <main class="min-h-screen grid" style="grid-template-rows:1fr auto;">
+  <main class="min-h-screen grid" style="grid-template-rows:1fr auto auto;">
     <div class="flex items-center justify-center px-4" style="background:var(--pink);">
       <div class="text-center max-w-lg py-16">
         <div class="w-16 h-16 mx-auto mb-6 overflow-hidden rounded-xl bg-white p-1">
@@ -46,6 +68,60 @@ const { contactEmail } = siteEntry.data;
         </a>
       </div>
     </div>
+
+    {/*
+      The facts, in plain prose. A reader who lands here should be able to find
+      out when and where the council meets without waiting for the full site,
+      and an assistant asked "when does BBCC meet" should be able to answer.
+    */}
+    <section class="px-4 py-16" style="background:#fff;" aria-labelledby="holding-facts">
+      <div class="max-w-2xl mx-auto">
+        <h2
+          id="holding-facts"
+          class="font-fraunces font-bold text-ink mb-6"
+          style="font-size:clamp(1.5rem,3vw,2rem);"
+        >
+          About the council
+        </h2>
+
+        <p class="text-ink leading-relaxed mb-4">{description}</p>
+
+        <p class="text-ink leading-relaxed mb-4">
+          The council covers Glasgow's city centre between the M8 and Renfield Street.
+          Its boundary runs {boundaryDescription.toLowerCase()}. It is part of the{" "}
+          {areaPartnership.name}, under the {areaPartnership.parentBody}.
+        </p>
+
+        <h3 class="font-fraunces font-semibold text-ink mt-8 mb-3" style="font-size:1.25rem;">
+          Public meetings
+        </h3>
+
+        <p class="text-ink leading-relaxed mb-4">
+          {meetingRuleText} Meetings are held at {venueLine}, and they are open to
+          everyone. {meetingRule.attendanceNote} {venue.accessNote}
+        </p>
+
+        {
+          upcomingMeetings.length > 0 && (
+            <ul class="text-ink leading-relaxed mb-6" style="list-style:disc;padding-left:1.25rem;">
+              {upcomingMeetings.map((m) => (
+                <li>
+                  <time datetime={m.date}>{m.longDate}</time>, {m.timeLabel}
+                </li>
+              ))}
+            </ul>
+          )
+        }
+
+        <p class="text-ink leading-relaxed">
+          To ask a question, raise an issue or join the mailing list, email{" "}
+          <a
+            href={`mailto:${contactEmail}`}
+            style="color:var(--pink);text-decoration:underline;">{contactEmail}</a
+          >.
+        </p>
+      </div>
+    </section>
     <footer class="py-6 px-4 text-center" style="background:var(--ink);">
       <p style="color:rgba(255,255,255,0.65);font-size:0.8125rem;">
         &copy; 2026 Blythswood &amp; Broomielaw Community Council &nbsp;·&nbsp;

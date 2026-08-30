@@ -36,6 +36,13 @@ const projectSchema = z.object({
     .optional(),
 });
 
+// A hand-copy of the original three fields of the site collection, not the
+// whole of it. The civic fact set added in #37 (legalName, venue, meetingRule
+// and the rest) is deliberately not mirrored here: duplicating twelve fields
+// would drift the moment either side moved. Those fields are enforced where it
+// counts - Astro validates src/content/site/index.json against the real schema
+// on every build, which is gate step 01, and tests/seo.test.mjs asserts the
+// facts reach the rendered page.
 const siteSchema = z.object({
   stats: z.array(
     z.object({
