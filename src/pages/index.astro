@@ -5,6 +5,7 @@ import Base from "../layouts/Base.astro";
 import ProjectCtaIcon from "../components/ProjectCtaIcon.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
 import { resolveProjectVariantColours } from "../lib/projectVariants";
+import { calendarLinks } from "../lib/calendar";
 import { CALENDAR_HORIZON, describeMeetingRule, nextMeetings } from "../lib/meetings";
 import { FACEBOOK_HOST, INSTAGRAM_HOST, socialProfileUrl } from "../lib/social";
 // Mark Ynys-Mon (Flickr: mym) gave permission on the condition that the page
@@ -47,6 +48,7 @@ const laterMeetings = upcomingMeetings.slice(1);
 // cancellations would make it fewer than CALENDAR_HORIZON, and the page should
 // not promise a number the file does not hold.
 const calendarCount = nextMeetings(meetingRule, meetingExceptions, CALENDAR_HORIZON).length;
+const addToCalendar = calendarLinks(Astro.site!);
 const meetingRuleText = describeMeetingRule(meetingRule);
 const venueLine = `${venue.name}, ${venue.streetAddress}, ${venue.addressLocality} ${venue.postalCode}`;
 // A name is optional in content and is usually unconfirmed in an election year,
@@ -484,8 +486,17 @@ const getInvolvedCardStyles = [
 
           <div class="flex flex-wrap gap-3">
             <a href={meetings.cta.url} class="btn btn-sm font-semibold" style="background:var(--pink);color:#fff;border:0;">{meetings.cta.label}</a>
-            <a
-              href="/meetings.ics"
+          </div>
+
+          {/*
+            A disclosure rather than a bare .ics link, because "add this to my
+            calendar" is a different URL depending on which calendar you use, and
+            handing everyone the file is the option that works worst for most of
+            them. No script: <details> opens on click and on Enter and reports
+            its expanded state to a screen reader for free.
+          */}
+          <details class="calendar-add mt-5">
+            <summary
               class="btn btn-sm font-semibold border bg-transparent text-white"
               style="border-color:rgba(255,255,255,0.45);"
             >
@@ -493,15 +504,29 @@ const getInvolvedCardStyles = [
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
               Add to your calendar
-            </a>
-          </div>
+            </summary>
 
-          <p class="text-xs mt-4" style="color:rgba(255,255,255,0.6);line-height:1.7;">
-            That downloads the next {calendarCount} meetings as a one-off. To have new dates and
-            any changes arrive on their own,
-            <a href="webcal://bbcc.scot/meetings.ics" style="color:inherit;text-decoration:underline;">subscribe to the calendar</a>
-            instead.
-          </p>
+            <ul class="calendar-add-menu">
+              {
+                addToCalendar.map((link) => (
+                  <li>
+                    <a href={link.href}>
+                      <span>{link.label}</span>
+                      <span class="calendar-add-note">
+                        {link.subscribes ? "stays up to date" : `${calendarCount} dates, one-off`}
+                      </span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+
+            <p class="calendar-add-help">
+              Subscribing means dates added or cancelled later reach you on their own. The
+              file is a snapshot of the next {calendarCount} meetings and stops updating the
+              moment you import it.
+            </p>
+          </details>
         </div>
 
         {

@@ -590,6 +590,45 @@ describe("Meetings - the calendar feed", () => {
     const res = await call("https://bbcc.scot/meetings.ics", "holding");
     assert.equal(res.status, 200);
   });
+
+  // A bare .ics link is the option that works worst for most readers: it is a
+  // download, and a download is a snapshot. Each provider takes the feed as a
+  // query parameter and subscribes on the reader's behalf, so each page has to
+  // offer the provider its reader actually uses.
+  it("hands each calendar app the feed in the form that app expects", () => {
+    const feed = "webcal://bbcc.scot/meetings.ics";
+    const expected = [
+      ["Google Calendar", `https://calendar.google.com/calendar/r?cid=${feed}`],
+      ["Outlook.com", `https://outlook.live.com/calendar/0/addfromweb?url=${feed}`],
+      ["Apple Calendar", feed],
+    ];
+
+    for (const route of ROUTES) {
+      const html = readRoute(route);
+      for (const [label, href] of expected) {
+        assert.ok(
+          html.includes(`href="${href}"`),
+          `${route.url} has no ${label} link (expected ${href})`,
+        );
+        assert.ok(html.includes(label), `${route.url} does not name ${label}`);
+      }
+    }
+  });
+
+  // Subscribing and downloading behave differently a year from now, and only
+  // one of them is still right. The reader has to be told which is which at the
+  // point of choosing, not afterwards.
+  it("says which options keep working and which freeze", () => {
+    for (const route of ROUTES) {
+      const html = readRoute(route);
+      assert.match(html, /stays up to date/, `${route.url} does not mark the live options`);
+      assert.match(
+        html,
+        /snapshot that stops updating|snapshot of the next \d+ meetings/,
+        `${route.url} offers a download without saying it is frozen`,
+      );
+    }
+  });
 });
 
 describe("GEO - llms.txt", () => {

@@ -210,13 +210,21 @@ the first release**:
       in the past. One-off cancellations go in `meetingExceptions` as `YYYY-MM-DD`.
 
       The same rule generates `/meetings.ics` (`src/pages/meetings.ics.ts`), so a subscriber and a
-      reader can never be told different dates. Both pages offer it twice, because the two ways of
-      using a calendar file behave differently and only one of them keeps working: downloading from
-      `https://bbcc.scot/meetings.ics` is a snapshot that never updates again, while subscribing to
-      `webcal://bbcc.scot/meetings.ics` tracks the feed, so the weekly cron carries new and
-      cancelled dates to people who did it that way. The page says so rather than letting anyone
-      find out the hard way. It publishes `CALENDAR_HORIZON` meetings — 18, about two years of the
-      rule — and the count in the prose is derived, not typed.
+      reader can never be told different dates. It publishes `CALENDAR_HORIZON` meetings — 18,
+      about two years of the rule — and the count quoted on the page is derived, not typed.
+
+      Both pages offer that feed through an "Add to your calendar" disclosure built from
+      `src/lib/calendar.ts`, not as a bare `.ics` link. A bare link is a download, and a download
+      is a snapshot that never updates again; the calendar apps most people use each take a feed
+      URL as a query parameter and subscribe on the reader's behalf, so they get handed that
+      instead. Google (`calendar.google.com/calendar/r?cid=`), Outlook.com
+      (`outlook.live.com/calendar/0/addfromweb?url=`) and anything registered for `webcal://`
+      (Apple, iOS, Thunderbird) all track the feed, so the weekly cron carries new and cancelled
+      dates to them on its own. The download is offered last and labelled as the one-off it is.
+      The URLs are built from `Astro.site`, so a preview deployment offers its own feed rather
+      than pointing subscribers at production. Work and school Microsoft accounts use
+      `outlook.office.com` instead; that is a fifth button for a minority of a community
+      council's readers, so it is left out and they can paste the feed URL.
 
       Cancelled meetings are dropped from the feed rather than published as `STATUS:CANCELLED`.
       A subscribing client reconciles against the whole feed and removes what is no longer in it;
