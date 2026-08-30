@@ -19,10 +19,14 @@ Two departures from the concept are deliberate:
 
 - **The left half is a flat ink panel, not a photograph.** It is meant to hold the coned Duke of
   Wellington from Flickr user [mym](https://www.flickr.com/photos/mymuk). The source is portrait
-  1067x1600, which fills the left half at full height without a crop, but it is not in the
-  repository and permission has not been confirmed to cover cropped derivatives and
-  redistribution as a share thumbnail. The panel is the right shape for it, so the photo drops in
-  by replacing one function in `scripts/build-og-card.mjs` and nothing else changes.
+  1067x1600, which fills the left half at full height without a crop. mym has granted permission
+  on the condition that the page carries a credit linking to their profile, and the site owes
+  them that credit wherever the photo appears. Two things still stand between the panel and the
+  photo: the file is not in the repository, and a share card is the one place the condition
+  cannot be met, because Slack and WhatsApp render the image away from the page that carries the
+  credit. The hero use is settled; the card needs mym asked the narrower question. The panel is
+  the right shape for the photo, so it drops in by replacing one function in
+  `scripts/build-og-card.mjs` and nothing else changes.
 - **The card is drawn in Georgia and Helvetica, not Fraunces and Inter.** `sharp` renders the SVG
   through librsvg, which resolves fonts against the system rather than against
   `node_modules`. Rather than ship a font-loading dance for one image, the card uses a serif and a
@@ -238,9 +242,15 @@ two are the difference between the work shipping and not shipping:
       and never enter the JSON-LD, so adding them is one JSON edit.
 - [ ] **Supply the 2026/27 meeting exceptions**, if any beyond the standing July/August/December
       break. The published dates stop at January 2026.
-- [ ] **Ask mym** for a higher-resolution or landscape original of the Duke of Wellington photo,
-      and confirm the permission covers cropped derivatives and redistribution as a share
-      thumbnail. Until then the share card's left half is a flat brand panel.
+- [ ] **Send the Duke of Wellington file.** mym has given permission, conditional on a credit on
+      the page linking to `flickr.com/photos/mymuk`. The image itself is still not in the
+      repository and no specific photo URL was ever recorded, only the profile. Drop the original
+      into `src/assets/` and the hero swap and its credit line land together, in that order: a
+      credit for a photo that is not on the page would be its own small untruth.
+- [ ] **Ask mym the share-card question separately.** The grant is for a credit on the page, and a
+      share thumbnail is seen in Slack and WhatsApp with no page attached, so the condition cannot
+      travel with it. A higher-resolution or landscape original would help too: 1067px is under
+      the 1200px platforms prefer. Until both are settled the card's left half stays a brand panel.
 - [ ] **Add `bbcc.scot` as the website link** on the Instagram and Facebook profiles.
 - [ ] **Decide the fate of `x.com/babccglasgow`** — delete, rename, or post a handover pointing
       here. The site claims neither the account nor a `twitter:site` tag, which is as far as
