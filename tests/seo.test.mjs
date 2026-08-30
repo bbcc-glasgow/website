@@ -216,6 +216,60 @@ describe("SEO - share card", () => {
   });
 });
 
+// ── The licensed photograph ────────────────────────────────────────────
+//
+// The hero photo is the one image on the site that is not Creative Commons.
+// Mark Ynys-Mon gave permission on the condition that the page credits him with
+// a link to his profile, so the photo and the credit have to ship together.
+// This is the only assertion here that exists for a licence rather than for a
+// crawler, and it is the reason it is worth failing a build over: dropping the
+// credit while keeping the photo would put the site in breach.
+
+describe("Licensing - the hero photograph carries its credit", () => {
+  const homepage = readRoute(ROUTES[0]);
+
+  it("credits the photographer with a link to the profile", () => {
+    assert.match(homepage, /Mark Ynys-Mon/);
+    assert.match(homepage, /href="https:\/\/www\.flickr\.com\/photos\/mymuk"/);
+  });
+
+  it("names the photographer inside the link, not merely near it", () => {
+    // A credit that sits beside an unrelated link is not attribution. The
+    // anchor's own text has to be the name a reader would click.
+    const anchor = homepage.match(
+      /<a[^>]+href="https:\/\/www\.flickr\.com\/photos\/mymuk"[^>]*>([\s\S]*?)<\/a>/,
+    );
+    assert.ok(anchor, "no anchor points at the photographer's profile");
+    assert.match(anchor[1], /Mark Ynys-Mon/);
+  });
+
+  it("does not use the photo anywhere the credit cannot follow", () => {
+    // Permission covers the page and the share card, and the share card was
+    // asked about specifically. Any third use needs asking about too, so pin
+    // the two that were agreed rather than letting a new one pass silently.
+    const source = fs.readFileSync(
+      path.resolve(rootDir, "src/pages/index.astro"),
+      "utf-8",
+    );
+    assert.match(source, /duke_of_wellington_mym/);
+
+    const otherPages = fs
+      .readdirSync(path.resolve(rootDir, "src/pages"))
+      .filter((f) => f !== "index.astro" && /\.(astro|ts)$/.test(f));
+    for (const file of otherPages) {
+      const body = fs.readFileSync(
+        path.resolve(rootDir, "src/pages", file),
+        "utf-8",
+      );
+      assert.doesNotMatch(
+        body,
+        /duke_of_wellington_mym/,
+        `${file} uses the licensed photo but carries no credit`,
+      );
+    }
+  });
+});
+
 // ── Structured data ────────────────────────────────────────────────────
 
 describe("GEO - JSON-LD", () => {

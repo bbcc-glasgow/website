@@ -8,25 +8,28 @@ Design: the settled **Vibrant Poppy** direction (concept v9), ported from
 [weebuilts](https://github.com/gkanitz/weebuilts), which served as the deployment rehearsal for
 this site.
 
+One thing has superseded the concept. The hero photograph is no longer the aerial of Central
+station; it is the coned Duke of Wellington in Royal Exchange Square, just inside the eastern
+boundary (#37). The aerial was a picture of Glasgow, and this is a picture of *this* Glasgow: the
+landmark a resident would name, the street sign in shot, and a joke the city has kept up since
+the Eighties. The split hero is unchanged, but the photo is portrait where the aerial was
+landscape, so `object-position` in `src/styles/global.css` is now doing real work and the mobile
+band is taller than the concept's. Both are commented where they sit.
+
 ### The share card
 
 The concept covers the page. It does not cover what the site looks like when somebody pastes a
 link into WhatsApp or Slack, so `public/images/og-card.png` extends the direction to a 1200x630
-share card: a split composition with the council's full name on the left and a brand-pink panel
-carrying the logo and `bbcc.scot` on the right (#37).
+share card: the coned Duke of Wellington on the left, and a brand-pink panel on the right
+carrying the council's full name, the logo and `bbcc.scot` (#37).
 
-Two departures from the concept are deliberate:
+The split is at 420px rather than half way, because that is what the photograph is: 1067x1600
+scaled to the card's full height comes to 420 wide, so the Duke runs top to bottom with
+essentially nothing cropped. The proportions follow the picture instead of forcing it into a
+shape it isn't.
 
-- **The left half is a flat ink panel, not a photograph.** It is meant to hold the coned Duke of
-  Wellington from Flickr user [mym](https://www.flickr.com/photos/mymuk). The source is portrait
-  1067x1600, which fills the left half at full height without a crop. mym has granted permission
-  on the condition that the page carries a credit linking to their profile, and the site owes
-  them that credit wherever the photo appears. Two things still stand between the panel and the
-  photo: the file is not in the repository, and a share card is the one place the condition
-  cannot be met, because Slack and WhatsApp render the image away from the page that carries the
-  credit. The hero use is settled; the card needs mym asked the narrower question. The panel is
-  the right shape for the photo, so it drops in by replacing one function in
-  `scripts/build-og-card.mjs` and nothing else changes.
+One departure from the concept is deliberate:
+
 - **The card is drawn in Georgia and Helvetica, not Fraunces and Inter.** `sharp` renders the SVG
   through librsvg, which resolves fonts against the system rather than against
   `node_modules`. Rather than ship a font-loading dance for one image, the card uses a serif and a
@@ -34,7 +37,13 @@ Two departures from the concept are deliberate:
   and pinning the output to a committed PNG is worth more than an exact type match.
 
 Run `node scripts/build-og-card.mjs` to regenerate it. The PNG is committed rather than built, so
-the URL is stable and unhashed and CI never has to reproduce font rendering.
+the URL is stable and unhashed and CI never has to reproduce font rendering. It is quantised to a
+palette, which takes it from 715 kB to 170 kB with nothing visible lost at the size a share card
+is ever seen.
+
+The card carries no photo credit. Mark Ynys-Mon was asked about this use specifically rather than
+it being read into the on-page permission, because a thumbnail in Slack or WhatsApp appears with
+no page attached and therefore no way to carry one.
 
 ## Stack
 
@@ -242,15 +251,11 @@ two are the difference between the work shipping and not shipping:
       and never enter the JSON-LD, so adding them is one JSON edit.
 - [ ] **Supply the 2026/27 meeting exceptions**, if any beyond the standing July/August/December
       break. The published dates stop at January 2026.
-- [ ] **Send the Duke of Wellington file.** mym has given permission, conditional on a credit on
-      the page linking to `flickr.com/photos/mymuk`. The image itself is still not in the
-      repository and no specific photo URL was ever recorded, only the profile. Drop the original
-      into `src/assets/` and the hero swap and its credit line land together, in that order: a
-      credit for a photo that is not on the page would be its own small untruth.
-- [ ] **Ask mym the share-card question separately.** The grant is for a credit on the page, and a
-      share thumbnail is seen in Slack and WhatsApp with no page attached, so the condition cannot
-      travel with it. A higher-resolution or landscape original would help too: 1067px is under
-      the 1200px platforms prefer. Until both are settled the card's left half stays a brand panel.
+- [ ] **Ask Mark Ynys-Mon for a full-resolution original** of the Duke of Wellington photo. The
+      copy in `src/assets/` is 1067x1600, which caps the hero srcset at 1067 and leaves nothing
+      spare on a large display. His Flickr profile restricts automatic access to larger versions
+      and asks that requests go to `photographs@druidic.org` or through Flickr. Permission for the
+      site and the share card is already given; this is only about resolution.
 - [ ] **Add `bbcc.scot` as the website link** on the Instagram and Facebook profiles.
 - [ ] **Decide the fate of `x.com/babccglasgow`** — delete, rename, or post a handover pointing
       here. The site claims neither the account nor a `twitter:site` tag, which is as far as
@@ -260,14 +265,19 @@ two are the difference between the work shipping and not shipping:
 
 ## Image credits
 
-All photos are Creative Commons. Sources live in `src/assets/` and are optimised at build time
-by `astro:assets` (Sharp): responsive srcsets at 420–1400px widths, WebP at quality 60–65, lazy
-loading everywhere except the hero. Only the logo stays in `public/images/` (it doubles as the
-favicon).
+Sources live in `src/assets/` and are optimised at build time by `astro:assets` (Sharp):
+responsive srcsets at 420–1400px widths, WebP at quality 60–65, lazy loading everywhere except
+the hero. Only the logo stays in `public/images/` (it doubles as the favicon).
+
+The hero photograph is the one asset that is not Creative Commons. It is used by permission, and
+that permission has a condition attached: a credit on the page linking to the photographer's
+profile. The footer of `src/pages/index.astro` carries it. If the photo is ever removed, remove
+the credit in the same commit; if it is ever used somewhere new, the credit goes with it.
 
 | File | Source |
 | --- | --- |
-| `central-aerial.jpg` | Wikimedia Commons — "Glasgow Central railway station - aerial - 2025-04-17" |
+| `duke_of_wellington_mym.jpeg` | Mark Ynys-Mon, [flickr.com/photos/mymuk](https://www.flickr.com/photos/mymuk) — used with permission (hero and share card), not under a CC licence. His profile asks that requests for full-resolution originals and any commercial use go through email or Flickr message. |
+| `central-aerial.jpg` | Wikimedia Commons — "Glasgow Central railway station - aerial - 2025-04-17" (currently unused; replaced as the hero by the photo above) |
 | `blythswood-square.jpg` | Wikimedia Commons — "Springtime in Blythswood Square, Glasgow" |
 | `squinty-bridge.jpg` | Wikimedia Commons — "The Squinty Bridge, River Clyde, Glasgow" (currently unused; kept for the future social section) |
 

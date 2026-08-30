@@ -7,7 +7,14 @@ import InstagramFeed from "../components/InstagramFeed.astro";
 import { resolveProjectVariantColours } from "../lib/projectVariants";
 import { describeMeetingRule, nextMeetings } from "../lib/meetings";
 import { FACEBOOK_HOST, INSTAGRAM_HOST, socialProfileUrl } from "../lib/social";
-import centralAerial from "../assets/central-aerial.jpg";
+// Mark Ynys-Mon (Flickr: mym) gave permission on the condition that the page
+// credits him with a link to his profile. The credit is in the footer; if this
+// import ever goes, that line goes with it.
+import dukeOfWellington from "../assets/duke_of_wellington_mym.jpeg";
+
+// The source is 1067px wide, so that is the top of the hero srcset: asking for
+// more would only make Sharp upscale a photo we cannot get bigger.
+const heroWidths = [540, 768, 1067];
 import blythswoodSquare from "../assets/blythswood-square.jpg";
 
 const projects = (await getCollection("projects"))
@@ -175,9 +182,9 @@ const getInvolvedCardStyles = [
       </div>
       <div class="hero-right">
         <Image
-          src={centralAerial}
-          alt="Aerial view of Glasgow Central station"
-          widths={[768, 1080, 1400]}
+          src={dukeOfWellington}
+          alt="The Duke of Wellington statue in Royal Exchange Square, Glasgow, wearing a traffic cone on its head"
+          widths={heroWidths}
           sizes="(max-width: 767px) 100vw, 50vw"
           quality={65}
           loading="eager"
@@ -580,7 +587,12 @@ const getInvolvedCardStyles = [
           &copy; 2026 Blythswood &amp; Broomielaw Community Council.
         </p>
         <p style="color:rgba(255,255,255,0.65);font-size:0.75rem;">
-          Photos: Wikimedia Commons and Flickr (Creative Commons) — see site repository for credits.
+          Duke of Wellington photograph by
+          <a
+            href="https://www.flickr.com/photos/mymuk"
+            rel="noopener"
+            style="color:inherit;text-decoration:underline;">Mark Ynys-Mon</a>, used with permission.
+          Other photos: Wikimedia Commons (Creative Commons).
         </p>
       </div>
     </div>

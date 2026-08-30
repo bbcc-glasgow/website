@@ -160,7 +160,11 @@ input:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: left center;
+  /* The hero photo is portrait (1067x1600) in a landscape-ish panel, so `cover`
+     always crops it vertically. Anchoring above centre keeps the cone in frame:
+     it sits about a fifth of the way down the source, and centring would push it
+     past the top edge. */
+  object-position: center 28%;
 }
 .hero-right::after {
   content: "";
@@ -175,12 +179,20 @@ input:focus-visible {
 @media (max-width: 767px) {
   #home {
     grid-template-columns: 1fr;
-    grid-template-rows: 55vw 1fr;
+    /* 72vw, not 55: the hero photo is portrait, the band is a landscape
+       letterbox, and the navbar sits over its top ~57px. At 55vw what survived
+       was either a cone with no rider under it or a rider with the cone cut
+       off. 72vw is the height at which the cone, the Duke and the horse's head
+       all fit below the navbar. */
+    grid-template-rows: 72vw 1fr;
     min-height: unset;
   }
   .hero-right {
     order: -1;
-    min-height: 55vw;
+    min-height: 72vw;
+  }
+  .hero-right img {
+    object-position: center 10%;
   }
   .hero-left {
     padding: 3rem 1.5rem 3.5rem;
