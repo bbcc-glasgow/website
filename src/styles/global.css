@@ -367,16 +367,52 @@ input:focus-visible {
   background: #1a1a2e;
   padding: 5rem 2.5rem;
 }
+/* The 1px gap over a tinted background is what draws the hairline grid; the
+   cards themselves carry no borders. */
+.jag-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: rgba(0, 168, 150, 0.2);
+}
+/* Fixed column counts rather than auto-fit. The background is what draws the
+   grid lines, so a row that does not fill leaves a lit band where the missing
+   cells would be; counts that divide the number of areas keep every row full. */
+@media (min-width: 480px) {
+  .jag-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 900px) {
+  .jag-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 .jag-card {
-  display: block;
+  display: flex;
+  align-items: center;
+  height: 100%;
   background: #1a1a2e;
-  padding: 1.75rem;
+  padding: 1.25rem 1.5rem;
   text-decoration: none;
   border-top: 3px solid transparent;
   transition: border-color 0.2s;
 }
-.jag-card:hover {
+/* Only a card that goes somewhere reacts to the pointer. Until a council's own
+   page is confirmed, these are names, not links. */
+a.jag-card:hover,
+a.jag-card:focus-visible {
   border-top-color: #dc1a84;
+}
+.jag-card-name {
+  font-family: "Fraunces Variable", "Fraunces", serif;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #fff;
 }
 
 /* ─── Get Involved ───────────────────────────────────────────── */

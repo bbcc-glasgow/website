@@ -45,10 +45,8 @@ const pagesSchema = z.object({
     body: z.string(),
     cards: z.array(
       z.object({
-        eyebrow: z.string(),
-        heading: z.string(),
-        body: z.string(),
-        ctaLabel: z.string(),
+        name: z.string(),
+        url: z.string().url().optional(),
       }),
     ),
   }),
@@ -60,7 +58,7 @@ const pagesSchema = z.object({
       z.object({
         heading: z.string(),
         body: z.string(),
-        cta: z.object({ label: z.string(), url: z.string() }),
+        ctas: z.array(z.object({ label: z.string(), url: z.string() })).min(1),
       }),
     ),
   }),

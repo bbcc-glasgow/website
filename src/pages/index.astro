@@ -79,14 +79,14 @@ const getInvolvedCardStyles = [
   {
     iconBg: "background:rgba(0,168,150,0.12);",
     iconColour: "var(--teal-dark)",
-    iconPath: '<path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>',
+    iconPath: '<path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342a3 3 0 100-2.684m0 2.684a3 3 0 11-2.684-4.026m2.684 4.026l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>',
     ctaClass: "text-white",
     ctaStyle: "background:var(--teal-dark);",
   },
   {
     iconBg: "background:rgba(244,161,0,0.12);",
     iconColour: "#8a5f00",
-    iconPath: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>',
+    iconPath: '<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>',
     ctaClass: "text-ink",
     ctaStyle: "background:var(--amber);",
   },
@@ -379,22 +379,29 @@ const getInvolvedCardStyles = [
         <p style="font-size:1rem;color:rgba(255,255,255,0.75);line-height:1.72;max-width:65ch;margin-bottom:3rem;">
           {jag.body}
         </p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:rgba(0,168,150,0.2);">
+        {/*
+          Names only. The areas are a fact the council can state; a compass
+          direction and a sentence about what each neighbour cares about would
+          be us writing on their behalf. A card becomes a link the moment
+          somebody puts a confirmed URL against it in the CMS.
+        */}
+        <ul class="jag-grid">
           {
             jag.cards.map((card) => (
-              <a href="#jag" class="jag-card">
-                <p class="section-eyebrow" style="font-size:0.65rem;color:var(--teal);margin-bottom:6px;">{card.eyebrow}</p>
-                <h3 class="font-fraunces" style="font-size:1rem;font-weight:600;color:white;margin-bottom:6px;line-height:1.3;">
-                  {card.heading}
-                </h3>
-                <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:14px;">
-                  {card.body}
-                </p>
-                <span style="font-size:0.75rem;font-weight:700;color:var(--pink-on-dark);">{card.ctaLabel}</span>
-              </a>
+              <li>
+                {card.url ? (
+                  <a href={card.url} class="jag-card">
+                    <span class="jag-card-name">{card.name}</span>
+                  </a>
+                ) : (
+                  <div class="jag-card">
+                    <span class="jag-card-name">{card.name}</span>
+                  </div>
+                )}
+              </li>
             ))
           }
-        </div>
+        </ul>
       </div>
     </section>
 
@@ -421,7 +428,11 @@ const getInvolvedCardStyles = [
                     </div>
                     <h3 class="font-fraunces font-semibold text-ink text-xl mb-2">{card.heading}</h3>
                     <p class="text-gray-600 text-sm leading-relaxed mb-4">{card.body}</p>
-                    <a href={card.cta.url} class={`btn btn-sm border-0 font-semibold ${s.ctaClass}`} style={s.ctaStyle}>{card.cta.label}</a>
+                    <div class="flex flex-wrap gap-2 mt-auto">
+                      {card.ctas.map((cta) => (
+                        <a href={cta.url} class={`btn btn-sm border-0 font-semibold ${s.ctaClass}`} style={s.ctaStyle}>{cta.label}</a>
+                      ))}
+                    </div>
                   </div>
                 </div>
               );
@@ -491,49 +502,55 @@ const getInvolvedCardStyles = [
             {meetingDetails.attendanceNote} {venue.accessNote}
           </p>
 
-          <div class="flex flex-wrap gap-3">
-            <a href={meetings.cta.url} class="btn btn-sm font-semibold" style="background:var(--pink);color:#fff;border:0;">{meetings.cta.label}</a>
-          </div>
-
           {/*
-            A disclosure rather than a bare .ics link, because "add this to my
-            calendar" is a different URL depending on which calendar you use, and
-            handing everyone the file is the option that works worst for most of
-            them. No script: <details> opens on click and on Enter and reports
-            its expanded state to a screen reader for free.
+            The two things a reader might want next, on one line where there is
+            room for it and stacked where there is not. `items-start` so the
+            open disclosure grows downwards instead of stretching the button
+            beside it.
           */}
-          <details class="calendar-add mt-5">
-            <summary
-              class="btn btn-sm font-semibold border bg-transparent text-white"
-              style="border-color:rgba(255,255,255,0.45);"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              Add to your calendar
-            </summary>
+          <div class="flex flex-wrap items-start gap-3">
+            <a href={meetings.cta.url} class="btn btn-sm font-semibold" style="background:var(--pink);color:#fff;border:0;">{meetings.cta.label}</a>
 
-            <ul class="calendar-add-menu">
-              {
-                addToCalendar.map((link) => (
-                  <li>
-                    <a href={link.href}>
-                      <span>{link.label}</span>
-                      <span class="calendar-add-note">
-                        {link.subscribes ? "stays up to date" : `${calendarCount} dates, one-off`}
-                      </span>
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
+            {/*
+              A disclosure rather than a bare .ics link, because "add this to my
+              calendar" is a different URL depending on which calendar you use,
+              and handing everyone the file is the option that works worst for
+              most of them. No script: <details> opens on click and on Enter and
+              reports its expanded state to a screen reader for free.
+            */}
+            <details class="calendar-add">
+              <summary
+                class="btn btn-sm font-semibold border bg-transparent text-white"
+                style="border-color:rgba(255,255,255,0.45);"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Add to your calendar
+              </summary>
 
-            <p class="calendar-add-help">
-              Subscribing means dates added or cancelled later reach you on their own. The
-              file is a snapshot of the next {calendarCount} meetings and stops updating the
-              moment you import it.
-            </p>
-          </details>
+              <ul class="calendar-add-menu">
+                {
+                  addToCalendar.map((link) => (
+                    <li>
+                      <a href={link.href}>
+                        <span>{link.label}</span>
+                        <span class="calendar-add-note">
+                          {link.subscribes ? "stays up to date" : `${calendarCount} dates, one-off`}
+                        </span>
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+
+              <p class="calendar-add-help">
+                Subscribing means dates added or cancelled later reach you on their own. The
+                file is a snapshot of the next {calendarCount} meetings and stops updating the
+                moment you import it.
+              </p>
+            </details>
+          </div>
         </div>
 
         {

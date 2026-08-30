@@ -128,12 +128,13 @@ const homepageSchema = z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
+    // A name, and a link only once somebody has confirmed the council's own
+    // page. The names are the fact; a compass direction and a sentence about
+    // what each neighbour cares about would be us making it up.
     cards: z.array(
       z.object({
-        eyebrow: z.string(),
-        heading: z.string(),
-        body: z.string(),
-        ctaLabel: z.string(),
+        name: z.string(),
+        url: z.string().url().optional(),
       }),
     ),
   }),
@@ -141,11 +142,13 @@ const homepageSchema = z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
+    // Plural, because "follow us" is two buttons and one card should not have
+    // to become two to say so.
     cards: z.array(
       z.object({
         heading: z.string(),
         body: z.string(),
-        cta: z.object({ label: z.string(), url: z.string() }),
+        ctas: z.array(z.object({ label: z.string(), url: z.string() })).min(1),
       }),
     ),
   }),
