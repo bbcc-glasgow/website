@@ -126,6 +126,10 @@ const siteFacts = JSON.parse(
   fs.readFileSync(path.resolve(rootDir, "src/content/site/index.json"), "utf-8"),
 );
 
+const pagesFacts = JSON.parse(
+  fs.readFileSync(path.resolve(rootDir, "src/content/pages/index.json"), "utf-8"),
+);
+
 function readRoute(route) {
   assert.ok(
     fs.existsSync(route.file),
@@ -854,5 +858,45 @@ describe("SEO - social profiles", () => {
       "facebook.com/bbccglasgow does not exist",
     );
     assert.ok(!home.includes(DISOWNED_PROFILE), `The site should not link ${DISOWNED_PROFILE}`);
+  });
+});
+
+describe("SEO - the neighbouring community councils", () => {
+  // These are the only outbound links to other organisations on the page. The
+  // URLs are the councils' own, confirmed by the owner (#37), so they belong
+  // in content rather than in an assertion; what is pinned here is that a URL
+  // in content actually becomes a link, and behaves like one to somewhere else.
+  const linked = pagesFacts.jag.cards.filter((card) => card.url);
+
+  it("turns every confirmed URL into a link that opens in a new tab", () => {
+    assert.ok(linked.length > 0, "no neighbouring council has a URL to link");
+    const home = readRoute(ROUTES[0]);
+
+    for (const card of linked) {
+      const anchor = home.match(
+        new RegExp(`<a[^>]*href="${card.url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*>`),
+      );
+      assert.ok(anchor, `${card.name} has a URL in content but no link on the page`);
+      assert.match(anchor[0], /class="[^"]*jag-card/, `${card.name} is linked outside the grid`);
+      assert.match(anchor[0], /target="_blank"/, `${card.name} does not open in a new tab`);
+      // Without noopener the new tab can reach back through window.opener.
+      assert.match(anchor[0], /rel="[^"]*noopener/, `${card.name} opens without noopener`);
+    }
+  });
+
+  it("marks each one as leaving the site, in the tab and to a screen reader", () => {
+    const home = readRoute(ROUTES[0]);
+    const icons = home.match(/class="jag-card-icon"/g) ?? [];
+    assert.equal(icons.length, linked.length, "every linked council needs the external-link arrow");
+    // The arrow is aria-hidden, so the new tab has to be said in words too.
+    const notes = home.match(/\(opens in a new tab\)/g) ?? [];
+    assert.equal(notes.length, linked.length, "every linked council needs the new-tab note");
+  });
+
+  it("keeps the councils without a confirmed URL as plain names", () => {
+    const home = readRoute(ROUTES[0]);
+    for (const card of pagesFacts.jag.cards.filter((c) => !c.url)) {
+      assert.ok(home.includes(card.name), `${card.name} is missing from the grid`);
+    }
   });
 });

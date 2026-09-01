@@ -35,12 +35,12 @@
     "heading": "Working Together Across Glasgow",
     "body": "Through the Joint Action Group (JAG), we team up with neighbouring community councils to channel community voices directly to Glasgow City Council — because some challenges can only be solved together.",
     "cards": [
-      { "name": "Anderston" },
-      { "name": "Dundasvale" },
-      { "name": "Garnethill" },
-      { "name": "Merchant City and Trongate" },
-      { "name": "Townhead and Ladywell" },
-      { "name": "Yorkhill and Kelvingrove" }
+      { "name": "Anderston", "url": "https://anderston-community-council.mailerpage.io/" },
+      { "name": "Dundasvale", "url": "https://dundasvalecc.co.uk/" },
+      { "name": "Garnethill", "url": "https://www.garnethillmc.co.uk/garnethill-community-council" },
+      { "name": "Merchant City and Trongate", "url": "https://mctcc.scot/" },
+      { "name": "Townhead and Ladywell", "url": "https://tandlcc.wordpress.com/" },
+      { "name": "Yorkhill and Kelvingrove", "url": "https://yokecoco.wordpress.com/" }
     ]
   },
   "getInvolved": {

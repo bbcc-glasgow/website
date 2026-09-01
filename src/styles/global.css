@@ -394,6 +394,7 @@ input:focus-visible {
 .jag-card {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
   height: 100%;
   background: #1a1a2e;
   padding: 1.25rem 1.5rem;
@@ -413,6 +414,21 @@ a.jag-card:focus-visible {
   font-weight: 600;
   line-height: 1.3;
   color: #fff;
+}
+/* Pushed to the trailing edge, so a column of cards has the arrows in a line
+   however long the area names are. Quiet until the card is hovered: it marks
+   the card as a link, it is not the thing being read. */
+.jag-card-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-left: auto;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.45);
+  transition: color 0.2s;
+}
+a.jag-card:hover .jag-card-icon,
+a.jag-card:focus-visible .jag-card-icon {
+  color: #dc1a84;
 }
 
 /* ─── Get Involved ───────────────────────────────────────────── */

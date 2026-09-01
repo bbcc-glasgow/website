@@ -381,18 +381,28 @@ const getInvolvedCardStyles = [
           {jag.body}
         </p>
         {/*
-          Names only. The areas are a fact the council can state; a compass
-          direction and a sentence about what each neighbour cares about would
-          be us writing on their behalf. A card becomes a link the moment
-          somebody puts a confirmed URL against it in the CMS.
+          The name and, where the council has confirmed one, that council's own
+          site. Nothing else: a compass direction or a sentence about what each
+          neighbour cares about would be us writing on their behalf. A card
+          without a URL stays a plain name rather than becoming a dead link.
+
+          These go to other organisations' sites, so they open in a new tab and
+          say so to a screen reader; the arrow says the same thing to everyone
+          else.
         */}
         <ul class="jag-grid">
           {
             jag.cards.map((card) => (
               <li>
                 {card.url ? (
-                  <a href={card.url} class="jag-card">
+                  <a href={card.url} class="jag-card" target="_blank" rel="noopener noreferrer">
                     <span class="jag-card-name">{card.name}</span>
+                    <span class="sr-only">(opens in a new tab)</span>
+                    <Icon
+                      name="heroicons:arrow-top-right-on-square"
+                      class="jag-card-icon"
+                      aria-hidden="true"
+                    />
                   </a>
                 ) : (
                   <div class="jag-card">
