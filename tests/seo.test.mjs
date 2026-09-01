@@ -698,14 +698,20 @@ describe("Meetings - the calendar feed", () => {
 
   // Subscribing and downloading behave differently a year from now, and only
   // one of them is still right. The reader has to be told which is which at the
-  // point of choosing, not afterwards.
-  it("says which options keep working and which freeze", () => {
+  // point of choosing, not afterwards — and told in words the buttons use. An
+  // explanation that says "subscribing" while nothing on screen says it leaves
+  // the reader guessing which half of the menu it is about.
+  it("labels each group of options with what it does", () => {
     for (const route of ROUTES) {
       const html = readRoute(route);
-      assert.match(html, /stays up to date/, `${route.url} does not mark the live options`);
       assert.match(
         html,
-        /snapshot that stops updating|snapshot of the next \d+ meetings/,
+        /<p class="calendar-add-group"[^>]*>\s*Subscribe/,
+        `${route.url} never says "subscribe" above the buttons that subscribe`,
+      );
+      assert.match(
+        html,
+        /<p class="calendar-add-group"[^>]*>\s*Or take a copy[^<]*stops updating/,
         `${route.url} offers a download without saying it is frozen`,
       );
     }

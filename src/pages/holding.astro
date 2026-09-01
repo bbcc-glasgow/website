@@ -44,6 +44,9 @@ const meetingRuleText = describeMeetingRule(meetingRule, meetingDetails);
 const venueLine = `${venue.name}, ${venue.streetAddress}, ${venue.addressLocality} ${venue.postalCode}`;
 const isHoldingUrl = Astro.url.pathname.startsWith("/holding");
 const addToCalendar = calendarLinks(Astro.site!);
+const calendarCount = calendarMeetings.length;
+const calendarSubscribe = addToCalendar.filter((link) => link.subscribes);
+const calendarDownload = addToCalendar.filter((link) => !link.subscribes);
 ---
 
 <Base
@@ -129,25 +132,32 @@ const addToCalendar = calendarLinks(Astro.site!);
             Add to your calendar
           </summary>
 
-          <ul class="calendar-add-menu">
+          <p class="calendar-add-group" id="calendar-subscribe-label">
+            Subscribe, and dates added or cancelled later reach you on their own:
+          </p>
+          <ul class="calendar-add-menu" aria-labelledby="calendar-subscribe-label">
             {
-              addToCalendar.map((link) => (
+              calendarSubscribe.map((link) => (
                 <li>
-                  <a href={link.href}>
-                    <span>{link.label}</span>
-                    <span class="calendar-add-note">
-                      {link.subscribes ? "stays up to date" : "one-off download"}
-                    </span>
-                  </a>
+                  <a href={link.href}>{link.label}</a>
                 </li>
               ))
             }
           </ul>
 
-          <p class="calendar-add-help">
-            Subscribing means dates added or cancelled later reach you on their own. The
-            file is a snapshot that stops updating the moment you import it.
+          <p class="calendar-add-group" id="calendar-download-label">
+            Or take a copy of the next {calendarCount} meetings, which stops updating the
+            moment you import it:
           </p>
+          <ul class="calendar-add-menu" aria-labelledby="calendar-download-label">
+            {
+              calendarDownload.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))
+            }
+          </ul>
         </details>
 
         <p class="text-ink leading-relaxed">

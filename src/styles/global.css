@@ -588,19 +588,26 @@ a.footer-link {
 .calendar-add > summary::-webkit-details-marker {
   display: none;
 }
+/* Labels the list under it. The two behaviours are labelled where the reader is
+   choosing between them, rather than explained in a paragraph afterwards that
+   used a word ("subscribing") nothing on screen said. */
+.calendar-add-group {
+  max-width: 22rem;
+  margin: 0.9rem 0 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+}
 .calendar-add-menu {
   display: grid;
   gap: 0.25rem;
-  margin: 0.75rem 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
   max-width: 22rem;
 }
 .calendar-add-menu a {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
+  display: block;
   padding: 0.55rem 0.75rem;
   border-radius: 0.5rem;
   font-size: 0.875rem;
@@ -614,19 +621,6 @@ a.footer-link {
 .calendar-add-menu a:focus-visible {
   background: rgba(255, 255, 255, 0.14);
 }
-.calendar-add-note {
-  font-size: 0.75rem;
-  font-weight: 400;
-  white-space: nowrap;
-  color: rgba(255, 255, 255, 0.6);
-}
-.calendar-add-help {
-  max-width: 22rem;
-  margin-top: 0.75rem;
-  font-size: 0.75rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.6);
-}
 
 /* The holding page runs the same markup on white. */
 .calendar-add-light .calendar-add-menu a {
@@ -638,7 +632,6 @@ a.footer-link {
 .calendar-add-light .calendar-add-menu a:focus-visible {
   background: rgba(0, 0, 0, 0.07);
 }
-.calendar-add-light .calendar-add-note,
-.calendar-add-light .calendar-add-help {
+.calendar-add-light .calendar-add-group {
   color: rgba(0, 0, 0, 0.6);
 }
