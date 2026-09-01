@@ -53,6 +53,15 @@ no page attached and therefore no way to carry one.
 - **Tailwind 4** (via `@tailwindcss/vite`) + **DaisyUI 5** for component classes.
 - **Self-hosted fonts** (Fraunces + Inter variable, via Fontsource). No external requests at
   runtime; no analytics or tracking of any kind.
+- **Heroicons v2** (MIT) via `astro-icon`, inlined into the HTML at build time. The `include`
+  list in `astro.config.mjs` names every icon the site uses, which keeps the 1,288-icon set out
+  of the build and doubles as the inventory. Nothing hosts icons on a CDN: the artwork is
+  already in the HTML, so a CDN could only add a DNS lookup and a connection to the critical
+  path, and it would break the no-external-requests line above.
+
+  Icons are referenced by name, never by pasted path data. Before this, the site was running
+  deprecated Heroicons v1 mixed with Feather, including two different calendar glyphs on the
+  same page and a location pin stored two different ways (#37).
 - **Cloudflare Workers static assets** (`wrangler.jsonc`), served at **https://bbcc.scot**
   (apex + www as Workers custom domains; the apex is canonical and `worker.js` 301s www to it).
 

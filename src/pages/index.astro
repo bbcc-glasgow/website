@@ -1,4 +1,5 @@
 ---
+import { Icon } from "astro-icon/components";
 import { Image, getImage } from "astro:assets";
 import { getCollection, getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
@@ -79,21 +80,21 @@ const getInvolvedCardStyles = [
   {
     iconBg: "background:rgba(0,168,150,0.12);",
     iconColour: "var(--teal-dark)",
-    iconPath: '<path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342a3 3 0 100-2.684m0 2.684a3 3 0 11-2.684-4.026m2.684 4.026l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>',
+    icon: "heroicons:share",
     ctaClass: "text-white",
     ctaStyle: "background:var(--teal-dark);",
   },
   {
     iconBg: "background:rgba(244,161,0,0.12);",
     iconColour: "#8a5f00",
-    iconPath: '<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>',
+    icon: "heroicons:calendar-days",
     ctaClass: "text-ink",
     ctaStyle: "background:var(--amber);",
   },
   {
     iconBg: "background:rgba(220,26,132,0.08);",
     iconColour: "var(--pink)",
-    iconPath: '<path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path>',
+    icon: "heroicons:puzzle-piece",
     ctaClass: "text-white",
     ctaStyle: "background:var(--pink);",
   },
@@ -139,9 +140,7 @@ const getInvolvedCardStyles = [
 
       <!-- Mobile hamburger -->
       <label for="mobile-drawer" class="md:hidden btn btn-ghost btn-sm p-2" aria-label="Open menu">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
+        <Icon name="heroicons:bars-3" class="w-6 h-6" aria-hidden="true" />
       </label>
     </div>
   </nav>
@@ -153,9 +152,7 @@ const getInvolvedCardStyles = [
     <div class="flex justify-between items-center mb-6">
       <span class="font-fraunces font-semibold text-ink text-base">Menu</span>
       <label for="mobile-drawer" class="btn btn-ghost btn-sm p-1" aria-label="Close menu">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
+        <Icon name="heroicons:x-mark" class="w-5 h-5" aria-hidden="true" />
       </label>
     </div>
     <nav aria-label="Mobile navigation" class="flex flex-col gap-1">
@@ -424,7 +421,7 @@ const getInvolvedCardStyles = [
                 <div class="card bg-white shadow-lg">
                   <div class="card-body text-left">
                     <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={s.iconBg}>
-                      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style={`color:${s.iconColour};`} aria-hidden="true" set:html={s.iconPath}></svg>
+                      <Icon name={s.icon} class="w-6 h-6" style={`color:${s.iconColour};`} aria-hidden="true" />
                     </div>
                     <h3 class="font-fraunces font-semibold text-ink text-xl mb-2">{card.heading}</h3>
                     <p class="text-gray-600 text-sm leading-relaxed mb-4">{card.body}</p>
@@ -463,9 +460,7 @@ const getInvolvedCardStyles = [
 
           <div class="grid sm:grid-cols-3 gap-4 mb-6">
             <div class="flex items-start gap-3">
-              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--teal);" aria-hidden="true">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
+              <Icon name="heroicons:calendar-days" class="w-5 h-5 mt-0.5 flex-shrink-0" style="color:var(--teal);" aria-hidden="true" />
               <div>
                 <p class="text-xs font-semibold" style="color:rgba(255,255,255,0.7);">Date</p>
                 <p class="text-white text-sm font-medium">
@@ -474,9 +469,7 @@ const getInvolvedCardStyles = [
               </div>
             </div>
             <div class="flex items-start gap-3">
-              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--teal);" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
+              <Icon name="heroicons:clock" class="w-5 h-5 mt-0.5 flex-shrink-0" style="color:var(--teal);" aria-hidden="true" />
               <div>
                 <p class="text-xs font-semibold" style="color:rgba(255,255,255,0.7);">Time</p>
                 <p class="text-white text-sm font-medium">
@@ -485,9 +478,7 @@ const getInvolvedCardStyles = [
               </div>
             </div>
             <div class="flex items-start gap-3">
-              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--teal);" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              </svg>
+              <Icon name="heroicons:map-pin" class="w-5 h-5 mt-0.5 flex-shrink-0" style="color:var(--teal);" aria-hidden="true" />
               <div>
                 <p class="text-xs font-semibold" style="color:rgba(255,255,255,0.7);">Location</p>
                 <p class="text-white text-sm font-medium">
@@ -523,9 +514,7 @@ const getInvolvedCardStyles = [
                 class="btn btn-sm font-semibold border bg-transparent text-white"
                 style="border-color:rgba(255,255,255,0.45);"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
+                <Icon name="heroicons:calendar-days" class="w-4 h-4" aria-hidden="true" />
                 Add to your calendar
               </summary>
 

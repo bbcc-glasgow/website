@@ -1,4 +1,5 @@
 ---
+import { Icon } from "astro-icon/components";
 import { getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
 import { calendarLinks } from "../lib/calendar";
@@ -124,9 +125,7 @@ const addToCalendar = calendarLinks(Astro.site!);
         {/* Same disclosure as the homepage, on the light background. */}
         <details class="calendar-add calendar-add-light mb-6">
           <summary class="btn btn-sm font-semibold border" style="border-color:var(--pink);color:var(--pink);background:transparent;">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
+            <Icon name="heroicons:calendar-days" class="w-4 h-4" aria-hidden="true" />
             Add to your calendar
           </summary>
 
