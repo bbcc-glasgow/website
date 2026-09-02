@@ -2,13 +2,7 @@
   "tag": "Place-making",
   "variant": "pink",
   "title": "Union Corner",
-  "summary": "Advocating for the sensitive redevelopment of the Union Street / Argyle Street corner — a gateway to the city centre.",
+  "summary": "Advocating for the sensitive redevelopment of Glasgow City Centre, we campaign for spaces in transition like the Union Street / Argyle Street corner. We will always lobby for more open and green spaces in our area.",
   "order": 4,
-  "ctas": [
-    {
-      "type": "contact",
-      "label": "Contact us",
-      "icon": "mail"
-    }
-  ]
+  "ctas": []
 }
