@@ -1,6 +1,9 @@
 .sandcastle/
+# Vendored from node_modules by scripts/vendor-decap.mjs at prebuild. Chunk
+# numbers change with every decap-cms release, so these are globs.
 public/admin/decap-cms.js
-public/admin/373.decap-cms.js
+public/admin/*.decap-cms.js
+public/admin/*.wasm
 public/admin/cms.css
 node_modules/
 .pnpm-store/

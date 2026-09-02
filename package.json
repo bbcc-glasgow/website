@@ -9,12 +9,13 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "cp node_modules/decap-cms/dist/decap-cms.js public/admin/decap-cms.js && cp node_modules/decap-cms/dist/373.decap-cms.js public/admin/373.decap-cms.js && cp node_modules/decap-cms/dist/cms.css public/admin/cms.css",
+    "prebuild": "node scripts/vendor-decap.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "test:links": "linkinator ./dist --recurse --verbosity error --skip \"^https?://\"",
     "test:a11y": "playwright test",
     "test:sitemap": "node --test tests/sitemap.test.mjs",
+    "test:seo": "node --test tests/seo.test.mjs",
     "test:gitignore": "node --experimental-strip-types --test tests/gitignore.test.ts",
     "test:instagram-feed": "node --experimental-strip-types --test tests/instagram-feed.test.ts",
     "test:instagram-refresh": "node --test tests/refresh-ig-token.test.mjs",
@@ -23,8 +24,11 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
+    "@iconify-json/heroicons": "^1.2.3",
     "astro": "^5.1.0",
-    "decap-cms": "3.11.0"
+    "astro-icon": "^1.2.0",
+    "decap-cms": "3.16.0",
+    "ical.js": "^2.2.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",

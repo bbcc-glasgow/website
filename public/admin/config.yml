@@ -106,14 +106,15 @@ collections:
               - { name: heading, label: Heading, widget: string }
               - { name: body, label: Body, widget: text }
               - name: cards
-                label: Neighbouring Council Cards
+                label: Neighbouring Council Areas
                 widget: list
-                summary: "{{fields.heading}}"
+                summary: "{{fields.name}}"
                 fields:
-                  - { name: eyebrow, label: Direction, widget: string }
-                  - { name: heading, label: Council Name, widget: string }
-                  - { name: body, label: Body, widget: text }
-                  - { name: ctaLabel, label: CTA Label, widget: string }
+                  - { name: name, label: Area Name, widget: string }
+                  # Optional, and left empty until somebody has confirmed the
+                  # council's own page. A name with no link is a name; a name
+                  # with a guessed link is a wrong answer.
+                  - { name: url, label: Council Website (optional), widget: string, required: false, pattern: ["^https://", "Must start with https://"] }
           - name: getInvolved
             label: Get Involved
             widget: object
@@ -129,10 +130,12 @@ collections:
                 fields:
                   - { name: heading, label: Heading, widget: string }
                   - { name: body, label: Body, widget: text }
-                  - name: cta
-                    label: Call to Action
-                    widget: object
-                    collapsed: true
+                  # A list, because the Follow Us card needs two buttons and
+                  # splitting it into two cards to get them would be silly.
+                  - name: ctas
+                    label: Buttons
+                    widget: list
+                    summary: "{{fields.label}}"
                     fields:
                       - { name: label, label: Label, widget: string }
                       - { name: url, label: URL, widget: string }
@@ -229,4 +232,72 @@ collections:
               - { name: duration, label: Duration (ms), widget: number, value_type: int, required: false }
           - { name: boundaryDescription, label: Boundary Description, widget: text }
           - { name: contactEmail, label: Contact Email, widget: string }
+          - { name: legalName, label: Full Legal Name, widget: string }
+          - name: description
+            label: What The Council Is
+            widget: text
+            hint: One paragraph. Used in the page text and in the structured data search engines read.
+          - name: venue
+            label: Meeting Venue
+            widget: object
+            collapsed: true
+            fields:
+              - { name: name, label: Venue Name, widget: string }
+              - { name: streetAddress, label: Street Address, widget: string }
+              - { name: addressLocality, label: Town or City, widget: string }
+              - { name: postalCode, label: Postcode, widget: string }
+              - { name: addressCountry, label: Country Code, widget: string, hint: "Two letters, e.g. GB" }
+              - { name: accessNote, label: Accessibility Note, widget: text }
+          - name: meetingCalendar
+            label: Meeting Calendar
+            widget: object
+            collapsed: true
+            hint: >-
+              Meeting dates come from the council's Google Calendar and are read
+              afresh every time the site is built. To add, move or cancel a
+              meeting, change it in Google Calendar - there is nothing to edit
+              here. This address only changes if the council moves to a
+              different calendar.
+            fields:
+              - name: icsUrl
+                label: Public iCal Address
+                widget: string
+                pattern: ["^https://.*\\.ics$", "Must be an https address ending in .ics"]
+                hint: >-
+                  From Google Calendar settings, under "Integrate calendar": the
+                  PUBLIC address in iCal format. Not the secret one - that is a
+                  password, and this file is public.
+          - name: meetingDetails
+            label: Meeting Details
+            widget: object
+            collapsed: true
+            hint: The two things about a meeting that a calendar entry cannot hold. Everything else comes from Google Calendar.
+            fields:
+              - { name: doorsOpen, label: Doors Open, widget: string, hint: "24-hour clock, e.g. 19:00. The calendar holds the start time; this is when people can arrive." }
+              - { name: attendanceNote, label: How To Attend, widget: text }
+          - name: areaPartnership
+            label: Area Partnership
+            widget: object
+            collapsed: true
+            fields:
+              - { name: name, label: Partnership Name, widget: string }
+              - { name: parentBody, label: Parent Body, widget: string }
+          - name: officeBearers
+            label: Office Bearers
+            widget: list
+            summary: "{{fields.role}}"
+            hint: Roles are always shown. A name is optional, appears as ordinary page text, and is never put into the structured data.
+            fields:
+              - { name: role, label: Role, widget: string }
+              - { name: name, label: Name, widget: string, required: false }
+          - name: socialProfiles
+            label: Social Profiles
+            widget: list
+            hint: Full URLs of accounts the council currently runs. These are published as the council's official profiles, so do not list an account that has been handed over or abandoned.
+            field: { name: url, label: Profile URL, widget: string }
+          - name: predecessorSite
+            label: Previous Website
+            widget: string
+            required: false
+            hint: The old site this one replaces. Naming it tells anyone who finds both which is current.
 

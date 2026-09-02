@@ -160,7 +160,11 @@ input:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: left center;
+  /* The hero photo is portrait (1067x1600) in a landscape-ish panel, so `cover`
+     always crops it vertically. Anchoring above centre keeps the cone in frame:
+     it sits about a fifth of the way down the source, and centring would push it
+     past the top edge. */
+  object-position: center 28%;
 }
 .hero-right::after {
   content: "";
@@ -175,12 +179,20 @@ input:focus-visible {
 @media (max-width: 767px) {
   #home {
     grid-template-columns: 1fr;
-    grid-template-rows: 55vw 1fr;
+    /* 72vw, not 55: the hero photo is portrait, the band is a landscape
+       letterbox, and the navbar sits over its top ~57px. At 55vw what survived
+       was either a cone with no rider under it or a rider with the cone cut
+       off. 72vw is the height at which the cone, the Duke and the horse's head
+       all fit below the navbar. */
+    grid-template-rows: 72vw 1fr;
     min-height: unset;
   }
   .hero-right {
     order: -1;
-    min-height: 55vw;
+    min-height: 72vw;
+  }
+  .hero-right img {
+    object-position: center 10%;
   }
   .hero-left {
     padding: 3rem 1.5rem 3.5rem;
@@ -355,16 +367,68 @@ input:focus-visible {
   background: #1a1a2e;
   padding: 5rem 2.5rem;
 }
+/* The 1px gap over a tinted background is what draws the hairline grid; the
+   cards themselves carry no borders. */
+.jag-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: rgba(0, 168, 150, 0.2);
+}
+/* Fixed column counts rather than auto-fit. The background is what draws the
+   grid lines, so a row that does not fill leaves a lit band where the missing
+   cells would be; counts that divide the number of areas keep every row full. */
+@media (min-width: 480px) {
+  .jag-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 900px) {
+  .jag-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 .jag-card {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 100%;
   background: #1a1a2e;
-  padding: 1.75rem;
+  padding: 1.25rem 1.5rem;
   text-decoration: none;
   border-top: 3px solid transparent;
   transition: border-color 0.2s;
 }
-.jag-card:hover {
+/* Only a card that goes somewhere reacts to the pointer. Until a council's own
+   page is confirmed, these are names, not links. */
+a.jag-card:hover,
+a.jag-card:focus-visible {
   border-top-color: #dc1a84;
+}
+.jag-card-name {
+  font-family: "Fraunces Variable", "Fraunces", serif;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #fff;
+}
+/* Pushed to the trailing edge, so a column of cards has the arrows in a line
+   however long the area names are. Quiet until the card is hovered: it marks
+   the card as a link, it is not the thing being read. */
+.jag-card-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-left: auto;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.45);
+  transition: color 0.2s;
+}
+a.jag-card:hover .jag-card-icon,
+a.jag-card:focus-visible .jag-card-icon {
+  color: #dc1a84;
 }
 
 /* ─── Get Involved ───────────────────────────────────────────── */
@@ -524,4 +588,66 @@ a.footer-link {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Add-to-calendar disclosure (index.astro, holding.astro).
+   A <details> styled as a button with a menu under it. The menu flows rather
+   than floating: an absolutely positioned one would need a z-index fight with
+   the meeting card and would clip on narrow screens, and there is nothing below
+   it worth protecting from being pushed down. */
+.calendar-add > summary {
+  /* Kill the disclosure triangle in both engines; the button already reads as
+     something you press, and the marker breaks the .btn box. */
+  list-style: none;
+  cursor: pointer;
+}
+.calendar-add > summary::-webkit-details-marker {
+  display: none;
+}
+/* Labels the list under it. The two behaviours are labelled where the reader is
+   choosing between them, rather than explained in a paragraph afterwards that
+   used a word ("subscribing") nothing on screen said. */
+.calendar-add-group {
+  max-width: 22rem;
+  margin: 0.9rem 0 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+}
+.calendar-add-menu {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: 22rem;
+}
+.calendar-add-menu a {
+  display: block;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.calendar-add-menu a:hover,
+.calendar-add-menu a:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* The holding page runs the same markup on white. */
+.calendar-add-light .calendar-add-menu a {
+  color: var(--ink);
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+.calendar-add-light .calendar-add-menu a:hover,
+.calendar-add-light .calendar-add-menu a:focus-visible {
+  background: rgba(0, 0, 0, 0.07);
+}
+.calendar-add-light .calendar-add-group {
+  color: rgba(0, 0, 0, 0.6);
 }

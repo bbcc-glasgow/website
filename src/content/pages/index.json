@@ -35,10 +35,12 @@
     "heading": "Working Together Across Glasgow",
     "body": "Through the Joint Action Group (JAG), we team up with neighbouring community councils to channel community voices directly to Glasgow City Council — because some challenges can only be solved together.",
     "cards": [
-      { "eyebrow": "East", "heading": "Merchant City & Trongate", "body": "Our immediate neighbours to the east, covering Glasgow's historic merchant quarter.", "ctaLabel": "Visit council →" },
-      { "eyebrow": "North", "heading": "Garnethill", "body": "Our northern neighbours above Sauchiehall Street, sharing many of our city-centre concerns.", "ctaLabel": "Visit council →" },
-      { "eyebrow": "West", "heading": "Anderston / City / Yorkhill", "body": "Our western neighbours across the motorway, from Anderston to Yorkhill.", "ctaLabel": "Visit council →" },
-      { "eyebrow": "South", "heading": "Gorbals", "body": "Our southern neighbours across the Clyde, working on waterfront and regeneration issues.", "ctaLabel": "Visit council →" }
+      { "name": "Anderston", "url": "https://anderston-community-council.mailerpage.io/" },
+      { "name": "Dundasvale", "url": "https://dundasvalecc.co.uk/" },
+      { "name": "Garnethill", "url": "https://www.garnethillmc.co.uk/garnethill-community-council" },
+      { "name": "Merchant City and Trongate", "url": "https://mctcc.scot/" },
+      { "name": "Townhead and Ladywell", "url": "https://tandlcc.wordpress.com/" },
+      { "name": "Yorkhill and Kelvingrove", "url": "https://yokecoco.wordpress.com/" }
     ]
   },
   "getInvolved": {
@@ -46,9 +48,9 @@
     "heading": "Your City. Your Say.",
     "body": "Community Councils only work when the community shows up. Here's how to make your voice count.",
     "cards": [
-      { "heading": "Attend a Meeting", "body": "Our public meetings are open to all. Come along, ask questions, and help set our agenda.", "cta": { "label": "See dates", "url": "#meetings" } },
-      { "heading": "Take the Survey", "body": "Tell us what matters most to you about living and working in the city centre. Takes 3 minutes.", "cta": { "label": "Start survey", "url": "#get-involved" } },
-      { "heading": "Join the Committee", "body": "Elections are held annually. Become an elected member and help steer the work of the council.", "cta": { "label": "Find out how", "url": "#newsletter" } }
+      { "heading": "Follow Us", "body": "See what is going on.", "ctas": [{ "label": "Instagram", "url": "https://www.instagram.com/bbccglasgow" }, { "label": "Facebook", "url": "https://www.facebook.com/glasgowbbcc" }] },
+      { "heading": "Attend a Meeting", "body": "Our public meetings are open to all. Come along, ask questions, and help set our agenda.", "ctas": [{ "label": "See dates", "url": "#meetings" }] },
+      { "heading": "Join the Committee", "body": "Elections are held annually. Become an elected member and help steer the work of the council.", "ctas": [{ "label": "Message us", "url": "mailto:info@bbcc.scot" }] }
     ]
   },
   "meetings": {

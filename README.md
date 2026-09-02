@@ -8,6 +8,43 @@ Design: the settled **Vibrant Poppy** direction (concept v9), ported from
 [weebuilts](https://github.com/gkanitz/weebuilts), which served as the deployment rehearsal for
 this site.
 
+One thing has superseded the concept. The hero photograph is no longer the aerial of Central
+station; it is the coned Duke of Wellington in Royal Exchange Square, just inside the eastern
+boundary (#37). The aerial was a picture of Glasgow, and this is a picture of *this* Glasgow: the
+landmark a resident would name, the street sign in shot, and a joke the city has kept up since
+the Eighties. The split hero is unchanged, but the photo is portrait where the aerial was
+landscape, so `object-position` in `src/styles/global.css` is now doing real work and the mobile
+band is taller than the concept's. Both are commented where they sit.
+
+### The share card
+
+The concept covers the page. It does not cover what the site looks like when somebody pastes a
+link into WhatsApp or Slack, so `public/images/og-card.png` extends the direction to a 1200x630
+share card: the coned Duke of Wellington on the left, and a brand-pink panel on the right
+carrying the council's full name, the logo and `bbcc.scot` (#37).
+
+The split is at 420px rather than half way, because that is what the photograph is: 1067x1600
+scaled to the card's full height comes to 420 wide, so the Duke runs top to bottom with
+essentially nothing cropped. The proportions follow the picture instead of forcing it into a
+shape it isn't.
+
+One departure from the concept is deliberate:
+
+- **The card is drawn in Georgia and Helvetica, not Fraunces and Inter.** `sharp` renders the SVG
+  through librsvg, which resolves fonts against the system rather than against
+  `node_modules`. Rather than ship a font-loading dance for one image, the card uses a serif and a
+  sans that sit close to the pairing. A share card is seen at thumbnail size, away from the site,
+  and pinning the output to a committed PNG is worth more than an exact type match.
+
+Run `node scripts/build-og-card.mjs` to regenerate it. The PNG is committed rather than built, so
+the URL is stable and unhashed and CI never has to reproduce font rendering. It is quantised to a
+palette, which takes it from 715 kB to 170 kB with nothing visible lost at the size a share card
+is ever seen.
+
+The card carries no photo credit. Mark Ynys-Mon was asked about this use specifically rather than
+it being read into the on-page permission, because a thumbnail in Slack or WhatsApp appears with
+no page attached and therefore no way to carry one.
+
 ## Stack
 
 - **Astro 5** (+ Sharp via `astro:assets` for build-time image optimisation) — static output, no
@@ -16,8 +53,17 @@ this site.
 - **Tailwind 4** (via `@tailwindcss/vite`) + **DaisyUI 5** for component classes.
 - **Self-hosted fonts** (Fraunces + Inter variable, via Fontsource). No external requests at
   runtime; no analytics or tracking of any kind.
+- **Heroicons v2** (MIT) via `astro-icon`, inlined into the HTML at build time. The `include`
+  list in `astro.config.mjs` names every icon the site uses, which keeps the 1,288-icon set out
+  of the build and doubles as the inventory. Nothing hosts icons on a CDN: the artwork is
+  already in the HTML, so a CDN could only add a DNS lookup and a connection to the critical
+  path, and it would break the no-external-requests line above.
+
+  Icons are referenced by name, never by pasted path data. Before this, the site was running
+  deprecated Heroicons v1 mixed with Feather, including two different calendar glyphs on the
+  same page and a location pin stored two different ways (#37).
 - **Cloudflare Workers static assets** (`wrangler.jsonc`), served at **https://bbcc.scot**
-  (apex + www as Workers custom domains; canonical is the apex).
+  (apex + www as Workers custom domains; the apex is canonical and `worker.js` 301s www to it).
 
 ## Commands
 
@@ -25,7 +71,10 @@ this site.
 | --- | --- |
 | `pnpm dev` | Local dev server |
 | `pnpm build` | Static build to `dist/` |
-| `pnpm gate` | All four gates: build → link integrity → axe a11y (zero violations) → Lighthouse budgets (perf ≥95, a11y =100, bp ≥95, seo ≥95) |
+| `pnpm gate` | Every step in `gate.d/`, in filename order: build → sitemap → link integrity → axe a11y (zero violations) → Lighthouse budgets (perf ≥95, a11y =100, bp ≥95, seo ≥95) → SEO/GEO invariants |
+
+Adding a check to CI is one new `gate.d/NN-name.sh`; `gate.sh` and `.github/workflows/ci.yml`
+need no edit.
 
 ## Release boundary
 
@@ -77,9 +126,18 @@ A small Worker (`worker.js`, `run_worker_first`) gates the static assets on the 
 variable in `wrangler.jsonc`:
 
 - **`holding`** (current): every route serves `src/pages/holding.astro` — the branded holding
-  page with the contact email. Nothing under development is publicly reachable (only hashed
-  `/_astro/` assets and `/images/` pass through). `/` returns 200; all other paths return 503 so
-  crawlers don't index half-built URLs.
+  page, which carries the council's facts as plain prose and the same structured data as the
+  homepage. Nothing under development is publicly reachable (only hashed `/_astro/` assets,
+  `/images/`, `/admin` and the crawler files pass through). `/` returns 200; all other paths
+  return 503 so crawlers don't index half-built URLs.
+
+  `/robots.txt`, `/sitemap-index.xml`, `/sitemap-0.xml` and `/llms.txt` are in the passthrough
+  because a policy file behind a 503 is the same as no policy file, and holding mode is exactly
+  when the site needs to be legible to crawlers. `/meetings.ics` is in it for a different reason:
+  the holding page offers the calendar, so a 503 there would be a broken promise on a page people
+  are being asked to trust. The `/holding/` URL itself is noindexed and kept out of the sitemap:
+  the worker serves that content at `/`, so `/` is the URL that should be found, and nothing needs
+  unwinding at launch.
 - **`live`**: all requests pass straight through to the built site.
 
 **To go live** (or to switch back): change `SITE_MODE` in `wrangler.jsonc` in a one-line PR, then
@@ -155,8 +213,54 @@ contact email) lives in `src/content/site/index.json`. Items below are placehold
 claims deliberately left for the owner to confirm — **each should be resolved via an issue before
 the first release**:
 
-- [ ] **Meeting card**: date, time and location are "To be announced" — fill in the real next
-      meeting.
+- [x] **Meeting card**: resolved in #37. **Meeting dates come from the council's Google Calendar
+      ("BBCC Public Events"), and nothing else.** To add, move or cancel a meeting, change it in
+      Google. There is no date anywhere in this repo, and no rule to keep in step with the
+      calendar either: `src/lib/gcal.ts` reads the public iCal feed at build time, expands the
+      recurrence with `ical.js`, and `src/lib/meetings.ts` derives the standing pattern from the
+      occurrences it finds. So the sentence on the page — "The third Tuesday of every month
+      except…, 7pm for a 7.30pm start, until 10pm" — is read off the calendar rather than typed
+      next to it, and cannot drift from it. A daily cron rebuilds, which is the delay between a
+      change in Google and the site showing it.
+
+      Content keeps only what a calendar entry cannot hold, in `meetingDetails`: `doorsOpen`
+      (Google has one start time per event; "doors at 7 for a 7.30 start" is two) and
+      `attendanceNote`. The structured venue address stays in content too, because schema.org
+      needs its parts and the calendar's `LOCATION` is prose — but the build refuses to publish
+      an address whose postcode the calendar disagrees with, so the venue cannot move in one
+      place only.
+
+      **Failure is loud, deliberately.** A build that cannot reach the calendar, cannot parse it,
+      finds no future meetings, or finds meetings that no longer fall on a consistent nth-weekday
+      stops with an error naming the problem. The deployed site keeps serving the last good
+      build, which still has real dates on it. The alternative — falling back to a hardcoded rule
+      — would quietly publish dates nobody had agreed to and look exactly like working.
+
+      That same read generates `/meetings.ics` (`src/pages/meetings.ics.ts`), so a subscriber and
+      a reader can never be told different dates. It publishes `CALENDAR_HORIZON` meetings — 18,
+      about two years — and the count quoted on the page is derived, not typed.
+
+      Both pages offer that feed through an "Add to your calendar" disclosure built from
+      `src/lib/calendar.ts`, not as a bare `.ics` link. A bare link is a download, and a download
+      is a snapshot that never updates again; the calendar apps most people use each take a feed
+      URL as a query parameter and subscribe on the reader's behalf, so they get handed that
+      instead. Google (`calendar.google.com/calendar/r?cid=`), Outlook.com
+      (`outlook.live.com/calendar/0/addfromweb?url=`) and anything registered for `webcal://`
+      (Apple, iOS, Thunderbird) all track the feed, so the daily cron carries new and cancelled
+      dates to them on its own. The download is offered last and labelled as the one-off it is.
+      The URLs are built from `Astro.site`, so a preview deployment offers its own feed rather
+      than pointing subscribers at production. Work and school Microsoft accounts use
+      `outlook.office.com` instead; that is a fifth button for a minority of a community
+      council's readers, so it is left out and they can paste the feed URL.
+
+      Cancelled meetings are dropped from the feed rather than published as `STATUS:CANCELLED`.
+      A subscribing client reconciles against the whole feed and removes what is no longer in it;
+      an importing client would never see the update whatever we emitted.
+
+      `tests/seo.test.mjs` derives its expectations from `dist/meetings.ics` rather than from
+      content, and checks that the prose sentence, the JSON-LD `Schedule`, the concrete `Event`
+      nodes and the feed all still agree. Asserting against a rule in content would be asserting
+      against a fact nobody maintains any more.
 - [ ] **Stats strip**: "200,000+ daily visitors" and "~30 lanes & closes" need a source or
       revised wording; "1820s Blythswood grid" and "UNESCO City of Music" are on solid ground.
       Values and wording are in `src/content/site/index.json` (same file holds the boundary
@@ -165,8 +269,9 @@ the first release**:
       remove the card.
 - [ ] **JAG cards**: "Visit council →" links are placeholders — add the neighbouring councils'
       real sites (or remove the link affordance).
-- [ ] **Instagram feed activation**: the section is built (epic #47; accounts confirmed as
-      @bbccglasgow on Instagram and Facebook) and renders the shell until real posts are
+- [ ] **Instagram feed activation**: the section is built (epic #47; the accounts are
+      `instagram.com/bbccglasgow` and `facebook.com/glasgowbbcc` — the Facebook handle is *not*
+      `bbccglasgow`, which is not a page, see #37) and renders the shell until real posts are
       committed. To activate: switch the Instagram account to Business/Creator, link the
       Facebook Page, create a Meta app with a long-lived Graph API token, and add the
       `IG_ACCESS_TOKEN` and `SECRETS_WRITE_PAT` repo secrets — the daily workflow then keeps
@@ -180,16 +285,54 @@ the first release**:
 - [ ] **Privacy / accessibility statements**: the concept footer linked to Privacy Policy and
       Accessibility pages that don't exist yet; add them as pages, then link them.
 
+### Off-repo tasks from the SEO/GEO pass (#37)
+
+The code side of #37 is done and gated. These are the parts no commit can carry, and the first
+two are the difference between the work shipping and not shipping:
+
+- [ ] **Turn off Cloudflare's managed robots.txt / AI Crawl Control.** Cloudflare serves a
+      `robots.txt` at the edge, ahead of the Worker, so `public/robots.txt` is inert until that
+      is switched off. The edge file currently does `Disallow: /` for GPTBot, ClaudeBot,
+      Google-Extended, CCBot, Applebot-Extended, Bytespider, Amazonbot and meta-externalagent,
+      with `ai-train=no` — the exact opposite of what this repo publishes. After the change,
+      check that `https://bbcc.scot/robots.txt` serves the repo's file.
+- [ ] **Point `babcc.wordpress.com` at this site.** It is live, carries an identical `<title>`,
+      and still advertises the old Instagram, Facebook and X accounts plus
+      `babccglasgow@gmail.com`. While it stands unedited it re-asserts the old identity more
+      loudly than this site's silence denies it.
+- [ ] **Confirm the office bearers.** `officeBearers` in `src/content/site/index.json` holds
+      roles with no names, because the legacy list (Irene Loundon, Rowan Evenstar, Joy Laughlin)
+      sits on a page that also says "this is our election year". Names render as ordinary prose
+      and never enter the JSON-LD, so adding them is one JSON edit.
+- [ ] **Supply the 2026/27 meeting exceptions**, if any beyond the standing July/August/December
+      break. The published dates stop at January 2026.
+- [ ] **Ask Mark Ynys-Mon for a full-resolution original** of the Duke of Wellington photo. The
+      copy in `src/assets/` is 1067x1600, which caps the hero srcset at 1067 and leaves nothing
+      spare on a large display. His Flickr profile restricts automatic access to larger versions
+      and asks that requests go to `photographs@druidic.org` or through Flickr. Permission for the
+      site and the share card is already given; this is only about resolution.
+- [ ] **Add `bbcc.scot` as the website link** on the Instagram and Facebook profiles.
+- [ ] **Decide the fate of `x.com/babccglasgow`** — delete, rename, or post a handover pointing
+      here. The site claims neither the account nor a `twitter:site` tag, which is as far as
+      markup can go; the rest is on the account.
+- [ ] **Decide about `community-council.org.uk/blythswoodandbroomielaw`**, which has minutes
+      indexed back to 2018: consolidate here, or leave it and accept the split.
+
 ## Image credits
 
-All photos are Creative Commons. Sources live in `src/assets/` and are optimised at build time
-by `astro:assets` (Sharp): responsive srcsets at 420–1400px widths, WebP at quality 60–65, lazy
-loading everywhere except the hero. Only the logo stays in `public/images/` (it doubles as the
-favicon).
+Sources live in `src/assets/` and are optimised at build time by `astro:assets` (Sharp):
+responsive srcsets at 420–1400px widths, WebP at quality 60–65, lazy loading everywhere except
+the hero. Only the logo stays in `public/images/` (it doubles as the favicon).
+
+The hero photograph is the one asset that is not Creative Commons. It is used by permission, and
+that permission has a condition attached: a credit on the page linking to the photographer's
+profile. The footer of `src/pages/index.astro` carries it. If the photo is ever removed, remove
+the credit in the same commit; if it is ever used somewhere new, the credit goes with it.
 
 | File | Source |
 | --- | --- |
-| `central-aerial.jpg` | Wikimedia Commons — "Glasgow Central railway station - aerial - 2025-04-17" |
+| `duke_of_wellington_mym.jpeg` | Mark Ynys-Mon, [flickr.com/photos/mymuk](https://www.flickr.com/photos/mymuk) — used with permission (hero and share card), not under a CC licence. His profile asks that requests for full-resolution originals and any commercial use go through email or Flickr message. |
+| `central-aerial.jpg` | Wikimedia Commons — "Glasgow Central railway station - aerial - 2025-04-17" (currently unused; replaced as the hero by the photo above) |
 | `blythswood-square.jpg` | Wikimedia Commons — "Springtime in Blythswood Square, Glasgow" |
 | `squinty-bridge.jpg` | Wikimedia Commons — "The Squinty Bridge, River Clyde, Glasgow" (currently unused; kept for the future social section) |
 

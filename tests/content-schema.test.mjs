@@ -36,6 +36,13 @@ const projectSchema = z.object({
     .optional(),
 });
 
+// A hand-copy of the original three fields of the site collection, not the
+// whole of it. The civic fact set added in #37 (legalName, venue, meetingRule
+// and the rest) is deliberately not mirrored here: duplicating twelve fields
+// would drift the moment either side moved. Those fields are enforced where it
+// counts - Astro validates src/content/site/index.json against the real schema
+// on every build, which is gate step 01, and tests/seo.test.mjs asserts the
+// facts reach the rendered page.
 const siteSchema = z.object({
   stats: z.array(
     z.object({
@@ -340,10 +347,8 @@ const homepageSchema = z.object({
     body: z.string(),
     cards: z.array(
       z.object({
-        eyebrow: z.string(),
-        heading: z.string(),
-        body: z.string(),
-        ctaLabel: z.string(),
+        name: z.string(),
+        url: z.string().url().optional(),
       }),
     ),
   }),
@@ -355,7 +360,7 @@ const homepageSchema = z.object({
       z.object({
         heading: z.string(),
         body: z.string(),
-        cta: z.object({ label: z.string(), url: z.string() }),
+        ctas: z.array(z.object({ label: z.string(), url: z.string() })).min(1),
       }),
     ),
   }),
@@ -411,16 +416,14 @@ describe("Pages schema", () => {
       eyebrow: "Joint Action Group",
       heading: "Working Together Across Glasgow",
       body: "Through the Joint Action Group (JAG), we team up with neighbouring councils.",
-      cards: [
-        { eyebrow: "East", heading: "Merchant City & Trongate", body: "Our immediate neighbours.", ctaLabel: "Visit council →" },
-      ],
+      cards: [{ name: "Merchant City and Trongate" }],
     },
     getInvolved: {
       eyebrow: "Participate",
       heading: "Your City. Your Say.",
       body: "Community Councils only work when the community shows up.",
       cards: [
-        { heading: "Attend a Meeting", body: "Our public meetings are open to all.", cta: { label: "See dates", url: "#meetings" } },
+        { heading: "Attend a Meeting", body: "Our public meetings are open to all.", ctas: [{ label: "See dates", url: "#meetings" }] },
       ],
     },
     meetings: {
@@ -487,10 +490,10 @@ describe("Pages schema", () => {
     assert.ok(!result.success);
   });
 
-  it("should reject a jag card missing ctaLabel", () => {
+  it("should reject a jag card missing name", () => {
     const { jag, ...rest } = validPages;
     const [first, ...others] = jag.cards;
-    const { ctaLabel: _removed, ...cardRest } = first;
+    const { name: _removed, ...cardRest } = first;
     const result = pagesSchema.safeParse({
       ...rest,
       jag: { ...jag, cards: [cardRest, ...others] },
@@ -498,15 +501,68 @@ describe("Pages schema", () => {
     assert.ok(!result.success);
   });
 
-  it("should reject getInvolved with a card missing cta", () => {
+  it("should accept a jag card with a confirmed council URL", () => {
+    const { jag, ...rest } = validPages;
+    const result = pagesSchema.safeParse({
+      ...rest,
+      jag: { ...jag, cards: [{ name: "Garnethill", url: "https://example.org/" }] },
+    });
+    assert.ok(result.success);
+  });
+
+  it("should reject a jag card whose URL is not a URL", () => {
+    const { jag, ...rest } = validPages;
+    const result = pagesSchema.safeParse({
+      ...rest,
+      jag: { ...jag, cards: [{ name: "Garnethill", url: "garnethill" }] },
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should reject getInvolved with a card missing ctas", () => {
     const { getInvolved, ...rest } = validPages;
     const [first, ...others] = getInvolved.cards;
-    const { cta: _removed, ...cardRest } = first;
+    const { ctas: _removed, ...cardRest } = first;
     const result = pagesSchema.safeParse({
       ...rest,
       getInvolved: { ...getInvolved, cards: [cardRest, ...others] },
     });
     assert.ok(!result.success);
+  });
+
+  // A card with no buttons is a card nobody can act on, which is the one thing
+  // this section exists to avoid.
+  it("should reject a getInvolved card with an empty ctas list", () => {
+    const { getInvolved, ...rest } = validPages;
+    const result = pagesSchema.safeParse({
+      ...rest,
+      getInvolved: {
+        ...getInvolved,
+        cards: [{ heading: "Follow Us", body: "See what is going on.", ctas: [] }],
+      },
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should accept a getInvolved card carrying two buttons", () => {
+    const { getInvolved, ...rest } = validPages;
+    const result = pagesSchema.safeParse({
+      ...rest,
+      getInvolved: {
+        ...getInvolved,
+        cards: [
+          {
+            heading: "Follow Us",
+            body: "See what is going on.",
+            ctas: [
+              { label: "Instagram", url: "https://www.instagram.com/bbccglasgow" },
+              { label: "Facebook", url: "https://www.facebook.com/glasgowbbcc" },
+            ],
+          },
+        ],
+      },
+    });
+    assert.ok(result.success);
   });
 
   it("should reject newsletter missing subtext", () => {

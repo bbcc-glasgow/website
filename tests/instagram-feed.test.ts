@@ -34,6 +34,16 @@ const FIXTURE_COPY = {
 // into the rendered HTML.
 const ACCOUNT_URL = "https://www.instagram.com/bbccglasgow/";
 
+// Deliberately not the council's real profiles. The component takes these as
+// props, so a fixture URL proves the plumbing without this test doubling as a
+// second, drifting copy of what the live site links to (#37).
+const FIXTURE_INSTAGRAM_URL = "https://www.instagram.com/fixture-account";
+const FIXTURE_FACEBOOK_URL = "https://www.facebook.com/fixture-page";
+
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function fixturePosts(count, { emptyAltAt } = {}) {
   return Array.from({ length: count }, (_, i) => {
     const n = i + 1;
@@ -73,6 +83,8 @@ async function buildFixture(
     postsFile: object | null;
     imageIds?: string[];
     includeGlobalCss?: boolean;
+    // Omit a key to render the fixture without that follow button.
+    socialUrls?: { instagramUrl?: string; facebookUrl?: string };
   },
 ) {
   const dir = mkdtempSync(join(tmpdir(), "bbcc-insta-"));
@@ -106,13 +118,18 @@ async function buildFixture(
   if (opts.includeGlobalCss) {
     copyFileSync(join(repoRoot, "src/styles/global.css"), join(dir, "src/styles/global.css"));
   }
+  const socialUrls = opts.socialUrls ?? {
+    instagramUrl: FIXTURE_INSTAGRAM_URL,
+    facebookUrl: FIXTURE_FACEBOOK_URL,
+  };
   writeFileSync(
     join(dir, "src/pages/index.astro"),
     `---
 ${stylesImport}import InstagramFeed from "../components/InstagramFeed.astro";
 const copy = ${JSON.stringify(FIXTURE_COPY)};
+const social = ${JSON.stringify(socialUrls)};
 ---
-<InstagramFeed copy={copy} />
+<InstagramFeed copy={copy} instagramUrl={social.instagramUrl} facebookUrl={social.facebookUrl} />
 `,
   );
 
@@ -209,15 +226,38 @@ describe("InstagramFeed populated feed", () => {
       "every tile image is lazy-loaded",
     );
 
+    // The URLs come from props now, not from inside the component, so what
+    // belongs here is that each button pairs its CMS label with the URL it was
+    // given. Which URLs the live site actually publishes is pinned against the
+    // committed site content in tests/seo.test.mjs (#37).
     assert.match(
       html,
-      /href="https:\/\/www\.instagram\.com\/bbccglasgow"[^>]*>\s*Follow on Instagram\s*<\/a>/,
-      "pink follow button uses the CMS label and the account URL",
+      new RegExp(
+        `href="${escapeRegex(FIXTURE_INSTAGRAM_URL)}"[^>]*>\\s*Follow on Instagram\\s*</a>`,
+      ),
+      "pink follow button uses the CMS label and the URL it was passed",
     );
     assert.match(
       html,
-      /href="https:\/\/www\.facebook\.com\/bbccglasgow"[^>]*>\s*Follow on Facebook\s*<\/a>/,
-      "ink follow button uses the CMS label and the account URL",
+      new RegExp(
+        `href="${escapeRegex(FIXTURE_FACEBOOK_URL)}"[^>]*>\\s*Follow on Facebook\\s*</a>`,
+      ),
+      "ink follow button uses the CMS label and the URL it was passed",
+    );
+  });
+
+  it("omits a follow button whose URL is absent rather than linking nowhere", async (t) => {
+    const { html } = await buildFixture(t, {
+      postsFile: { posts: fixturePosts(6) },
+      imageIds: Array.from({ length: 6 }, (_, i) => `fixture-${i + 1}`),
+      socialUrls: { instagramUrl: FIXTURE_INSTAGRAM_URL },
+    });
+
+    assert.match(html, />\s*Follow on Instagram\s*<\/a>/, "Instagram button still renders");
+    assert.doesNotMatch(
+      html,
+      />\s*Follow on Facebook\s*<\/a>/,
+      "Facebook button is dropped when no Facebook URL is configured",
     );
   });
 

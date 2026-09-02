@@ -12,17 +12,61 @@
 // temporary: the next deploy resets SITE_MODE to the value in wrangler.jsonc,
 // which is the source of truth.
 
+// The apex is canonical. www is a separate Workers custom domain pointing at
+// the same script, so without this the site answers on two hostnames and every
+// signal splits between them; the canonical link tag mitigates that but does
+// not fix it (#37).
+const CANONICAL_HOST = "bbcc.scot";
+
+// Files that must resolve even in holding mode. Mostly crawler-facing: a
+// robots.txt or sitemap behind a 503 is the same as no robots.txt or sitemap,
+// because the policy this site publishes about itself only counts if it can be
+// fetched now, while the holding page is what accrues the signals.
+//
+// /meetings.ics is here for a different reason. The holding page publishes the
+// meeting rule and the next dates, and it offers the calendar alongside them, so
+// the file has to be fetchable or that offer is a broken link.
+const CRAWLER_PATHS = new Set([
+  "/robots.txt",
+  "/sitemap-index.xml",
+  "/sitemap-0.xml",
+  "/llms.txt",
+  "/meetings.ics",
+  "/favicon.ico",
+]);
+
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+
+    if (url.hostname === `www.${CANONICAL_HOST}`) {
+      url.hostname = CANONICAL_HOST;
+      return Response.redirect(url.toString(), 301);
+    }
+
+    // /holding/ is the route the holding page is built from, not a URL it is
+    // published at: in holding mode its content is what `/` serves, and in live
+    // mode `/` is the real homepage. Either way answering here would put the
+    // same page on a second URL, so it redirects instead. The page's canonical
+    // and og:url say `/` to match (#37).
+    //
+    // Above the SITE_MODE branch because it holds in both modes. No loop risk:
+    // the holding fetch below goes to the asset store directly, not back
+    // through this worker.
+    if (url.pathname === "/holding" || url.pathname === "/holding/") {
+      url.pathname = "/";
+      return Response.redirect(url.toString(), 301);
+    }
+
     if (env.SITE_MODE === "live") {
       return env.ASSETS.fetch(request);
     }
 
-    const url = new URL(request.url);
     const passthrough =
       url.pathname.startsWith("/_astro/") ||
       url.pathname.startsWith("/images/") ||
-      url.pathname.startsWith("/admin");
+      url.pathname.startsWith("/admin") ||
+      CRAWLER_PATHS.has(url.pathname);
     if (passthrough) {
       return env.ASSETS.fetch(request);
     }
