@@ -10,14 +10,20 @@ import "../styles/global.css";
 interface Props {
   title: string;
   description: string;
-  /** Keep this page out of search results. Used by the holding page. */
-  noindex?: boolean;
+  /**
+   * The URL this page is published at, when that differs from the route it is
+   * built from. The holding page is the only case: it is built at /holding/ but
+   * the worker serves it at /, and everything the page says about itself —
+   * canonical, og:url, the URL a share preview is attributed to — has to name
+   * the URL a reader can actually reach (#37).
+   */
+  canonicalPath?: string;
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, description, canonicalPath } = Astro.props;
 
 const site = Astro.site!;
-const canonical = new URL(Astro.url.pathname, site);
+const canonical = new URL(canonicalPath ?? Astro.url.pathname, site);
 // The share card is committed rather than hashed, so its URL survives rebuilds
 // and stays valid in the caches at Facebook, LinkedIn, Slack and the rest.
 const ogImage = new URL("/images/og-card.png", site);
@@ -41,7 +47,6 @@ const graph = buildGraph(facts, site.href, meetings.slice(0, 3), rule);
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="icon" type="image/svg+xml" href="/images/bbcc-logo.svg" />
     <link rel="icon" type="image/png" href="/images/bbcc-logo.png" sizes="133x134" />
 

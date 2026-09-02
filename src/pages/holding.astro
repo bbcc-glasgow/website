@@ -32,8 +32,13 @@ const {
 // whatever search and answer engines learn about the council now accrues to the
 // URL that survives launch. That only pays off if the page states the facts, so
 // it carries the same fact set as the homepage instead of an apology for being
-// unfinished (#37). The `/holding/` URL itself is noindexed and kept out of the
-// sitemap; `/` is where this content is meant to be found.
+// unfinished (#37).
+//
+// `/holding/` is the route this is built from, not a URL anyone is meant to
+// reach: the worker redirects it to `/`, and the sitemap does not list it. So
+// the page identifies as `/` and stays indexable. Marking it noindex would have
+// been self-defeating — it is the page accruing the signals, and a share of
+// bbcc.scot would have shown a preview attributed to /holding/.
 const { meetings: calendarMeetings, rule: meetingRule } = await loadMeetings(
   meetingCalendar.icsUrl,
   meetingDetails,
@@ -42,7 +47,6 @@ const { meetings: calendarMeetings, rule: meetingRule } = await loadMeetings(
 const upcomingMeetings = calendarMeetings.slice(0, 2);
 const meetingRuleText = describeMeetingRule(meetingRule, meetingDetails);
 const venueLine = `${venue.name}, ${venue.streetAddress}, ${venue.addressLocality} ${venue.postalCode}`;
-const isHoldingUrl = Astro.url.pathname.startsWith("/holding");
 const addToCalendar = calendarLinks(Astro.site!);
 const calendarCount = calendarMeetings.length;
 const calendarSubscribe = addToCalendar.filter((link) => link.subscribes);
@@ -52,7 +56,7 @@ const calendarDownload = addToCalendar.filter((link) => !link.subscribes);
 <Base
   title={`${legalName} | Glasgow City Centre`}
   description={`The statutory community council for Glasgow's city centre. Public meetings: ${meetingRuleText.toLowerCase().replace(/\.$/, "")} at ${venueLine}.`}
-  noindex={isHoldingUrl}
+  canonicalPath="/"
 >
   <main class="min-h-screen grid" style="grid-template-rows:1fr auto auto;">
     <div class="flex items-center justify-center px-4" style="background:var(--pink);">

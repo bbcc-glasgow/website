@@ -117,10 +117,19 @@ function publishedPattern() {
   };
 }
 
+// `url` is the route a file is built from; `canonical` is the URL it is
+// published at, where the two differ. The holding page is built at /holding/
+// but served at / by the worker, so / is what its head tags must name (#37).
 const ROUTES = [
   { url: "/", file: path.join(distDir, "index.html") },
-  { url: "/holding/", file: path.join(distDir, "holding", "index.html") },
+  {
+    url: "/holding/",
+    file: path.join(distDir, "holding", "index.html"),
+    canonical: "/",
+  },
 ];
+
+const publishedUrl = (route) => `${SITE}${route.canonical ?? route.url}`;
 
 const siteFacts = JSON.parse(
   fs.readFileSync(path.resolve(rootDir, "src/content/site/index.json"), "utf-8"),
@@ -219,8 +228,8 @@ describe("SEO - head tags on every built route", () => {
       );
       assert.equal(
         canonicalOf(html),
-        `${SITE}${route.url}`,
-        `${route.url} canonical should be its own absolute URL`,
+        publishedUrl(route),
+        `${route.url} canonical should name the URL it is published at`,
       );
     });
 
@@ -249,7 +258,10 @@ describe("SEO - head tags on every built route", () => {
       );
       assert.equal(metaContent(html, "og:image:width", "property"), String(OG_IMAGE_WIDTH));
       assert.equal(metaContent(html, "og:image:height", "property"), String(OG_IMAGE_HEIGHT));
-      assert.equal(metaContent(html, "og:url", "property"), `${SITE}${route.url}`);
+      // A share of bbcc.scot has to be attributed to bbcc.scot. og:url tracking
+      // the build route rather than the published one is exactly how the
+      // holding page's previews ended up pointing at /holding/.
+      assert.equal(metaContent(html, "og:url", "property"), publishedUrl(route));
     });
 
     it(`${route.url} has a large Twitter card and no twitter:site`, () => {
@@ -281,19 +293,17 @@ describe("SEO - head tags on every built route", () => {
     );
   });
 
-  it("noindexes /holding/ but not /", () => {
-    const home = readRoute(ROUTES[0]);
-    const holding = readRoute(ROUTES[1]);
-
-    assert.match(
-      metaContent(holding, "robots") ?? "",
-      /noindex/,
-      "/holding/ must be noindexed - the worker serves this content at / instead",
-    );
-    assert.ok(
-      !/noindex/.test(metaContent(home, "robots") ?? ""),
-      "/ must stay indexable",
-    );
+  // The holding page is the page accruing every signal the council has while
+  // the site is unlaunched, so noindexing it would have defeated its purpose.
+  // The duplicate URL it used to guard against is gone instead: the worker
+  // redirects /holding/ to /, so there is only one URL left to index.
+  it("leaves every route indexable", () => {
+    for (const route of ROUTES) {
+      assert.ok(
+        !/noindex/.test(metaContent(readRoute(route), "robots") ?? ""),
+        `${route.url} is noindexed, so nothing it publishes can be found`,
+      );
+    }
   });
 });
 
@@ -833,6 +843,19 @@ describe("SEO - worker routing", () => {
   it("still 503s an ordinary path in holding mode", async () => {
     const response = await call("https://bbcc.scot/projects", "holding");
     assert.equal(response.status, 503);
+  });
+
+  // The holding page's content is published at /, and it says so in its
+  // canonical and og:url. If /holding/ also answered, the same page would sit
+  // on two URLs and a share of one would credit the other.
+  it("301s /holding/ to the apex in both modes", async () => {
+    for (const mode of ["holding", "live"]) {
+      for (const path of ["/holding", "/holding/"]) {
+        const response = await call(`https://bbcc.scot${path}`, mode);
+        assert.equal(response.status, 301, `${path} should redirect in ${mode} mode`);
+        assert.equal(response.headers.get("location"), "https://bbcc.scot/");
+      }
+    }
   });
 });
 

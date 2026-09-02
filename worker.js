@@ -44,6 +44,20 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
 
+    // /holding/ is the route the holding page is built from, not a URL it is
+    // published at: in holding mode its content is what `/` serves, and in live
+    // mode `/` is the real homepage. Either way answering here would put the
+    // same page on a second URL, so it redirects instead. The page's canonical
+    // and og:url say `/` to match (#37).
+    //
+    // Above the SITE_MODE branch because it holds in both modes. No loop risk:
+    // the holding fetch below goes to the asset store directly, not back
+    // through this worker.
+    if (url.pathname === "/holding" || url.pathname === "/holding/") {
+      url.pathname = "/";
+      return Response.redirect(url.toString(), 301);
+    }
+
     if (env.SITE_MODE === "live") {
       return env.ASSETS.fetch(request);
     }
