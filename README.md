@@ -165,8 +165,28 @@ For an ordinary content PR that is harmless. For a PR that changes the *shape* o
 CMS will show errors on entries that have not been migrated yet, because on `main` they haven't:
 a list that gained variable types reports "item has no 'type' property" against every entry
 still in the old shape. Config and content land in the same merge commit, so it clears itself the
-moment the PR merges; there is nothing to fix and nothing to work around. To exercise a schema
-change before merge, run `pnpm dev` and open `http://localhost:4321/admin` on the branch.
+moment the PR merges; there is nothing to fix and nothing to work around.
+
+To try a config change before merging it, edit the working tree instead of the repo:
+
+```
+pnpm cms     # decap-server, port 8081
+pnpm dev     # in another terminal
+```
+
+then open `http://localhost:4321/admin`. `local_backend: true` in the config sends the CMS to that
+proxy, which reads and writes the branch you have checked out, with no login. Decap only does this
+when the page is served from localhost, so the line has no effect on the deployed site.
+
+The proxy reports `publish_modes: ["simple"]`, so locally a save writes the file straight into the
+working tree rather than opening a draft PR. Editorial workflow is a property of the real backend,
+and is unaffected.
+
+Pointing a preview deploy at its own branch instead would be a smaller change (the branch name is
+in `github.head_ref`), but the CMS writes as well as reads: with `publish_mode: editorial_workflow`
+a save opens a PR against whatever `branch` says, so a preview wired to a feature branch would
+send an editor's work into a branch that gets deleted on merge. The preview URL is public. The
+local proxy covers the same need without that.
 
 Two things do need checking before merging a shape change: that no editorial-workflow draft is
 open (`gh pr list` plus any `cms/*` branches), since a draft written in the old shape will not

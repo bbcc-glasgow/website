@@ -20,6 +20,18 @@ backend:
     deleteMedia: Delete "{{path}}" - {{author-name}} <{{author-login}}> via DecapBridge
     openAuthoring: Message {{message}} - {{author-name}} <{{author-login}}> via DecapBridge
 
+# Edit the checked-out working tree instead of the repo, so a change to this
+# file can be tried before it is merged. `branch: main` above means every
+# deployed /admin — production and PR preview alike — loads content from main,
+# so a preview deploy shows the PR's new config against main's old content and
+# reports errors on entries the PR has already migrated. Run `pnpm cms`
+# alongside `pnpm dev` and localhost:4321/admin reads the branch you are on.
+#
+# Safe to ship: Decap only talks to the proxy when the page is served from
+# localhost or 127.0.0.1, and widening that needs an explicit allowed_hosts
+# which is not set. On bbcc.scot this line does nothing.
+local_backend: true
+
 auth:
   email_claim: email
   first_name_claim: first_name

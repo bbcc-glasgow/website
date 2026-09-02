@@ -222,6 +222,32 @@ describe("Decap CMS config.yml", () => {
     assert.strictEqual(map.branch, "main");
   });
 
+  // Paired with the branch above: because every deployed /admin reads main, the
+  // only way to try a config change before merging it is the local proxy. Both
+  // halves are asserted so neither can be dropped without the other's reason
+  // being noticed.
+  it("should enable the local backend so a config change can be tried on a branch", () => {
+    assert.match(
+      getConfig(),
+      /^local_backend: true$/m,
+      "config.yml must set local_backend: true (see pnpm cms)",
+    );
+  });
+
+  // Decap reaches for the proxy only from localhost unless allowed_hosts widens
+  // it. Widening it would put an unauthenticated write path to the working tree
+  // on whatever host was listed, so it stays absent.
+  it("should not widen the local backend beyond localhost", () => {
+    // Comments stripped first: the config explains allowed_hosts in order to
+    // say why it is absent, and a test that cannot tell the explanation from
+    // the setting would fail on the explanation.
+    const settings = getConfig()
+      .split("\n")
+      .filter((line) => !line.trim().startsWith("#"))
+      .join("\n");
+    assert.doesNotMatch(settings, /allowed_hosts/);
+  });
+
   it("should set auth_type to pkce", () => {
     const lines = yamlSection(getConfig(), "backend");
     const map = yamlFlatMap(lines);
