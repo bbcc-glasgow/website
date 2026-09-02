@@ -2,13 +2,14 @@
   "tag": "Strategy",
   "variant": "pink",
   "title": "Local Place Plan",
-  "summary": "Developing a community-led spatial vision for Blythswood & Broomielaw — shaping how the area grows over the next decade.",
+  "summary": "We have developed a community-led spatial vision for Blythswood & Broomielaw — shaping how the area grows over the next decade. This has been certified and published by Glasgow City Council; please have a look.",
   "order": 1,
   "ctas": [
     {
-      "type": "contact",
-      "label": "Contact us",
-      "icon": "mail"
+      "type": "document",
+      "newTab": true,
+      "label": "Local Place Plan",
+      "file": "/documents/blythswood_and_broomielaw_lpp.pdf"
     }
   ]
 }
