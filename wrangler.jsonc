@@ -15,7 +15,7 @@
   // and deploy (workflow_dispatch), or temporarily in the Cloudflare dashboard
   // for an instant maintenance switch (reverts on next deploy).
   "vars": {
-    "SITE_MODE": "holding"
+    "SITE_MODE": "live"
   },
   "routes": [
     {
