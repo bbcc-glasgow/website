@@ -2,13 +2,7 @@
   "tag": "Culture",
   "variant": "teal",
   "title": "Backing Venues",
-  "summary": "Supporting Glasgow's music and arts venues against noise complaints and licensing conditions that threaten their future.",
+  "summary": "Supporting Glasgow's grassroots music and arts venues to protect the city's legacy as a cultural capital and UNESCO city of music; whilst promoting an environment to nurture the next generation of talent.",
   "order": 5,
-  "ctas": [
-    {
-      "type": "contact",
-      "label": "Contact us",
-      "icon": "mail"
-    }
-  ]
+  "ctas": []
 }
