@@ -154,6 +154,24 @@ DecapBridge dashboard holds the GitHub fine-grained PAT (contents + pull-request
 repository secret**; only the site ID (`648cbae2-8402-4cde-ade9-014199b3e953`) appears in
 `public/admin/config.yml`, which is not a secret.
 
+### The CMS on a preview deploy always edits `main`
+
+`backend.branch` in `public/admin/config.yml` is `main`. That is what makes editing work at all —
+an editor opens `/admin`, edits what is live, and DecapBridge opens a PR — but it means the
+`/admin` on a PR's preview deploy is not previewing that PR. It serves the PR's `config.yml`
+against `main`'s content.
+
+For an ordinary content PR that is harmless. For a PR that changes the *shape* of a field, the
+CMS will show errors on entries that have not been migrated yet, because on `main` they haven't:
+a list that gained variable types reports "item has no 'type' property" against every entry
+still in the old shape. Config and content land in the same merge commit, so it clears itself the
+moment the PR merges; there is nothing to fix and nothing to work around. To exercise a schema
+change before merge, run `pnpm dev` and open `http://localhost:4321/admin` on the branch.
+
+Two things do need checking before merging a shape change: that no editorial-workflow draft is
+open (`gh pr list` plus any `cms/*` branches), since a draft written in the old shape will not
+load in the new CMS, and that the content in the PR is migrated in the same commit as the config.
+
 ## Editing the site (volunteers)
 
 Volunteers do **not** need a GitHub account or GitHub collaborator access to edit the site.
