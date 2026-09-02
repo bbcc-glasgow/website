@@ -109,66 +109,88 @@ describe("Decap CMS vendor setup", () => {
     );
   });
 
-  it("should pin decap-cms at version 3.11.0", () => {
+  it("should pin decap-cms to an exact version", () => {
     const pkg = JSON.parse(readFileSync(resolve(repoRoot, "package.json"), "utf-8"));
-    assert.strictEqual(
+    // Exact, not a range: the CMS is vendored into public/admin at build time,
+    // so a floating version would change what ships without changing the repo.
+    assert.match(
       pkg.dependencies["decap-cms"],
-      "3.11.0",
-      "decap-cms must be pinned at 3.11.0",
+      /^\d+\.\d+\.\d+$/,
+      "decap-cms must be pinned to an exact version, not a range",
     );
   });
 
-  it("should have a prebuild script in package.json that vendors three decap-cms files", () => {
+  it("should vendor the bundle with the script rather than a list of filenames", () => {
     const pkg = JSON.parse(readFileSync(resolve(repoRoot, "package.json"), "utf-8"));
     assert.ok(pkg.scripts, "package.json must have a scripts field");
     assert.ok(pkg.scripts.prebuild, "package.json must define a prebuild script");
+    // This was three `cp` commands naming the entry, one lazy chunk and the
+    // stylesheet. 3.16.0 ships about a hundred chunks with different numbers,
+    // so a hand-written list is wrong on the next upgrade and fails silently:
+    // a missing lazy chunk only surfaces when an editor opens the widget that
+    // needs it. The script derives the list from the installed bundle.
     assert.ok(
-      pkg.scripts.prebuild.startsWith("cp "),
-      "prebuild script must use cp to copy the pre-built bundle",
+      pkg.scripts.prebuild.includes("scripts/vendor-decap.mjs"),
+      "prebuild must run scripts/vendor-decap.mjs",
     );
     assert.ok(
-      pkg.scripts.prebuild.includes("node_modules/decap-cms/dist/decap-cms.js"),
-      "prebuild script must copy decap-cms.js from the npm package dist",
+      existsSync(resolve(repoRoot, "scripts/vendor-decap.mjs")),
+      "scripts/vendor-decap.mjs must exist",
     );
     assert.ok(
-      pkg.scripts.prebuild.includes("node_modules/decap-cms/dist/373.decap-cms.js"),
-      "prebuild script must copy 373.decap-cms.js from the npm package dist",
+      !/\d+\.decap-cms\.js/.test(pkg.scripts.prebuild),
+      "prebuild must not name a chunk by number - they change every release",
+    );
+  });
+
+  // The CMS is styled by emotion, which generates `css-<hash>-<Label>` class
+  // names. An override naming the hash breaks on any release that changes the
+  // declarations, which is exactly what 3.11 -> 3.16 did. Nothing else catches
+  // it: the class names belong to a third party and the CMS is behind a login
+  // the a11y run never reaches.
+  it("should not couple the contrast override to an emotion hash", () => {
+    const html = readFileSync(resolve(repoRoot, "public/admin/index.html"), "utf-8");
+    // Only the rules, not the comment above them, which names the old class to
+    // explain why it went.
+    const styles = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join("\n");
+    assert.ok(
+      styles.includes('[class*="-ButtonText"]'),
+      "the contrast override must match the emotion label, not a hashed class",
     );
     assert.ok(
-      pkg.scripts.prebuild.includes("node_modules/decap-cms/dist/cms.css"),
-      "prebuild script must copy cms.css from the npm package dist",
-    );
-    assert.ok(
-      pkg.scripts.prebuild.includes("public/admin/decap-cms.js"),
-      "prebuild script must output decap-cms.js to public/admin/",
-    );
-    assert.ok(
-      pkg.scripts.prebuild.includes("public/admin/373.decap-cms.js"),
-      "prebuild script must output 373.decap-cms.js to public/admin/",
-    );
-    assert.ok(
-      pkg.scripts.prebuild.includes("public/admin/cms.css"),
-      "prebuild script must output cms.css to public/admin/",
+      !/css-[a-z0-9]{5,8}-/.test(styles),
+      "index.html must not name a generated emotion class - the hash moves on upgrade",
     );
   });
 
   // ── .gitignore ───────────────────────────────────────────────────────
 
-  it("should have all three generated files listed in .gitignore", () => {
-    const gitignore = readFileSync(resolve(repoRoot, ".gitignore"), "utf-8");
-    const lines = gitignore.split("\n").map((l) => l.trim());
-    assert.ok(
-      lines.some((l) => l === "public/admin/decap-cms.js"),
-      ".gitignore must contain 'public/admin/decap-cms.js'",
+  // Everything the vendor script writes has to be ignored, or an upgrade turns
+  // into a hundred-file diff. Checking the actual vendored files against the
+  // patterns catches the case the old test could not: a new kind of chunk
+  // (3.16.0 added .wasm) that nothing in .gitignore covers.
+  it("should ignore every file the vendor script writes into public/admin", () => {
+    const patterns = readFileSync(resolve(repoRoot, ".gitignore"), "utf-8")
+      .split("\n")
+      .map((l) => l.trim())
+      .filter((l) => l.startsWith("public/admin/"))
+      .map((l) => new RegExp(`^${l.replace(/[.]/g, "\\.").replace(/\*/g, ".*")}$`));
+
+    const vendored = readdirSync(resolve(repoRoot, "public/admin")).filter(
+      (name) =>
+        name === "cms.css" ||
+        name === "decap-cms.js" ||
+        name.endsWith(".wasm") ||
+        /^\d+\.decap-cms\.js$/.test(name),
     );
-    assert.ok(
-      lines.some((l) => l === "public/admin/373.decap-cms.js"),
-      ".gitignore must contain 'public/admin/373.decap-cms.js'",
-    );
-    assert.ok(
-      lines.some((l) => l === "public/admin/cms.css"),
-      ".gitignore must contain 'public/admin/cms.css'",
-    );
+
+    assert.ok(vendored.length > 0, "public/admin must hold a vendored bundle - run pnpm build");
+    for (const name of vendored) {
+      assert.ok(
+        patterns.some((p) => p.test(`public/admin/${name}`)),
+        `.gitignore has no pattern covering public/admin/${name}`,
+      );
+    }
   });
 });
 

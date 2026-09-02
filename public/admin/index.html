@@ -6,9 +6,19 @@
   <meta name="description" content="Blythswood &amp; Broomielaw Community Council — content management" />
   <meta name="robots" content="noindex, nofollow" />
   <title>Content Manager — BBCC</title>
-  <!-- Override low-contrast Decap CMS button text to meet WCAG AA (4.5:1) -->
+  <!--
+    Override low-contrast Decap CMS button text to meet WCAG AA (4.5:1).
+
+    Decap styles with emotion, which names classes `css-<hash>-<Label>`. This
+    rule used to name the hash (css-73h02d-ButtonText). The hash is derived from
+    the declarations, so upgrading 3.11 -> 3.16 changed it and the rule stopped
+    matching without any sign: no test can see inside a third party's generated
+    class names, and the CMS sits behind a login the a11y run never reaches.
+    Matching the label suffix instead holds across any release that keeps the
+    label, which is the part Decap's own source controls.
+  -->
   <style>
-    body .css-73h02d-ButtonText { color: #4d5b69 !important; }
+    body [class*="-ButtonText"] { color: #4d5b69 !important; }
   </style>
 </head>
 <body>
