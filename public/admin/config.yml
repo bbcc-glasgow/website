@@ -25,7 +25,9 @@ backend:
 # deployed /admin — production and PR preview alike — loads content from main,
 # so a preview deploy shows the PR's new config against main's old content and
 # reports errors on entries the PR has already migrated. Run `pnpm cms`
-# alongside `pnpm dev` and localhost:4321/admin reads the branch you are on.
+# alongside `pnpm dev` and localhost:4321/admin/index.html reads the branch you
+# are on. (The filename is needed only under `astro dev`, which serves public/
+# without resolving a directory to its index.)
 #
 # Safe to ship: Decap only talks to the proxy when the page is served from
 # localhost or 127.0.0.1, and widening that needs an explicit allowed_hosts

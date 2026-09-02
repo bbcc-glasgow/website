@@ -174,7 +174,11 @@ pnpm cms     # decap-server, port 8081
 pnpm dev     # in another terminal
 ```
 
-then open `http://localhost:4321/admin`. `local_backend: true` in the config sends the CMS to that
+then open `http://localhost:4321/admin/index.html`. The filename is not optional under `astro dev`:
+Vite serves `public/` without directory-index resolution, so `/admin` and `/admin/` both 404 there.
+`astro preview` and the deployed Worker do resolve them, which is why only dev needs the suffix.
+
+`local_backend: true` in the config sends the CMS to that
 proxy, which reads and writes the branch you have checked out, with no login. Decap only does this
 when the page is served from localhost, so the line has no effect on the deployed site.
 
@@ -200,8 +204,9 @@ DecapBridge, which issues a PR behind the scenes.
 
 ### Step-by-step walkthrough
 
-1. **Go to `/admin`** — open `https://bbcc.scot/admin` (or your local dev server at
-   `http://localhost:4321/admin`). You see the Decap CMS login screen.
+1. **Go to `/admin`** — open `https://bbcc.scot/admin`. You see the Decap CMS login screen.
+   (Running it locally instead? See "The CMS on a preview deploy always edits `main`" above: the
+   URL is `/admin/index.html` and there is no login.)
 
 2. **Log in with your invite** — click "Login with DecapBridge". The screen offers **Password**
    (the one you set when you accepted the invite), **Google**, or **Microsoft**. Pick whichever
