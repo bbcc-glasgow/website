@@ -3,6 +3,7 @@ import assert from "node:assert";
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { CTA_ICONS, CTA_TYPES, SOCIAL_PLATFORMS } from "../src/lib/cta.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const configPath = resolve(repoRoot, "public/admin/config.yml");
@@ -221,6 +222,32 @@ describe("Decap CMS config.yml", () => {
     assert.strictEqual(map.branch, "main");
   });
 
+  // Paired with the branch above: because every deployed /admin reads main, the
+  // only way to try a config change before merging it is the local proxy. Both
+  // halves are asserted so neither can be dropped without the other's reason
+  // being noticed.
+  it("should enable the local backend so a config change can be tried on a branch", () => {
+    assert.match(
+      getConfig(),
+      /^local_backend: true$/m,
+      "config.yml must set local_backend: true (see pnpm cms)",
+    );
+  });
+
+  // Decap reaches for the proxy only from localhost unless allowed_hosts widens
+  // it. Widening it would put an unauthenticated write path to the working tree
+  // on whatever host was listed, so it stays absent.
+  it("should not widen the local backend beyond localhost", () => {
+    // Comments stripped first: the config explains allowed_hosts in order to
+    // say why it is absent, and a test that cannot tell the explanation from
+    // the setting would fail on the explanation.
+    const settings = getConfig()
+      .split("\n")
+      .filter((line) => !line.trim().startsWith("#"))
+      .join("\n");
+    assert.doesNotMatch(settings, /allowed_hosts/);
+  });
+
   it("should set auth_type to pkce", () => {
     const lines = yamlSection(getConfig(), "backend");
     const map = yamlFlatMap(lines);
@@ -421,32 +448,6 @@ describe("Decap CMS config.yml", () => {
     }
   });
 
-  it("should offer a ctas list with label, url and icon sub-fields", () => {
-    const projBlock = extractCollectionBlock(getConfig(), "projects");
-    assert.ok(projBlock, "projects collection must exist");
-
-    const ctasSection = projBlock.split(/name\s*:\s*ctas\b/)[1] ?? "";
-    assert.match(ctasSection, /widget\s*:\s*list/, "ctas must use the list widget");
-    for (const subField of ["label", "url", "icon"]) {
-      assert.ok(
-        new RegExp(`name\\s*:\\s*${subField}\\b`).test(ctasSection),
-        `ctas list must have a '${subField}' sub-field`,
-      );
-    }
-  });
-
-  it("should restrict the cta icon choice to the predefined set", () => {
-    const projBlock = extractCollectionBlock(getConfig(), "projects");
-    assert.ok(projBlock, "projects collection must exist");
-
-    const ctasSection = projBlock.split(/name\s*:\s*ctas\b/)[1] ?? "";
-    const iconField = ctasSection.split(/name\s*:\s*icon\b/)[1] ?? "";
-    assert.match(iconField, /widget\s*:\s*select/, "icon must use the select widget");
-    for (const option of ["arrow-right", "external", "mail", "calendar", "map-pin", "download"]) {
-      assert.ok(iconField.includes(`"${option}"`), `icon select must offer '${option}'`);
-    }
-  });
-
   // ── Collections: site ─────────────────────────────────────────────
 
   it("should have a site collection with file at src/content/site/index.json", () => {
@@ -619,7 +620,7 @@ describe("Decap CMS config.yml", () => {
     );
     assert.deepStrictEqual(
       holdingFields,
-      ["eyebrow", "heading", "body", "ctaLabel"],
+      ["eyebrow", "heading", "body", "ctas"],
     );
   });
 
@@ -634,7 +635,7 @@ describe("Decap CMS config.yml", () => {
     );
   });
 
-  it("should give the instagram section exactly the five string fields", () => {
+  it("should give the instagram section exactly its four fields", () => {
     const pagesBlock = extractCollectionBlock(getConfig(), "pages");
     assert.ok(pagesBlock, "pages collection must exist");
 
@@ -652,23 +653,16 @@ describe("Decap CMS config.yml", () => {
     );
 
     const fields = extractFieldNames(instagramSection);
-    assert.deepStrictEqual(fields, [
-      "eyebrow",
-      "heading",
-      "body",
-      "instagramCtaLabel",
-      "facebookCtaLabel",
-    ]);
+    assert.deepStrictEqual(fields, ["eyebrow", "heading", "body", "ctas"]);
   });
 
-  it("should give every instagram field a string-type widget", () => {
+  it("should give every instagram copy field a string-type widget", () => {
     const pagesBlock = extractCollectionBlock(getConfig(), "pages");
     assert.ok(pagesBlock, "pages collection must exist");
 
     const instagramSection =
       pagesBlock.split(/name\s*:\s*instagram\b/)[1] ?? "";
-    const fields = extractFieldNames(instagramSection);
-    for (const field of fields) {
+    for (const field of ["eyebrow", "heading", "body"]) {
       const fieldBlock =
         instagramSection.split(
           new RegExp(`name\\s*:\\s*${field}\\b`),
@@ -695,10 +689,178 @@ describe("Decap CMS config.yml", () => {
       !/feed/i.test(instagramSection),
       "instagram section must not expose a feed widget or feed data",
     );
+    // media_folder appears inside the CTA block, where it names where an
+    // uploaded document goes. What must not appear is the photo feed: the
+    // tiles come from the fetch workflow, not from an editor.
     assert.ok(
-      !/image|media/.test(instagramSection),
-      "instagram section must not reference image or media files",
+      !/assets\/instagram|public\/images/.test(instagramSection),
+      "instagram section must not reference the feed's images",
     );
+  });
+});
+
+// ── Call-to-action buttons ────────────────────────────────────────────────
+//
+// Eight sections offer CTA buttons, and the config spells the block out eight
+// times rather than aliasing it, so that the CMS shows an editor the same eight
+// choices wherever they are. Nothing but a test keeps those copies identical,
+// and nothing but a test keeps them in step with src/lib/cta.ts, which is what
+// actually validates the content they produce.
+
+describe("Decap CMS call-to-action fields", () => {
+  /** Every `- name: ctas` block in the config, with its own indented body. */
+  function ctaBlocks(text: string): string[] {
+    const lines = text.split("\n");
+    const blocks: string[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const match = lines[i].match(/^(\s*)- name:\s*ctas\s*$/);
+      if (!match) continue;
+
+      const indent = match[1].length;
+      const body = [lines[i]];
+      for (let j = i + 1; j < lines.length; j++) {
+        const line = lines[j];
+        if (line.trim() === "") {
+          body.push(line);
+          continue;
+        }
+        if (line.length - line.trimStart().length <= indent) break;
+        body.push(line);
+      }
+      blocks.push(body.join("\n"));
+    }
+    return blocks;
+  }
+
+  /** The body of one variable type inside a ctas block. */
+  function typeBlock(block: string, name: string): string {
+    const lines = block.split("\n");
+    const start = lines.findIndex((l) => new RegExp(`^\\s*- name:\\s*${name}\\s*$`).test(l));
+    if (start === -1) return "";
+    const indent = lines[start].length - lines[start].trimStart().length;
+    const body = [lines[start]];
+    for (let i = start + 1; i < lines.length; i++) {
+      if (lines[i].trim() === "") continue;
+      if (lines[i].length - lines[i].trimStart().length <= indent) break;
+      body.push(lines[i]);
+    }
+    return body.join("\n");
+  }
+
+  it("should offer a ctas list in every section that renders buttons", () => {
+    // hero, ourProjects.ideaCard, getInvolved cards, meetings, newsletter,
+    // instagram, the holding page, and project cards.
+    assert.strictEqual(ctaBlocks(getConfig()).length, 8);
+  });
+
+  it("should make every ctas field a variable-type list", () => {
+    for (const block of ctaBlocks(getConfig())) {
+      assert.match(block, /widget:\s*list/, "ctas must use the list widget");
+      assert.match(block, /^\s*types:\s*$/m, "ctas must offer variable types, not fixed fields");
+      assert.ok(
+        !/^\s*fields:\s*$/m.test(block.split(/^\s*types:\s*$/m)[0]),
+        "a ctas list must not carry its own fields alongside its types",
+      );
+    }
+  });
+
+  it("should offer exactly the four types the content schema accepts", () => {
+    for (const block of ctaBlocks(getConfig())) {
+      const types = [...block.matchAll(/^\s*- name:\s*(\w+)\s*$/gm)]
+        .map((m) => m[1])
+        .filter((name) => name !== "ctas" && name !== "file");
+      assert.deepStrictEqual(
+        types,
+        [...CTA_TYPES],
+        "every ctas list must offer the same four types, in the same order",
+      );
+    }
+  });
+
+  it("should give each type only the fields its own shape needs", () => {
+    const expected = {
+      link: ["label", "url", "newTab", "icon"],
+      document: ["label", "file", "newTab", "icon"],
+      contact: ["label", "subject", "newTab", "icon"],
+      social: ["label", "platform", "newTab", "icon"],
+    };
+
+    for (const block of ctaBlocks(getConfig())) {
+      for (const [type, fields] of Object.entries(expected)) {
+        const body = typeBlock(block, type);
+        assert.ok(body, `every ctas list must offer the '${type}' type`);
+        const names = [...body.matchAll(/name:\s*([A-Za-z]+)/g)]
+          .map((m) => m[1])
+          .filter((name) => name !== type);
+        assert.deepStrictEqual(names, fields, `the '${type}' type's fields`);
+      }
+    }
+  });
+
+  it("should send an uploaded document to public/documents and link it as /documents", () => {
+    for (const block of ctaBlocks(getConfig())) {
+      const file = typeBlock(block, "document");
+      assert.match(file, /widget:\s*file/, "a document cta must use the file widget");
+      assert.match(
+        file,
+        /media_folder:\s*\/public\/documents/,
+        "uploads must land in public/documents, not the image library",
+      );
+      assert.match(
+        file,
+        /public_folder:\s*\/documents/,
+        "the stored path must be the one the browser asks for",
+      );
+    }
+  });
+
+  it("should let an editor choose whether any button opens a new tab", () => {
+    for (const block of ctaBlocks(getConfig())) {
+      const toggles = [...block.matchAll(/name:\s*newTab[^}]*\}/g)].map((m) => m[0]);
+      assert.strictEqual(toggles.length, CTA_TYPES.length, "one toggle per type");
+      for (const toggle of toggles) {
+        assert.match(toggle, /widget:\s*boolean/);
+        assert.match(toggle, /required:\s*false/);
+        assert.match(toggle, /default:\s*(true|false)/, "the toggle must show its default");
+      }
+    }
+  });
+
+  it("should restrict the icon choice to the set the renderer has artwork for", () => {
+    for (const block of ctaBlocks(getConfig())) {
+      const icons = [...block.matchAll(/name:\s*icon[^}]*\}/g)].map((m) => m[0]);
+      assert.strictEqual(icons.length, CTA_TYPES.length, "one icon select per type");
+      for (const icon of icons) {
+        assert.match(icon, /widget:\s*select/, "icon must use the select widget");
+        for (const option of CTA_ICONS) {
+          assert.ok(icon.includes(`"${option}"`), `icon select must offer '${option}'`);
+        }
+        const offered = [...icon.matchAll(/"([a-z-]+)"/g)].map((m) => m[1]);
+        assert.deepStrictEqual(offered, [...CTA_ICONS], "no icon the renderer cannot draw");
+      }
+    }
+  });
+
+  it("should restrict a social button to the platforms the site has profiles for", () => {
+    for (const block of ctaBlocks(getConfig())) {
+      const platform = typeBlock(block, "social").match(/name:\s*platform[^}]*\}/)?.[0] ?? "";
+      assert.match(platform, /widget:\s*select/);
+      const offered = [...platform.matchAll(/"([a-z]+)"/g)].map((m) => m[1]);
+      assert.deepStrictEqual(offered, [...SOCIAL_PLATFORMS]);
+    }
+  });
+
+  // The contact address and the profile URLs are facts in the site collection.
+  // If the CMS offers an address box beside them, an editor will eventually
+  // fill it in, and then there are two answers to the same question.
+  it("should give an editor nowhere to retype the contact address", () => {
+    for (const block of ctaBlocks(getConfig())) {
+      const contact = typeBlock(block, "contact");
+      assert.ok(!/name:\s*(url|email|address)\b/.test(contact));
+      const social = typeBlock(block, "social");
+      assert.ok(!/name:\s*url\b/.test(social));
+    }
   });
 });
 

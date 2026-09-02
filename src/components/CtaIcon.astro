@@ -1,8 +1,8 @@
 ---
-// Icon for a project CTA button. Icons are decorative (aria-hidden); the button
-// label carries the accessible name. The allowed icon names live in
-// src/lib/projectVariants.ts and the Decap CMS config; an unknown name renders
-// nothing rather than a broken image.
+// Icon for a CTA button. Icons are decorative (aria-hidden); the button label
+// carries the accessible name. The allowed icon names live in src/lib/cta.ts
+// and the Decap CMS config; an unknown name renders nothing rather than a
+// broken image.
 //
 // The map turns the site's own vocabulary ("external", "mail") into Heroicons
 // names. Editors pick from a short list of things a button does, and are not
@@ -22,6 +22,7 @@ const icons: Record<string, string> = {
   calendar: "heroicons:calendar-days",
   "map-pin": "heroicons:map-pin",
   download: "heroicons:arrow-down-tray",
+  document: "heroicons:document-text",
 };
 
 const icon = icons[name];

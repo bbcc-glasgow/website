@@ -12,11 +12,14 @@
 // can be exercised with fixture data in tests without touching committed
 // site content.
 //
-// The two follow buttons take their URLs from props, resolved by the page from
-// `socialProfiles` in the site content (#37). They used to be written into this
-// file, and the Facebook one pointed at a page that does not exist. A button
-// with no URL is not rendered rather than rendered pointing nowhere.
+// The follow buttons arrive already resolved, as `social` CTAs whose addresses
+// came from `socialProfiles` in the site content (#37). They used to be written
+// into this file, and the Facebook one pointed at a page that does not exist. A
+// button whose profile is not listed is dropped before it reaches here rather
+// than rendered pointing nowhere.
 import { Image, type ImageMetadata } from "astro:assets";
+import CtaLink from "./CtaLink.astro";
+import type { ResolvedCta } from "../lib/cta";
 
 interface FeedPost {
   id: string;
@@ -29,22 +32,16 @@ interface Props {
     eyebrow: string;
     heading: string;
     body: string;
-    instagramCtaLabel: string;
-    facebookCtaLabel: string;
   };
-  instagramUrl?: string;
-  facebookUrl?: string;
+  ctas?: ResolvedCta[];
   posts?: FeedPost[];
   images?: Record<string, ImageMetadata>;
 }
 
-const {
-  copy,
-  instagramUrl,
-  facebookUrl,
-  posts: postsProp,
-  images: imagesProp,
-} = Astro.props;
+const { copy, ctas = [], posts: postsProp, images: imagesProp } = Astro.props;
+
+// A primary and a secondary, styled by position the way the hero pair is.
+const followStyles = ["background:var(--pink);", "background:var(--ink);"];
 
 const feedModules = import.meta.glob("../data/instagram/posts.json", {
   eager: true,
@@ -112,30 +109,13 @@ const tiles = posts
 
     <div class="flex flex-wrap gap-3 justify-center mt-10">
       {
-        instagramUrl && (
-          <a
-            href={instagramUrl}
-            class="btn border-0 text-white font-semibold"
-            target="_blank"
-            rel="noopener noreferrer"
-            style="background:var(--pink);"
-          >
-            {copy.instagramCtaLabel}
-          </a>
-        )
-      }
-      {
-        facebookUrl && (
-          <a
-            href={facebookUrl}
-            class="btn border-0 text-white font-semibold"
-            target="_blank"
-            rel="noopener noreferrer"
-            style="background:var(--ink);"
-          >
-            {copy.facebookCtaLabel}
-          </a>
-        )
+        ctas.map((cta, i) => (
+          <CtaLink
+            cta={cta}
+            class="btn border-0 text-white font-semibold inline-flex items-center gap-2"
+            style={followStyles[Math.min(i, followStyles.length - 1)]}
+          />
+        ))
       }
     </div>
   </div>

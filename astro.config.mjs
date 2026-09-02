@@ -25,6 +25,7 @@ export default defineConfig({
           "bars-3",
           "calendar-days",
           "clock",
+          "document-text",
           "envelope",
           "map-pin",
           "puzzle-piece",

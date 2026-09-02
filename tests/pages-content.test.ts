@@ -4,6 +4,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "module";
+import { ctaSchema } from "../src/lib/cta.ts";
 
 // Zod is a transitive dependency of Astro — resolve it via Astro's module path.
 const astroUrl = import.meta.resolve("astro");
@@ -15,12 +16,15 @@ const pagesFile = resolve(repoRoot, "src/content/pages/index.json");
 
 // ── Pages schema (mirror src/content.config.ts) ─────────────────────────
 
+// Imported, not mirrored: see the note in tests/content-schema.test.mjs.
+const cta = ctaSchema(z);
+
 const pagesSchema = z.object({
   hero: z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    ctas: z.array(z.object({ label: z.string(), url: z.string() })),
+    ctas: z.array(cta),
   }),
   ourArea: z.object({
     eyebrow: z.string(),
@@ -36,7 +40,7 @@ const pagesSchema = z.object({
     ideaCard: z.object({
       heading: z.string(),
       body: z.string(),
-      cta: z.object({ label: z.string(), url: z.string() }),
+      ctas: z.array(cta),
     }),
   }),
   jag: z.object({
@@ -58,7 +62,7 @@ const pagesSchema = z.object({
       z.object({
         heading: z.string(),
         body: z.string(),
-        ctas: z.array(z.object({ label: z.string(), url: z.string() })).min(1),
+        ctas: z.array(cta).min(1),
       }),
     ),
   }),
@@ -66,21 +70,20 @@ const pagesSchema = z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    cta: z.object({ label: z.string(), url: z.string() }),
+    ctas: z.array(cta),
   }),
   newsletter: z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    ctaLabel: z.string(),
+    ctas: z.array(cta),
     subtext: z.string(),
   }),
   instagram: z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    instagramCtaLabel: z.string(),
-    facebookCtaLabel: z.string(),
+    ctas: z.array(cta),
   }),
 });
 
@@ -177,16 +180,11 @@ describe("instagram section", () => {
     );
   });
 
-  it("should expose exactly the five instagram fields, all non-empty strings", () => {
+  it("should expose exactly the four instagram fields", () => {
     const instagram = readPages().instagram as Record<string, unknown>;
-    assert.deepStrictEqual(Object.keys(instagram), [
-      "eyebrow",
-      "heading",
-      "body",
-      "instagramCtaLabel",
-      "facebookCtaLabel",
-    ]);
-    for (const [key, value] of Object.entries(instagram)) {
+    assert.deepStrictEqual(Object.keys(instagram), ["eyebrow", "heading", "body", "ctas"]);
+    for (const key of ["eyebrow", "heading", "body"]) {
+      const value = instagram[key];
       assert.ok(
         typeof value === "string" && value.trim().length > 0,
         `instagram.${key} must be a non-empty string`,
@@ -194,9 +192,25 @@ describe("instagram section", () => {
     }
   });
 
+  // The two follow buttons name a platform rather than a URL, so the profile
+  // addresses stay a single fact in the site collection.
+  it("should point its follow buttons at the site's own social profiles", () => {
+    const ctas = readPages().instagram.ctas as Array<Record<string, unknown>>;
+    assert.strictEqual(ctas.length, 2);
+    assert.deepStrictEqual(
+      ctas.map((c) => c.platform),
+      ["instagram", "facebook"],
+    );
+    for (const c of ctas) {
+      assert.strictEqual(c.type, "social");
+      assert.ok(!("url" in c), "a social cta must not carry an address of its own");
+    }
+  });
+
   it("must not hide any feed data (posts, images) behind the instagram section", () => {
     const instagram = readPages().instagram as Record<string, unknown>;
     for (const [key, value] of Object.entries(instagram)) {
+      if (key === "ctas") continue;
       assert.ok(
         typeof value === "string",
         `instagram.${key} must be a plain string, not a nested feed/list/object`,
@@ -255,14 +269,15 @@ describe("holding page content file", () => {
     const data = JSON.parse(readFileSync(holdingFile, "utf-8"));
     assert.deepStrictEqual(
       Object.keys(data),
-      ["eyebrow", "heading", "body", "ctaLabel"],
+      ["eyebrow", "heading", "body", "ctas"],
     );
-    for (const [key, value] of Object.entries(data)) {
+    for (const key of ["eyebrow", "heading", "body"]) {
       assert.ok(
-        typeof value === "string" && value.trim().length > 0,
+        typeof data[key] === "string" && data[key].trim().length > 0,
         `${key} must be a non-empty string`,
       );
     }
+    assert.ok(Array.isArray(data.ctas) && data.ctas.length > 0, "ctas must not be empty");
   });
 
   it("should keep the holding page copy unchanged from the original entry", () => {
@@ -273,7 +288,7 @@ describe("holding page content file", () => {
       data.body,
       "Blythswood & Broomielaw Community Council gives residents and workers a democratic voice in shaping the heart of Glasgow. Our website is under construction. In the meantime, we'd love to hear from you.",
     );
-    assert.strictEqual(data.ctaLabel, "Email us");
+    assert.deepStrictEqual(data.ctas, [{ type: "contact", label: "Email us" }]);
   });
 });
 
@@ -293,7 +308,7 @@ describe("holding page copy source", () => {
   });
 
   it("should render each field from the pages content entry", () => {
-    for (const ref of ["eyebrow", "heading", "body", "ctaLabel"]) {
+    for (const ref of ["eyebrow", "heading", "body", "ctas"]) {
       assert.ok(
         holdingAstro.includes(ref),
         `holding.astro must render ${ref} from the pages content entry`,

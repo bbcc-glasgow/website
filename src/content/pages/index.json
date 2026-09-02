@@ -4,8 +4,16 @@
     "heading": "Your City,<br />Our City.",
     "body": "Blythswood & Broomielaw Community Council gives residents and workers a democratic voice in shaping the heart of Glasgow.",
     "ctas": [
-      { "label": "Get Involved", "url": "#get-involved" },
-      { "label": "Our Area", "url": "#our-area" }
+      {
+        "type": "link",
+        "label": "Get Involved",
+        "url": "#get-involved"
+      },
+      {
+        "type": "link",
+        "label": "Our Area",
+        "url": "#our-area"
+      }
     ]
   },
   "ourArea": {
@@ -15,10 +23,22 @@
     "body2": "As a statutory Community Council, we have a right to be consulted on planning, licensing and policy decisions that affect our area. We amplify the voices of those who use this city.",
     "boundaryLabel": "Boundary",
     "pillars": [
-      { "heading": "Planning & Licensing", "body": "Statutory consultee on applications that reshape our streets." },
-      { "heading": "Public Realm", "body": "Greening lanes, improving footpaths, reducing clutter." },
-      { "heading": "Night-time Economy", "body": "Backing venues, culture, and a thriving evening city." },
-      { "heading": "Heritage", "body": "Protecting the Victorian grid and built character." }
+      {
+        "heading": "Planning & Licensing",
+        "body": "Statutory consultee on applications that reshape our streets."
+      },
+      {
+        "heading": "Public Realm",
+        "body": "Greening lanes, improving footpaths, reducing clutter."
+      },
+      {
+        "heading": "Night-time Economy",
+        "body": "Backing venues, culture, and a thriving evening city."
+      },
+      {
+        "heading": "Heritage",
+        "body": "Protecting the Victorian grid and built character."
+      }
     ]
   },
   "ourProjects": {
@@ -27,7 +47,13 @@
     "ideaCard": {
       "heading": "Have an idea?",
       "body": "Tell us about issues in your neighbourhood that we should prioritise.",
-      "cta": { "label": "Contact us", "url": "#get-involved" }
+      "ctas": [
+        {
+          "type": "link",
+          "label": "Contact us",
+          "url": "#get-involved"
+        }
+      ]
     }
   },
   "jag": {
@@ -35,12 +61,30 @@
     "heading": "Working Together Across Glasgow",
     "body": "Through the Joint Action Group (JAG), we team up with neighbouring community councils to channel community voices directly to Glasgow City Council — because some challenges can only be solved together.",
     "cards": [
-      { "name": "Anderston", "url": "https://anderston-community-council.mailerpage.io/" },
-      { "name": "Dundasvale", "url": "https://dundasvalecc.co.uk/" },
-      { "name": "Garnethill", "url": "https://www.garnethillmc.co.uk/garnethill-community-council" },
-      { "name": "Merchant City and Trongate", "url": "https://mctcc.scot/" },
-      { "name": "Townhead and Ladywell", "url": "https://tandlcc.wordpress.com/" },
-      { "name": "Yorkhill and Kelvingrove", "url": "https://yokecoco.wordpress.com/" }
+      {
+        "name": "Anderston",
+        "url": "https://anderston-community-council.mailerpage.io/"
+      },
+      {
+        "name": "Dundasvale",
+        "url": "https://dundasvalecc.co.uk/"
+      },
+      {
+        "name": "Garnethill",
+        "url": "https://www.garnethillmc.co.uk/garnethill-community-council"
+      },
+      {
+        "name": "Merchant City and Trongate",
+        "url": "https://mctcc.scot/"
+      },
+      {
+        "name": "Townhead and Ladywell",
+        "url": "https://tandlcc.wordpress.com/"
+      },
+      {
+        "name": "Yorkhill and Kelvingrove",
+        "url": "https://yokecoco.wordpress.com/"
+      }
     ]
   },
   "getInvolved": {
@@ -48,29 +92,86 @@
     "heading": "Your City. Your Say.",
     "body": "Community Councils only work when the community shows up. Here's how to make your voice count.",
     "cards": [
-      { "heading": "Follow Us", "body": "See what is going on.", "ctas": [{ "label": "Instagram", "url": "https://www.instagram.com/bbccglasgow" }, { "label": "Facebook", "url": "https://www.facebook.com/glasgowbbcc" }] },
-      { "heading": "Attend a Meeting", "body": "Our public meetings are open to all. Come along, ask questions, and help set our agenda.", "ctas": [{ "label": "See dates", "url": "#meetings" }] },
-      { "heading": "Join the Committee", "body": "Elections are held annually. Become an elected member and help steer the work of the council.", "ctas": [{ "label": "Message us", "url": "mailto:info@bbcc.scot" }] }
+      {
+        "heading": "Follow Us",
+        "body": "See what is going on.",
+        "ctas": [
+          {
+            "type": "social",
+            "label": "Instagram",
+            "platform": "instagram"
+          },
+          {
+            "type": "social",
+            "label": "Facebook",
+            "platform": "facebook"
+          }
+        ]
+      },
+      {
+        "heading": "Attend a Meeting",
+        "body": "Our public meetings are open to all. Come along, ask questions, and help set our agenda.",
+        "ctas": [
+          {
+            "type": "link",
+            "label": "See dates",
+            "url": "#meetings"
+          }
+        ]
+      },
+      {
+        "heading": "Join the Committee",
+        "body": "Elections are held annually. Become an elected member and help steer the work of the council.",
+        "ctas": [
+          {
+            "type": "contact",
+            "label": "Message us"
+          }
+        ]
+      }
     ]
   },
   "meetings": {
     "eyebrow": "Open Meetings",
     "heading": "Coming to a Meeting",
     "body": "All meetings are held in public. No registration required. Agendas published one week in advance.",
-    "cta": { "label": "Get notified by email", "url": "#newsletter" }
+    "ctas": [
+      {
+        "type": "link",
+        "label": "Get notified by email",
+        "url": "#newsletter"
+      }
+    ]
   },
   "newsletter": {
     "eyebrow": "Stay Informed",
     "heading": "Stay in the Loop",
     "body": "For occasional updates on meetings, consultations, and planning decisions that affect your city centre, email us and ask to join the mailing list.",
-    "ctaLabel": "Email us to subscribe",
+    "ctas": [
+      {
+        "type": "contact",
+        "label": "Email us to subscribe",
+        "subject": "Subscribe to BBCC updates",
+        "icon": "mail"
+      }
+    ],
     "subtext": "No spam. Unsubscribe any time."
   },
   "instagram": {
     "eyebrow": "Social",
     "heading": "Find Us on Instagram",
     "body": "Follow us on Instagram @bbccglasgow for updates from the heart of Glasgow city centre.",
-    "instagramCtaLabel": "Follow on Instagram",
-    "facebookCtaLabel": "Follow on Facebook"
+    "ctas": [
+      {
+        "type": "social",
+        "label": "Follow on Instagram",
+        "platform": "instagram"
+      },
+      {
+        "type": "social",
+        "label": "Follow on Facebook",
+        "platform": "facebook"
+      }
+    ]
   }
 }

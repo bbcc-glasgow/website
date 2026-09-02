@@ -5,10 +5,10 @@ import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   DEFAULT_PROJECT_VARIANT,
-  PROJECT_CTA_ICONS,
   PROJECT_VARIANTS,
   resolveProjectVariantColours,
 } from "../src/lib/projectVariants.ts";
+import { CTA_ICONS, CTA_TYPES } from "../src/lib/cta.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const projectsDir = resolve(repoRoot, "src/content/projects");
@@ -131,7 +131,7 @@ describe("migrated project files", () => {
     }
   });
 
-  it("has valid ctas (label, url, known icon) when present", () => {
+  it("has valid ctas (label, known type, known icon) when present", () => {
     for (const p of projects) {
       for (const cta of p.data.ctas ?? []) {
         assert.ok(
@@ -139,16 +139,28 @@ describe("migrated project files", () => {
           `${p.file} has a cta without a label`,
         );
         assert.ok(
-          typeof cta.url === "string" && cta.url.length > 0,
-          `${p.file} has a cta without a url`,
+          (CTA_TYPES as readonly string[]).includes(cta.type),
+          `${p.file} has a cta of unknown type '${cta.type}'`,
         );
         if (cta.icon !== undefined) {
           assert.ok(
-            (PROJECT_CTA_ICONS as readonly string[]).includes(cta.icon),
+            (CTA_ICONS as readonly string[]).includes(cta.icon),
             `${p.file} uses unknown cta icon '${cta.icon}'`,
           );
         }
       }
+    }
+  });
+
+  // The contact address is a fact in the site collection. A project file that
+  // spells it out is a second copy waiting to go stale, which is what these
+  // four cards used to be.
+  it("names the contact address nowhere in a project file", () => {
+    for (const p of projects) {
+      assert.ok(
+        !JSON.stringify(p.data).includes("mailto:"),
+        `${p.file} writes out a mailto address; use a contact cta instead`,
+      );
     }
   });
 });

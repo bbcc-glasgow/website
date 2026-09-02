@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "cms": "decap-server",
     "prebuild": "node scripts/vendor-decap.mjs",
     "build": "astro build",
     "preview": "astro preview",
@@ -16,6 +17,7 @@
     "test:a11y": "playwright test",
     "test:sitemap": "node --test tests/sitemap.test.mjs",
     "test:seo": "node --test tests/seo.test.mjs",
+    "test:content": "node --test tests/cta.test.mjs tests/content-schema.test.mjs tests/pages-content.test.ts tests/project-content.test.ts tests/decap-cms.test.ts tests/instagram-feed.test.ts",
     "test:gitignore": "node --experimental-strip-types --test tests/gitignore.test.ts",
     "test:instagram-feed": "node --experimental-strip-types --test tests/instagram-feed.test.ts",
     "test:instagram-refresh": "node --test tests/refresh-ig-token.test.mjs",
@@ -38,6 +40,7 @@
     "@playwright/test": "1.49.1",
     "@tailwindcss/vite": "^4.0.0",
     "daisyui": "^5.0.0",
+    "decap-server": "^3.11.0",
     "linkinator": "^6.1.2",
     "sharp": "^0.35.3",
     "tailwindcss": "^4.0.0"

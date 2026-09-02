@@ -3,13 +3,13 @@ import { Icon } from "astro-icon/components";
 import { Image, getImage } from "astro:assets";
 import { getCollection, getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
-import ProjectCtaIcon from "../components/ProjectCtaIcon.astro";
+import CtaLink from "../components/CtaLink.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
 import { resolveProjectVariantColours } from "../lib/projectVariants";
+import { linkCta, resolveCtas } from "../lib/cta";
 import { calendarLinks } from "../lib/calendar";
 import { loadMeetings } from "../lib/gcal";
 import { describeMeetingRule } from "../lib/meetings";
-import { FACEBOOK_HOST, INSTAGRAM_HOST, socialProfileUrl } from "../lib/social";
 // Mark Ynys-Mon (Flickr: mym) gave permission on the condition that the page
 // credits him with a link to his profile. The credit is in the footer; if this
 // import ever goes, that line goes with it.
@@ -37,8 +37,9 @@ const {
   socialProfiles,
 } = siteEntry.data;
 
-const instagramUrl = socialProfileUrl(socialProfiles, INSTAGRAM_HOST);
-const facebookUrl = socialProfileUrl(socialProfiles, FACEBOOK_HOST);
+// The two facts a CTA can point at without carrying an address of its own.
+const ctaFacts = { contactEmail, socialProfiles };
+
 
 // Meeting dates are read from the council's Google Calendar at build time, so
 // the page never shows a date that has passed and nobody maintains a list of
@@ -181,16 +182,27 @@ const getInvolvedCardStyles = [
             {hero.body}
           </p>
           <div class="flex flex-wrap gap-3">
-            <a href={hero.ctas[0].url} class="btn font-semibold border-0 shadow-md" style="background:#fff;color:var(--pink);">
-              {hero.ctas[0].label}
-            </a>
-            <a
-              href={hero.ctas[1].url}
-              class="btn font-semibold border-2 bg-transparent text-white"
-              style="border-color:rgba(255,255,255,0.7);"
-            >
-              {hero.ctas[1].label}
-            </a>
+            {
+              /*
+               * The hero's two buttons are a primary and a secondary, so the
+               * treatment comes from the position rather than from content.
+               */
+              resolveCtas(hero.ctas, ctaFacts).map((cta, i) =>
+                i === 0 ? (
+                  <CtaLink
+                    cta={cta}
+                    class="btn font-semibold border-0 shadow-md inline-flex items-center gap-2"
+                    style="background:#fff;color:var(--pink);"
+                  />
+                ) : (
+                  <CtaLink
+                    cta={cta}
+                    class="btn font-semibold border-2 bg-transparent text-white inline-flex items-center gap-2"
+                    style="border-color:rgba(255,255,255,0.7);"
+                  />
+                ),
+              )
+            }
           </div>
         </div>
       </div>
@@ -333,15 +345,12 @@ const getInvolvedCardStyles = [
                       p.ctas && p.ctas.length > 0 && (
                         <div class="flex flex-wrap gap-2 mt-4">
                           {
-                            p.ctas.map((cta) => (
-                              <a
-                                href={cta.url}
+                            resolveCtas(p.ctas, ctaFacts).map((cta) => (
+                              <CtaLink
+                                cta={cta}
                                 class="btn btn-sm border-0 text-white font-semibold inline-flex items-center gap-2"
                                 style="background:var(--teal-dark);"
-                              >
-                                {cta.icon && <ProjectCtaIcon name={cta.icon} />}
-                                {cta.label}
-                              </a>
+                              />
                             ))
                           }
                         </div>
@@ -361,14 +370,20 @@ const getInvolvedCardStyles = [
             <p class="text-sm text-gray-600 mb-5">
               {ourProjects.ideaCard.body}
             </p>
-            <a href={ourProjects.ideaCard.cta.url} class="btn btn-sm border-0 text-white font-semibold" style="background:var(--ink);">{ourProjects.ideaCard.cta.label}</a>
+            {resolveCtas(ourProjects.ideaCard.ctas, ctaFacts).map((cta) => (
+              <CtaLink
+                cta={cta}
+                class="btn btn-sm border-0 text-white font-semibold inline-flex items-center gap-2"
+                style="background:var(--ink);"
+              />
+            ))}
           </div>
         </div>
       </div>
     </section>
 
     <!-- ═══ INSTAGRAM FEED — PAPER BAND ═══ -->
-    <InstagramFeed copy={instagram} instagramUrl={instagramUrl} facebookUrl={facebookUrl} />
+    <InstagramFeed copy={instagram} ctas={resolveCtas(instagram.ctas, ctaFacts)} />
 
     <!-- ═══ JAG — NEIGHBOURING COUNCILS ═══ -->
     <section id="jag">
@@ -440,8 +455,12 @@ const getInvolvedCardStyles = [
                     <h3 class="font-fraunces font-semibold text-ink text-xl mb-2">{card.heading}</h3>
                     <p class="text-gray-600 text-sm leading-relaxed mb-4">{card.body}</p>
                     <div class="flex flex-wrap gap-2 mt-auto">
-                      {card.ctas.map((cta) => (
-                        <a href={cta.url} class={`btn btn-sm border-0 font-semibold ${s.ctaClass}`} style={s.ctaStyle}>{cta.label}</a>
+                      {resolveCtas(card.ctas, ctaFacts).map((cta) => (
+                        <CtaLink
+                          cta={cta}
+                          class={`btn btn-sm border-0 font-semibold inline-flex items-center gap-2 ${s.ctaClass}`}
+                          style={s.ctaStyle}
+                        />
                       ))}
                     </div>
                   </div>
@@ -514,7 +533,13 @@ const getInvolvedCardStyles = [
             beside it.
           */}
           <div class="flex flex-wrap items-start gap-3">
-            <a href={meetings.cta.url} class="btn btn-sm font-semibold" style="background:var(--pink);color:#fff;border:0;">{meetings.cta.label}</a>
+            {resolveCtas(meetings.ctas, ctaFacts).map((cta) => (
+              <CtaLink
+                cta={cta}
+                class="btn btn-sm font-semibold inline-flex items-center gap-2"
+                style="background:var(--pink);color:#fff;border:0;"
+              />
+            ))}
 
             {/*
               A disclosure rather than a bare .ics link, because "add this to my
@@ -546,7 +571,7 @@ const getInvolvedCardStyles = [
                 {
                   calendarSubscribe.map((link) => (
                     <li>
-                      <a href={link.href}>{link.label}</a>
+                      <CtaLink cta={linkCta(link.href, link.label)} />
                     </li>
                   ))
                 }
@@ -560,7 +585,7 @@ const getInvolvedCardStyles = [
                 {
                   calendarDownload.map((link) => (
                     <li>
-                      <a href={link.href}>{link.label}</a>
+                      <CtaLink cta={linkCta(link.href, link.label)} />
                     </li>
                   ))
                 }
@@ -611,13 +636,13 @@ const getInvolvedCardStyles = [
           {newsletter.body}
         </p>
 
-        <a
-          href={`mailto:${contactEmail}?subject=Subscribe%20to%20BBCC%20updates`}
-          class="btn border-0 font-semibold text-white px-8 shadow-lg"
-          style="background:var(--ink);"
-        >
-          {newsletter.ctaLabel}
-        </a>
+        {resolveCtas(newsletter.ctas, ctaFacts).map((cta) => (
+          <CtaLink
+            cta={cta}
+            class="btn border-0 font-semibold text-white px-8 shadow-lg inline-flex items-center gap-2"
+            style="background:var(--ink);"
+          />
+        ))}
 
         <p class="text-sm mt-4" style="color:rgba(26,26,46,0.85);">
           {newsletter.subtext}

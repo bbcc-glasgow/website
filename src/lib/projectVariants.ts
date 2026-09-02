@@ -53,22 +53,6 @@ export function resolveProjectVariantColours(
     : projectVariantColours[DEFAULT_PROJECT_VARIANT];
 }
 
-/**
- * Predefined CTA icons. An editor picks from this set in Decap CMS rather
- * than typing a free-text icon name. The SVG artwork lives in
- * ProjectCtaIcon.astro; the names here are the shared contract between the
- * content schema, the CMS config and the renderer.
- */
-export const PROJECT_CTA_ICONS = [
-  "arrow-right",
-  "external",
-  "mail",
-  "calendar",
-  "map-pin",
-  "download",
-] as const;
-export type ProjectCtaIcon = (typeof PROJECT_CTA_ICONS)[number];
-
-export function isProjectCtaIcon(value: unknown): value is ProjectCtaIcon {
-  return (PROJECT_CTA_ICONS as readonly string[]).includes(value as string);
-}
+// The CTA icon names used to live here, when only project cards had buttons.
+// They now belong to the whole site along with the rest of the CTA model, in
+// src/lib/cta.ts.

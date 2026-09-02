@@ -1,0 +1,76 @@
+---
+/**
+ * Every call-to-action link on the site.
+ *
+ * The appearance stays with the caller: nine different button treatments exist
+ * across the page and unifying them is a separate question from unifying what
+ * they do. What lives here is the part that was previously decided section by
+ * section and got decided differently each time — the target, the rel, the
+ * warning a screen reader needs, and what a document button tells you before
+ * you commit to the download.
+ *
+ * Because it is decided once, a link cannot open a new tab without saying so.
+ */
+import fs from "node:fs";
+import path from "node:path";
+import CtaIcon from "./CtaIcon.astro";
+import type { ResolvedCta } from "../lib/cta";
+
+interface Props {
+  cta: ResolvedCta;
+  class?: string;
+  style?: string;
+}
+
+const { cta, class: className, style } = Astro.props;
+
+/**
+ * What a document button says beside its label.
+ *
+ * Read off the file rather than typed by an editor, so it cannot disagree with
+ * what actually downloads. A button labelled "Read the report" that quietly
+ * pulls four megabytes is a bad deal on mobile data, and the file is sitting
+ * right there at build time.
+ *
+ * A missing file annotates nothing; the build-time check in tests/seo.test.mjs
+ * is what fails on that, with a message naming the CTA.
+ */
+function describeDocument(publicPath: string): string | null {
+  const onDisk = path.join(process.cwd(), "public", publicPath.replace(/^\//, ""));
+  if (!fs.existsSync(onDisk)) return null;
+
+  const bytes = fs.statSync(onDisk).size;
+  const extension = path.extname(publicPath).replace(/^\./, "").toUpperCase();
+  const size =
+    bytes >= 1024 * 1024
+      ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+      : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+
+  return extension ? `${extension}, ${size}` : size;
+}
+
+const documentNote = cta.documentPath ? describeDocument(cta.documentPath) : null;
+
+// Without noopener the opened page can reach back through window.opener.
+const rel = cta.newTab ? "noopener noreferrer" : undefined;
+---
+
+<a
+  href={cta.href}
+  class={className}
+  style={style}
+  target={cta.newTab ? "_blank" : undefined}
+  rel={rel}
+>
+  {cta.icon && <CtaIcon name={cta.icon} />}
+  <span>{cta.label}</span>
+  {documentNote && <span class="cta-doc-note">({documentNote})</span>}
+  {
+    /*
+     * Sighted readers get the new-tab convention from context; a screen reader
+     * gets nothing unless the link says so, and finding yourself in a new
+     * window with no way back is disorienting rather than merely surprising.
+     */
+    cta.newTab && <span class="sr-only">(opens in a new tab)</span>
+  }
+</a>

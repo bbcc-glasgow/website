@@ -71,7 +71,7 @@ no page attached and therefore no way to carry one.
 | --- | --- |
 | `pnpm dev` | Local dev server |
 | `pnpm build` | Static build to `dist/` |
-| `pnpm gate` | Every step in `gate.d/`, in filename order: build → sitemap → link integrity → axe a11y (zero violations) → Lighthouse budgets (perf ≥95, a11y =100, bp ≥95, seo ≥95) → SEO/GEO invariants |
+| `pnpm gate` | Every step in `gate.d/`, in filename order: build → sitemap → link integrity → axe a11y (zero violations) → Lighthouse budgets (perf ≥95, a11y =100, bp ≥95, seo ≥95) → SEO/GEO invariants → content, CMS config and component contracts |
 
 Adding a check to CI is one new `gate.d/NN-name.sh`; `gate.sh` and `.github/workflows/ci.yml`
 need no edit.
@@ -154,6 +154,48 @@ DecapBridge dashboard holds the GitHub fine-grained PAT (contents + pull-request
 repository secret**; only the site ID (`648cbae2-8402-4cde-ade9-014199b3e953`) appears in
 `public/admin/config.yml`, which is not a secret.
 
+### The CMS on a preview deploy always edits `main`
+
+`backend.branch` in `public/admin/config.yml` is `main`. That is what makes editing work at all —
+an editor opens `/admin`, edits what is live, and DecapBridge opens a PR — but it means the
+`/admin` on a PR's preview deploy is not previewing that PR. It serves the PR's `config.yml`
+against `main`'s content.
+
+For an ordinary content PR that is harmless. For a PR that changes the *shape* of a field, the
+CMS will show errors on entries that have not been migrated yet, because on `main` they haven't:
+a list that gained variable types reports "item has no 'type' property" against every entry
+still in the old shape. Config and content land in the same merge commit, so it clears itself the
+moment the PR merges; there is nothing to fix and nothing to work around.
+
+To try a config change before merging it, edit the working tree instead of the repo:
+
+```
+pnpm cms     # decap-server, port 8081
+pnpm dev     # in another terminal
+```
+
+then open `http://localhost:4321/admin/index.html`. The filename is not optional under `astro dev`:
+Vite serves `public/` without directory-index resolution, so `/admin` and `/admin/` both 404 there.
+`astro preview` and the deployed Worker do resolve them, which is why only dev needs the suffix.
+
+`local_backend: true` in the config sends the CMS to that
+proxy, which reads and writes the branch you have checked out, with no login. Decap only does this
+when the page is served from localhost, so the line has no effect on the deployed site.
+
+The proxy reports `publish_modes: ["simple"]`, so locally a save writes the file straight into the
+working tree rather than opening a draft PR. Editorial workflow is a property of the real backend,
+and is unaffected.
+
+Pointing a preview deploy at its own branch instead would be a smaller change (the branch name is
+in `github.head_ref`), but the CMS writes as well as reads: with `publish_mode: editorial_workflow`
+a save opens a PR against whatever `branch` says, so a preview wired to a feature branch would
+send an editor's work into a branch that gets deleted on merge. The preview URL is public. The
+local proxy covers the same need without that.
+
+Two things do need checking before merging a shape change: that no editorial-workflow draft is
+open (`gh pr list` plus any `cms/*` branches), since a draft written in the old shape will not
+load in the new CMS, and that the content in the PR is migrated in the same commit as the config.
+
 ## Editing the site (volunteers)
 
 Volunteers do **not** need a GitHub account or GitHub collaborator access to edit the site.
@@ -162,8 +204,9 @@ DecapBridge, which issues a PR behind the scenes.
 
 ### Step-by-step walkthrough
 
-1. **Go to `/admin`** — open `https://bbcc.scot/admin` (or your local dev server at
-   `http://localhost:4321/admin`). You see the Decap CMS login screen.
+1. **Go to `/admin`** — open `https://bbcc.scot/admin`. You see the Decap CMS login screen.
+   (Running it locally instead? See "The CMS on a preview deploy always edits `main`" above: the
+   URL is `/admin/index.html` and there is no login.)
 
 2. **Log in with your invite** — click "Login with DecapBridge". The screen offers **Password**
    (the one you set when you accepted the invite), **Google**, or **Microsoft**. Pick whichever
@@ -180,6 +223,27 @@ DecapBridge, which issues a PR behind the scenes.
    gates (link integrity, a11y, Lighthouse budgets) run automatically. A maintainer reviews the PR
    and merges it; the merge deploys to production automatically and your change goes live at
    https://bbcc.scot.
+
+### Buttons
+
+Every button on the site is edited the same way, through a **Call to Action Buttons** list. Add
+one and the first thing it asks is what kind of destination it has:
+
+- **Link** — an address you type. A `#section` jumps down the current page, `/page` goes to
+  another page on the site, and a full `https://` address goes somewhere else entirely.
+- **Document** — a file you upload. It lands in `public/documents/` and the button shows its type
+  and size ("PDF, 240 KB") automatically, read off the file rather than typed.
+- **Email us** — no address to fill in. It uses the contact address from **Site Settings**, with
+  an optional subject line to prefill.
+- **Social profile** — no address to fill in either. Pick Instagram or Facebook and it uses the
+  profile from **Site Settings**.
+
+The last two exist so the council's email address and profile URLs are written down once. Change
+the address in Site Settings and every button that uses it follows.
+
+Each button also has an **Open in a new tab** toggle. Leave it alone and it does the ordinary
+thing: pages on this site stay in the same tab, documents and other people's sites open away.
+Whichever way it ends up, a link that opens a new tab tells screen reader users so.
 
 ### Inviting a new volunteer
 
