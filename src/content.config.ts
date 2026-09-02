@@ -1,9 +1,10 @@
 import { defineCollection, z } from "astro:content";
-import {
-  DEFAULT_PROJECT_VARIANT,
-  PROJECT_CTA_ICONS,
-  PROJECT_VARIANTS,
-} from "./lib/projectVariants";
+import { DEFAULT_PROJECT_VARIANT, PROJECT_VARIANTS } from "./lib/projectVariants";
+import { ctaSchema } from "./lib/cta";
+
+// One CTA shape for the whole site. Defined in src/lib/cta.ts so the tests
+// validate against the same object rather than a hand-copy of it.
+const cta = ctaSchema(z);
 
 const projects = defineCollection({
   type: "data",
@@ -16,15 +17,7 @@ const projects = defineCollection({
     title: z.string(),
     summary: z.string(),
     order: z.number(),
-    ctas: z
-      .array(
-        z.object({
-          label: z.string(),
-          url: z.string(),
-          icon: z.enum(PROJECT_CTA_ICONS).optional(),
-        }),
-      )
-      .optional(),
+    ctas: z.array(cta).optional(),
   }),
 });
 
@@ -97,7 +90,7 @@ const site = defineCollection({
 });
 
 // The pages collection holds two file entries: the Homepage (one object per
-// section, in page order) and the Holding Page (eyebrow/heading/body/ctaLabel).
+// section, in page order) and the Holding Page (eyebrow/heading/body/ctas).
 // A union lets both files validate against the same collection schema; each
 // entry matches exactly one member.
 const homepageSchema = z.object({
@@ -105,7 +98,7 @@ const homepageSchema = z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    ctas: z.array(z.object({ label: z.string(), url: z.string() })),
+    ctas: z.array(cta),
   }),
   ourArea: z.object({
     eyebrow: z.string(),
@@ -121,7 +114,7 @@ const homepageSchema = z.object({
     ideaCard: z.object({
       heading: z.string(),
       body: z.string(),
-      cta: z.object({ label: z.string(), url: z.string() }),
+      ctas: z.array(cta),
     }),
   }),
   jag: z.object({
@@ -148,7 +141,7 @@ const homepageSchema = z.object({
       z.object({
         heading: z.string(),
         body: z.string(),
-        ctas: z.array(z.object({ label: z.string(), url: z.string() })).min(1),
+        ctas: z.array(cta).min(1),
       }),
     ),
   }),
@@ -156,21 +149,20 @@ const homepageSchema = z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    cta: z.object({ label: z.string(), url: z.string() }),
+    ctas: z.array(cta),
   }),
   newsletter: z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    ctaLabel: z.string(),
+    ctas: z.array(cta),
     subtext: z.string(),
   }),
   instagram: z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    instagramCtaLabel: z.string(),
-    facebookCtaLabel: z.string(),
+    ctas: z.array(cta),
   }),
 });
 
@@ -178,7 +170,7 @@ const holdingSchema = z.object({
   eyebrow: z.string(),
   heading: z.string(),
   body: z.string(),
-  ctaLabel: z.string(),
+  ctas: z.array(cta),
 });
 
 const pages = defineCollection({

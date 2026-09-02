@@ -24,8 +24,6 @@ const FIXTURE_COPY = {
   eyebrow: "Social",
   heading: "Find Us on Instagram",
   body: "Follow us on Instagram @bbccglasgow for updates from the heart of Glasgow city centre.",
-  instagramCtaLabel: "Follow on Instagram",
-  facebookCtaLabel: "Follow on Facebook",
 };
 
 // The feed contract written by scripts/fetch-instagram.mjs: one {id}.jpg per
@@ -34,11 +32,18 @@ const FIXTURE_COPY = {
 // into the rendered HTML.
 const ACCOUNT_URL = "https://www.instagram.com/bbccglasgow/";
 
-// Deliberately not the council's real profiles. The component takes these as
-// props, so a fixture URL proves the plumbing without this test doubling as a
-// second, drifting copy of what the live site links to (#37).
+// Deliberately not the council's real profiles. The component takes its follow
+// buttons as already-resolved CTAs, so a fixture URL proves the plumbing
+// without this test doubling as a second, drifting copy of what the live site
+// links to (#37). Resolving a `social` CTA to one of these is src/lib/cta.ts's
+// job and is tested in tests/cta.test.mjs.
 const FIXTURE_INSTAGRAM_URL = "https://www.instagram.com/fixture-account";
 const FIXTURE_FACEBOOK_URL = "https://www.facebook.com/fixture-page";
+
+const FIXTURE_CTAS = [
+  { href: FIXTURE_INSTAGRAM_URL, label: "Follow on Instagram", newTab: true },
+  { href: FIXTURE_FACEBOOK_URL, label: "Follow on Facebook", newTab: true },
+];
 
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -83,8 +88,8 @@ async function buildFixture(
     postsFile: object | null;
     imageIds?: string[];
     includeGlobalCss?: boolean;
-    // Omit a key to render the fixture without that follow button.
-    socialUrls?: { instagramUrl?: string; facebookUrl?: string };
+    // Pass a shorter list to render the fixture with fewer follow buttons.
+    ctas?: Array<{ href: string; label: string; newTab: boolean }>;
   },
 ) {
   const dir = mkdtempSync(join(tmpdir(), "bbcc-insta-"));
@@ -99,10 +104,15 @@ async function buildFixture(
   ]) {
     mkdirSync(join(dir, p), { recursive: true });
   }
-  copyFileSync(
-    join(repoRoot, "src/components/InstagramFeed.astro"),
-    join(dir, "src/components/InstagramFeed.astro"),
-  );
+  // CtaLink and CtaIcon come along because the follow buttons render through
+  // them; copying rather than stubbing is what makes this test cover the
+  // target/rel handling the component no longer does itself.
+  for (const component of ["InstagramFeed.astro", "CtaLink.astro", "CtaIcon.astro"]) {
+    copyFileSync(
+      join(repoRoot, `src/components/${component}`),
+      join(dir, `src/components/${component}`),
+    );
+  }
 
   if (opts.postsFile) {
     writeFileSync(
@@ -118,27 +128,28 @@ async function buildFixture(
   if (opts.includeGlobalCss) {
     copyFileSync(join(repoRoot, "src/styles/global.css"), join(dir, "src/styles/global.css"));
   }
-  const socialUrls = opts.socialUrls ?? {
-    instagramUrl: FIXTURE_INSTAGRAM_URL,
-    facebookUrl: FIXTURE_FACEBOOK_URL,
-  };
   writeFileSync(
     join(dir, "src/pages/index.astro"),
     `---
 ${stylesImport}import InstagramFeed from "../components/InstagramFeed.astro";
 const copy = ${JSON.stringify(FIXTURE_COPY)};
-const social = ${JSON.stringify(socialUrls)};
+const ctas = ${JSON.stringify(opts.ctas ?? FIXTURE_CTAS)};
 ---
-<InstagramFeed copy={copy} instagramUrl={social.instagramUrl} facebookUrl={social.facebookUrl} />
+<InstagramFeed copy={copy} ctas={ctas} />
 `,
   );
 
+  // astro-icon is an integration, not a plain import: CtaIcon resolves its
+  // artwork through a virtual module the integration creates, so the fixture
+  // has to register it even when no CTA in the fixture carries an icon.
+  const iconIntegration =
+    'import icon from "astro-icon";\nconst integrations = [icon({ include: { heroicons: ["arrow-right", "arrow-top-right-on-square", "arrow-down-tray", "calendar-days", "document-text", "envelope", "map-pin"] } })];';
   const vitePlugin = opts.includeGlobalCss
-    ? 'import tailwindcss from "@tailwindcss/vite";\nexport default defineConfig({ site: "https://bbcc.scot", vite: { plugins: [tailwindcss()] } });'
-    : 'export default defineConfig({ site: "https://bbcc.scot" });';
+    ? 'import tailwindcss from "@tailwindcss/vite";\nexport default defineConfig({ site: "https://bbcc.scot", integrations, vite: { plugins: [tailwindcss()] } });'
+    : 'export default defineConfig({ site: "https://bbcc.scot", integrations });';
   writeFileSync(
     join(dir, "astro.config.mjs"),
-    `import { defineConfig } from "astro/config";\n${vitePlugin}\n`,
+    `import { defineConfig } from "astro/config";\n${iconIntegration}\n${vitePlugin}\n`,
   );
   writeFileSync(
     join(dir, "package.json"),
@@ -226,38 +237,42 @@ describe("InstagramFeed populated feed", () => {
       "every tile image is lazy-loaded",
     );
 
-    // The URLs come from props now, not from inside the component, so what
-    // belongs here is that each button pairs its CMS label with the URL it was
-    // given. Which URLs the live site actually publishes is pinned against the
-    // committed site content in tests/seo.test.mjs (#37).
-    assert.match(
-      html,
-      new RegExp(
-        `href="${escapeRegex(FIXTURE_INSTAGRAM_URL)}"[^>]*>\\s*Follow on Instagram\\s*</a>`,
-      ),
-      "pink follow button uses the CMS label and the URL it was passed",
-    );
-    assert.match(
-      html,
-      new RegExp(
-        `href="${escapeRegex(FIXTURE_FACEBOOK_URL)}"[^>]*>\\s*Follow on Facebook\\s*</a>`,
-      ),
-      "ink follow button uses the CMS label and the URL it was passed",
-    );
+    // The buttons arrive resolved now, so what belongs here is that each one
+    // pairs its label with the address it was handed, and that leaving the site
+    // is handled rather than left to whoever wrote the section. Which URLs the
+    // live site publishes is pinned against the committed site content in
+    // tests/seo.test.mjs (#37).
+    for (const { url, label } of [
+      { url: FIXTURE_INSTAGRAM_URL, label: "Follow on Instagram" },
+      { url: FIXTURE_FACEBOOK_URL, label: "Follow on Facebook" },
+    ]) {
+      const anchor = html.match(new RegExp(`<a href="${escapeRegex(url)}"[^>]*>.*?</a>`, "s"));
+      assert.ok(anchor, `${label} button renders`);
+      assert.ok(anchor[0].includes(`<span>${label}</span>`), "button carries the CMS label");
+      assert.match(anchor[0], /target="_blank"/, "outbound follow button opens away");
+      assert.match(anchor[0], /rel="noopener noreferrer"/, "noopener noreferrer");
+      assert.ok(
+        anchor[0].includes("(opens in a new tab)"),
+        "a screen reader is told the tab changes",
+      );
+    }
+
+    // Primary then secondary, by position, the way the hero pair is styled.
+    assert.match(html, /style="background:var\(--pink\);"/, "first button is the pink one");
+    assert.match(html, /style="background:var\(--ink\);"/, "second button is the ink one");
   });
 
-  it("omits a follow button whose URL is absent rather than linking nowhere", async (t) => {
+  it("renders exactly the follow buttons it is given", async (t) => {
     const { html } = await buildFixture(t, {
       postsFile: { posts: fixturePosts(6) },
       imageIds: Array.from({ length: 6 }, (_, i) => `fixture-${i + 1}`),
-      socialUrls: { instagramUrl: FIXTURE_INSTAGRAM_URL },
+      ctas: [FIXTURE_CTAS[0]],
     });
 
-    assert.match(html, />\s*Follow on Instagram\s*<\/a>/, "Instagram button still renders");
-    assert.doesNotMatch(
-      html,
-      />\s*Follow on Facebook\s*<\/a>/,
-      "Facebook button is dropped when no Facebook URL is configured",
+    assert.ok(html.includes("<span>Follow on Instagram</span>"), "Instagram button renders");
+    assert.ok(
+      !html.includes("<span>Follow on Facebook</span>"),
+      "no button appears for a profile that was not passed in",
     );
   });
 
@@ -342,8 +357,8 @@ describe("InstagramFeed empty feed", () => {
       />\s*Follow us on Instagram @bbccglasgow for updates from the heart of Glasgow city centre\.\s*<\/p>/,
       "intro line renders",
     );
-    assert.match(html, />\s*Follow on Instagram\s*<\/a>/, "Instagram follow button renders");
-    assert.match(html, />\s*Follow on Facebook\s*<\/a>/, "Facebook follow button renders");
+    assert.ok(html.includes("<span>Follow on Instagram</span>"), "Instagram follow button renders");
+    assert.ok(html.includes("<span>Follow on Facebook</span>"), "Facebook follow button renders");
     assert.ok(!html.includes("insta-grid"), "no tile grid element in the DOM");
     assert.ok(!html.includes("insta-tile"), "no tile anchors in the DOM");
     assert.ok(!html.includes("squinty-bridge"), "no placeholder tile image");
@@ -358,8 +373,8 @@ describe("InstagramFeed missing posts.json", () => {
 
     assert.match(html, /<section id="instagram"/);
     assert.match(html, />\s*Find Us on Instagram\s*<\/h2>/, "heading renders");
-    assert.match(html, />\s*Follow on Instagram\s*<\/a>/, "Instagram follow button renders");
-    assert.match(html, />\s*Follow on Facebook\s*<\/a>/, "Facebook follow button renders");
+    assert.ok(html.includes("<span>Follow on Instagram</span>"), "Instagram follow button renders");
+    assert.ok(html.includes("<span>Follow on Facebook</span>"), "Facebook follow button renders");
     assert.ok(!html.includes("insta-grid"), "no tile grid element in the DOM");
   });
 });

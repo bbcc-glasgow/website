@@ -56,9 +56,52 @@ collections:
                 label: Call to Action Buttons
                 widget: list
                 summary: "{{fields.label}}"
-                fields:
-                  - { name: label, label: Label, widget: string }
-                  - { name: url, label: URL, widget: string }
+                # Four kinds of destination, so the editor is only ever shown the
+                # fields their choice needs. Two of them carry no address at all:
+                # Email us and Social profile read the address from Site Settings,
+                # so it is written down once and cannot go stale in one button.
+                types:
+                  - name: link
+                    label: Link
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: url, label: URL, widget: string, hint: "#section on this page, /another-page, or a full https:// address" }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: document
+                    label: Document
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - name: file
+                        label: File
+                        widget: file
+                        hint: Uploaded to the site. Its type and size are shown on the button automatically.
+                        media_folder: /public/documents
+                        public_folder: /documents
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: contact
+                    label: Email us
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: subject, label: Subject line, widget: string, required: false, hint: "Prefills the reader's email. Leave blank for none." }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: social
+                    label: Social profile
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: platform, label: Platform, widget: select, options: ["instagram", "facebook"] }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
           - name: ourArea
             label: Our Area
             widget: object
@@ -90,13 +133,56 @@ collections:
                 fields:
                   - { name: heading, label: Heading, widget: string }
                   - { name: body, label: Body, widget: text }
-                  - name: cta
-                    label: Call to Action
-                    widget: object
-                    collapsed: true
-                    fields:
-                      - { name: label, label: Label, widget: string }
-                      - { name: url, label: URL, widget: string }
+                  - name: ctas
+                    label: Call to Action Buttons
+                    widget: list
+                    summary: "{{fields.label}}"
+                    # Four kinds of destination, so the editor is only ever shown the
+                    # fields their choice needs. Two of them carry no address at all:
+                    # Email us and Social profile read the address from Site Settings,
+                    # so it is written down once and cannot go stale in one button.
+                    types:
+                      - name: link
+                        label: Link
+                        widget: object
+                        summary: "{{fields.label}}"
+                        fields:
+                          - { name: label, label: Label, widget: string }
+                          - { name: url, label: URL, widget: string, hint: "#section on this page, /another-page, or a full https:// address" }
+                          - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                          - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                      - name: document
+                        label: Document
+                        widget: object
+                        summary: "{{fields.label}}"
+                        fields:
+                          - { name: label, label: Label, widget: string }
+                          - name: file
+                            label: File
+                            widget: file
+                            hint: Uploaded to the site. Its type and size are shown on the button automatically.
+                            media_folder: /public/documents
+                            public_folder: /documents
+                          - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                          - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                      - name: contact
+                        label: Email us
+                        widget: object
+                        summary: "{{fields.label}}"
+                        fields:
+                          - { name: label, label: Label, widget: string }
+                          - { name: subject, label: Subject line, widget: string, required: false, hint: "Prefills the reader's email. Leave blank for none." }
+                          - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                          - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                      - name: social
+                        label: Social profile
+                        widget: object
+                        summary: "{{fields.label}}"
+                        fields:
+                          - { name: label, label: Label, widget: string }
+                          - { name: platform, label: Platform, widget: select, options: ["instagram", "facebook"] }
+                          - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                          - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
           - name: jag
             label: Joint Action Group
             widget: object
@@ -136,9 +222,52 @@ collections:
                     label: Buttons
                     widget: list
                     summary: "{{fields.label}}"
-                    fields:
-                      - { name: label, label: Label, widget: string }
-                      - { name: url, label: URL, widget: string }
+                    # Four kinds of destination, so the editor is only ever shown the
+                    # fields their choice needs. Two of them carry no address at all:
+                    # Email us and Social profile read the address from Site Settings,
+                    # so it is written down once and cannot go stale in one button.
+                    types:
+                      - name: link
+                        label: Link
+                        widget: object
+                        summary: "{{fields.label}}"
+                        fields:
+                          - { name: label, label: Label, widget: string }
+                          - { name: url, label: URL, widget: string, hint: "#section on this page, /another-page, or a full https:// address" }
+                          - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                          - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                      - name: document
+                        label: Document
+                        widget: object
+                        summary: "{{fields.label}}"
+                        fields:
+                          - { name: label, label: Label, widget: string }
+                          - name: file
+                            label: File
+                            widget: file
+                            hint: Uploaded to the site. Its type and size are shown on the button automatically.
+                            media_folder: /public/documents
+                            public_folder: /documents
+                          - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                          - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                      - name: contact
+                        label: Email us
+                        widget: object
+                        summary: "{{fields.label}}"
+                        fields:
+                          - { name: label, label: Label, widget: string }
+                          - { name: subject, label: Subject line, widget: string, required: false, hint: "Prefills the reader's email. Leave blank for none." }
+                          - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                          - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                      - name: social
+                        label: Social profile
+                        widget: object
+                        summary: "{{fields.label}}"
+                        fields:
+                          - { name: label, label: Label, widget: string }
+                          - { name: platform, label: Platform, widget: select, options: ["instagram", "facebook"] }
+                          - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                          - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
           - name: meetings
             label: Meetings Intro
             widget: object
@@ -147,13 +276,56 @@ collections:
               - { name: eyebrow, label: Eyebrow, widget: string }
               - { name: heading, label: Heading, widget: string }
               - { name: body, label: Intro Body, widget: text }
-              - name: cta
-                label: Call to Action
-                widget: object
-                collapsed: true
-                fields:
-                  - { name: label, label: Label, widget: string }
-                  - { name: url, label: URL, widget: string }
+              - name: ctas
+                label: Call to Action Buttons
+                widget: list
+                summary: "{{fields.label}}"
+                # Four kinds of destination, so the editor is only ever shown the
+                # fields their choice needs. Two of them carry no address at all:
+                # Email us and Social profile read the address from Site Settings,
+                # so it is written down once and cannot go stale in one button.
+                types:
+                  - name: link
+                    label: Link
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: url, label: URL, widget: string, hint: "#section on this page, /another-page, or a full https:// address" }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: document
+                    label: Document
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - name: file
+                        label: File
+                        widget: file
+                        hint: Uploaded to the site. Its type and size are shown on the button automatically.
+                        media_folder: /public/documents
+                        public_folder: /documents
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: contact
+                    label: Email us
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: subject, label: Subject line, widget: string, required: false, hint: "Prefills the reader's email. Leave blank for none." }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: social
+                    label: Social profile
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: platform, label: Platform, widget: select, options: ["instagram", "facebook"] }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
           - name: newsletter
             label: Newsletter
             widget: object
@@ -162,7 +334,56 @@ collections:
               - { name: eyebrow, label: Eyebrow, widget: string }
               - { name: heading, label: Heading, widget: string }
               - { name: body, label: Body, widget: text }
-              - { name: ctaLabel, label: CTA Label, widget: string }
+              - name: ctas
+                label: Call to Action Buttons
+                widget: list
+                summary: "{{fields.label}}"
+                # Four kinds of destination, so the editor is only ever shown the
+                # fields their choice needs. Two of them carry no address at all:
+                # Email us and Social profile read the address from Site Settings,
+                # so it is written down once and cannot go stale in one button.
+                types:
+                  - name: link
+                    label: Link
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: url, label: URL, widget: string, hint: "#section on this page, /another-page, or a full https:// address" }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: document
+                    label: Document
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - name: file
+                        label: File
+                        widget: file
+                        hint: Uploaded to the site. Its type and size are shown on the button automatically.
+                        media_folder: /public/documents
+                        public_folder: /documents
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: contact
+                    label: Email us
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: subject, label: Subject line, widget: string, required: false, hint: "Prefills the reader's email. Leave blank for none." }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: social
+                    label: Social profile
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: platform, label: Platform, widget: select, options: ["instagram", "facebook"] }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
               - { name: subtext, label: Subtext, widget: string }
           - name: instagram
             label: Instagram
@@ -172,8 +393,56 @@ collections:
               - { name: eyebrow, label: Eyebrow, widget: string }
               - { name: heading, label: Heading, widget: string }
               - { name: body, label: Body, widget: text }
-              - { name: instagramCtaLabel, label: Instagram CTA Label, widget: string }
-              - { name: facebookCtaLabel, label: Facebook CTA Label, widget: string }
+              - name: ctas
+                label: Call to Action Buttons
+                widget: list
+                summary: "{{fields.label}}"
+                # Four kinds of destination, so the editor is only ever shown the
+                # fields their choice needs. Two of them carry no address at all:
+                # Email us and Social profile read the address from Site Settings,
+                # so it is written down once and cannot go stale in one button.
+                types:
+                  - name: link
+                    label: Link
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: url, label: URL, widget: string, hint: "#section on this page, /another-page, or a full https:// address" }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: document
+                    label: Document
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - name: file
+                        label: File
+                        widget: file
+                        hint: Uploaded to the site. Its type and size are shown on the button automatically.
+                        media_folder: /public/documents
+                        public_folder: /documents
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: contact
+                    label: Email us
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: subject, label: Subject line, widget: string, required: false, hint: "Prefills the reader's email. Leave blank for none." }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+                  - name: social
+                    label: Social profile
+                    widget: object
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: Label, widget: string }
+                      - { name: platform, label: Platform, widget: select, options: ["instagram", "facebook"] }
+                      - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                      - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
       - file: src/content/pages/holding.json
         name: holding
         label: Holding Page
@@ -181,7 +450,56 @@ collections:
           - { name: eyebrow, label: Eyebrow, widget: string }
           - { name: heading, label: Heading, widget: string }
           - { name: body, label: Body, widget: text }
-          - { name: ctaLabel, label: CTA Label, widget: string }
+          - name: ctas
+            label: Call to Action Buttons
+            widget: list
+            summary: "{{fields.label}}"
+            # Four kinds of destination, so the editor is only ever shown the
+            # fields their choice needs. Two of them carry no address at all:
+            # Email us and Social profile read the address from Site Settings,
+            # so it is written down once and cannot go stale in one button.
+            types:
+              - name: link
+                label: Link
+                widget: object
+                summary: "{{fields.label}}"
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: url, label: URL, widget: string, hint: "#section on this page, /another-page, or a full https:// address" }
+                  - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                  - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+              - name: document
+                label: Document
+                widget: object
+                summary: "{{fields.label}}"
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - name: file
+                    label: File
+                    widget: file
+                    hint: Uploaded to the site. Its type and size are shown on the button automatically.
+                    media_folder: /public/documents
+                    public_folder: /documents
+                  - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                  - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+              - name: contact
+                label: Email us
+                widget: object
+                summary: "{{fields.label}}"
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: subject, label: Subject line, widget: string, required: false, hint: "Prefills the reader's email. Leave blank for none." }
+                  - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+                  - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+              - name: social
+                label: Social profile
+                widget: object
+                summary: "{{fields.label}}"
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: platform, label: Platform, widget: select, options: ["instagram", "facebook"] }
+                  - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+                  - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
 
   - name: projects
     label: Projects
@@ -204,10 +522,52 @@ collections:
         widget: list
         required: false
         summary: "{{fields.label}}"
-        fields:
-          - { name: label, label: Label, widget: string }
-          - { name: url, label: URL, widget: string }
-          - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download"], required: false }
+        # Four kinds of destination, so the editor is only ever shown the
+        # fields their choice needs. Two of them carry no address at all:
+        # Email us and Social profile read the address from Site Settings,
+        # so it is written down once and cannot go stale in one button.
+        types:
+          - name: link
+            label: Link
+            widget: object
+            summary: "{{fields.label}}"
+            fields:
+              - { name: label, label: Label, widget: string }
+              - { name: url, label: URL, widget: string, hint: "#section on this page, /another-page, or a full https:// address" }
+              - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+              - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+          - name: document
+            label: Document
+            widget: object
+            summary: "{{fields.label}}"
+            fields:
+              - { name: label, label: Label, widget: string }
+              - name: file
+                label: File
+                widget: file
+                hint: Uploaded to the site. Its type and size are shown on the button automatically.
+                media_folder: /public/documents
+                public_folder: /documents
+              - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+              - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+          - name: contact
+            label: Email us
+            widget: object
+            summary: "{{fields.label}}"
+            fields:
+              - { name: label, label: Label, widget: string }
+              - { name: subject, label: Subject line, widget: string, required: false, hint: "Prefills the reader's email. Leave blank for none." }
+              - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: false }
+              - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
+          - name: social
+            label: Social profile
+            widget: object
+            summary: "{{fields.label}}"
+            fields:
+              - { name: label, label: Label, widget: string }
+              - { name: platform, label: Platform, widget: select, options: ["instagram", "facebook"] }
+              - { name: newTab, label: Open in a new tab, widget: boolean, required: false, default: true }
+              - { name: icon, label: Icon, widget: select, options: ["arrow-right", "external", "mail", "calendar", "map-pin", "download", "document"], required: false }
 
   - name: site
     label: Site Settings

@@ -65,6 +65,10 @@ export default {
     const passthrough =
       url.pathname.startsWith("/_astro/") ||
       url.pathname.startsWith("/images/") ||
+      // Documents attached to a CTA. The holding page can carry a document
+      // button like any other section, and a button that 503s is worse than no
+      // button; nothing lands here that an editor did not deliberately publish.
+      url.pathname.startsWith("/documents/") ||
       url.pathname.startsWith("/admin") ||
       CRAWLER_PATHS.has(url.pathname);
     if (passthrough) {

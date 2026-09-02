@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { createRequire } from "module";
+import { ctaSchema } from "../src/lib/cta.ts";
 
 // Zod is a transitive dependency of Astro — resolve it via Astro's module path.
 const astroUrl = import.meta.resolve("astro");
@@ -9,15 +10,15 @@ const { z } = require("zod");
 
 // ── Schemas (mirror src/content.config.ts) ──────────────────────────────
 
+// The CTA schema is imported rather than mirrored. It is the one part of the
+// content model an editor picks a *shape* for rather than filling in a field,
+// so a hand-copy here would be the likeliest of all these copies to drift —
+// and the drift would be invisible, because a stale copy still passes. The
+// factory in src/lib/cta.ts exists to be called with this zod as well as
+// Astro's.
+const cta = ctaSchema(z);
+
 const projectVariants = ["teal", "pink", "amber"];
-const projectCtaIcons = [
-  "arrow-right",
-  "external",
-  "mail",
-  "calendar",
-  "map-pin",
-  "download",
-];
 
 const projectSchema = z.object({
   tag: z.string(),
@@ -25,15 +26,7 @@ const projectSchema = z.object({
   title: z.string(),
   summary: z.string(),
   order: z.number(),
-  ctas: z
-    .array(
-      z.object({
-        label: z.string(),
-        url: z.string(),
-        icon: z.enum(projectCtaIcons).optional(),
-      }),
-    )
-    .optional(),
+  ctas: z.array(cta).optional(),
 });
 
 // A hand-copy of the original three fields of the site collection, not the
@@ -69,7 +62,7 @@ describe("Project schema", () => {
     title: "Local Place Plan",
     summary: "A community-led spatial vision.",
     order: 1,
-    ctas: [{ label: "Contact us", url: "mailto:info@bbcc.scot", icon: "mail" }],
+    ctas: [{ type: "contact", label: "Contact us", icon: "mail" }],
   };
 
   it("should accept a complete project object", () => {
@@ -145,16 +138,75 @@ describe("Project schema", () => {
     assert.ok(!result.success);
   });
 
-  it("should reject a cta missing url", () => {
-    const { url: _, ...ctaNoUrl } = validProject.ctas[0];
-    const result = projectSchema.safeParse({ ...validProject, ctas: [ctaNoUrl] });
+  it("should reject a cta with no type", () => {
+    const { type: _, ...ctaNoType } = validProject.ctas[0];
+    const result = projectSchema.safeParse({ ...validProject, ctas: [ctaNoType] });
+    assert.ok(!result.success);
+  });
+
+  it("should reject a link cta missing its url", () => {
+    const result = projectSchema.safeParse({
+      ...validProject,
+      ctas: [{ type: "link", label: "Read the plan" }],
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should reject a document cta missing its file", () => {
+    const result = projectSchema.safeParse({
+      ...validProject,
+      ctas: [{ type: "document", label: "Read the plan" }],
+    });
+    assert.ok(!result.success);
+  });
+
+  // The fields belong to the type that asks for them. A url on a document
+  // would be an address nothing reads, which is how a button ends up pointing
+  // somewhere its editor never intended.
+  it("should reject a cta carrying another type's field", () => {
+    const result = projectSchema.safeParse({
+      ...validProject,
+      ctas: [{ type: "contact", label: "Contact us", url: "#get-involved" }],
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should reject a cta with an unknown type", () => {
+    const result = projectSchema.safeParse({
+      ...validProject,
+      ctas: [{ type: "phone", label: "Call us", number: "0141 000 0000" }],
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should reject a social cta naming a platform we do not have", () => {
+    const result = projectSchema.safeParse({
+      ...validProject,
+      ctas: [{ type: "social", label: "X", platform: "twitter" }],
+    });
     assert.ok(!result.success);
   });
 
   it("should reject a cta with an invalid icon", () => {
     const result = projectSchema.safeParse({
       ...validProject,
-      ctas: [{ label: "Contact us", url: "mailto:info@bbcc.scot", icon: "sparkles" }],
+      ctas: [{ type: "contact", label: "Contact us", icon: "sparkles" }],
+    });
+    assert.ok(!result.success);
+  });
+
+  it("should accept an explicit newTab on any type", () => {
+    const result = projectSchema.safeParse({
+      ...validProject,
+      ctas: [{ type: "contact", label: "Contact us", newTab: true }],
+    });
+    assert.ok(result.success);
+  });
+
+  it("should reject a non-boolean newTab", () => {
+    const result = projectSchema.safeParse({
+      ...validProject,
+      ctas: [{ type: "contact", label: "Contact us", newTab: "yes" }],
     });
     assert.ok(!result.success);
   });
@@ -169,7 +221,7 @@ const holdingSchema = z.object({
   eyebrow: z.string(),
   heading: z.string(),
   body: z.string(),
-  ctaLabel: z.string(),
+  ctas: z.array(cta),
 });
 
 // The Holding Page is the second file entry in the pages collection. Its
@@ -179,7 +231,7 @@ const validHolding = {
   eyebrow: "Glasgow's City Centre Community Council",
   heading: "Your City,<br />Our City.",
   body: "Blythswood & Broomielaw Community Council gives residents and workers a democratic voice in shaping the heart of Glasgow. Our website is under construction — in the meantime, we'd love to hear from you.",
-  ctaLabel: "Email us",
+  ctas: [{ type: "contact", label: "Email us" }],
 };
 
 // ── Holding Page entry schema tests ───────────────────────────────────
@@ -208,8 +260,8 @@ describe("Holding Page entry schema", () => {
     assert.ok(!result.success);
   });
 
-  it("should reject missing ctaLabel", () => {
-    const { ctaLabel: _, ...rest } = validHolding;
+  it("should reject missing ctas", () => {
+    const { ctas: _, ...rest } = validHolding;
     const result = holdingSchema.safeParse(rest);
     assert.ok(!result.success);
   });
@@ -314,7 +366,7 @@ describe("Site schema", () => {
 // ── Pages schema ─────────────────────────────────────────────────────────
 //
 // The pages collection holds two file entries: the Homepage (one object per
-// section, in page order) and the Holding Page (eyebrow/heading/body/ctaLabel).
+// section, in page order) and the Holding Page (eyebrow/heading/body/ctas).
 // A union lets both files validate against the same collection schema.
 
 const homepageSchema = z.object({
@@ -322,7 +374,7 @@ const homepageSchema = z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    ctas: z.array(z.object({ label: z.string(), url: z.string() })),
+    ctas: z.array(cta),
   }),
   ourArea: z.object({
     eyebrow: z.string(),
@@ -338,7 +390,7 @@ const homepageSchema = z.object({
     ideaCard: z.object({
       heading: z.string(),
       body: z.string(),
-      cta: z.object({ label: z.string(), url: z.string() }),
+      ctas: z.array(cta),
     }),
   }),
   jag: z.object({
@@ -360,7 +412,7 @@ const homepageSchema = z.object({
       z.object({
         heading: z.string(),
         body: z.string(),
-        ctas: z.array(z.object({ label: z.string(), url: z.string() })).min(1),
+        ctas: z.array(cta).min(1),
       }),
     ),
   }),
@@ -368,14 +420,20 @@ const homepageSchema = z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    cta: z.object({ label: z.string(), url: z.string() }),
+    ctas: z.array(cta),
   }),
   newsletter: z.object({
     eyebrow: z.string(),
     heading: z.string(),
     body: z.string(),
-    ctaLabel: z.string(),
+    ctas: z.array(cta),
     subtext: z.string(),
+  }),
+  instagram: z.object({
+    eyebrow: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    ctas: z.array(cta),
   }),
 });
 
@@ -388,8 +446,8 @@ describe("Pages schema", () => {
       heading: "Your City,<br />Our City.",
       body: "Blythswood & Broomielaw Community Council gives residents and workers a democratic voice.",
       ctas: [
-        { label: "Get Involved", url: "#get-involved" },
-        { label: "Our Area", url: "#our-area" },
+        { type: "link", label: "Get Involved", url: "#get-involved" },
+        { type: "link", label: "Our Area", url: "#our-area" },
       ],
     },
     ourArea: {
@@ -409,7 +467,7 @@ describe("Pages schema", () => {
       ideaCard: {
         heading: "Have an idea?",
         body: "Tell us about issues in your neighbourhood.",
-        cta: { label: "Contact us", url: "#get-involved" },
+        ctas: [{ type: "link", label: "Contact us", url: "#get-involved" }],
       },
     },
     jag: {
@@ -423,21 +481,41 @@ describe("Pages schema", () => {
       heading: "Your City. Your Say.",
       body: "Community Councils only work when the community shows up.",
       cards: [
-        { heading: "Attend a Meeting", body: "Our public meetings are open to all.", ctas: [{ label: "See dates", url: "#meetings" }] },
+        {
+          heading: "Attend a Meeting",
+          body: "Our public meetings are open to all.",
+          ctas: [{ type: "link", label: "See dates", url: "#meetings" }],
+        },
       ],
     },
     meetings: {
       eyebrow: "Open Meetings",
       heading: "Coming to a Meeting",
       body: "All meetings are held in public.",
-      cta: { label: "Get notified by email", url: "#newsletter" },
+      ctas: [{ type: "link", label: "Get notified by email", url: "#newsletter" }],
     },
     newsletter: {
       eyebrow: "Stay Informed",
       heading: "Stay in the Loop",
       body: "For occasional updates on meetings, consultations, and planning decisions.",
-      ctaLabel: "Email us to subscribe",
+      ctas: [
+        {
+          type: "contact",
+          label: "Email us to subscribe",
+          subject: "Subscribe to BBCC updates",
+          icon: "mail",
+        },
+      ],
       subtext: "No spam. Unsubscribe any time.",
+    },
+    instagram: {
+      eyebrow: "Follow Along",
+      heading: "See What We're Up To",
+      body: "Photos and short updates from around the area.",
+      ctas: [
+        { type: "social", label: "Follow on Instagram", platform: "instagram" },
+        { type: "social", label: "Follow on Facebook", platform: "facebook" },
+      ],
     },
   };
 
@@ -447,7 +525,7 @@ describe("Pages schema", () => {
   });
 
   it("should reject a pages object missing a section", () => {
-    for (const key of ["hero", "ourArea", "ourProjects", "jag", "getInvolved", "meetings", "newsletter"]) {
+    for (const key of ["hero", "ourArea", "ourProjects", "jag", "getInvolved", "meetings", "newsletter", "instagram"]) {
       const { [key]: _removed, ...rest } = validPages;
       const result = pagesSchema.safeParse(rest);
       assert.ok(!result.success, `must reject when ${key} is missing`);
@@ -461,7 +539,7 @@ describe("Pages schema", () => {
     assert.ok(!result.success);
   });
 
-  it("should reject hero with a cta missing url", () => {
+  it("should reject hero with a link cta missing url", () => {
     const { hero, ...rest } = validPages;
     const [first, ...others] = hero.ctas;
     const { url: _removed, ...ctaRest } = first;
@@ -555,8 +633,8 @@ describe("Pages schema", () => {
             heading: "Follow Us",
             body: "See what is going on.",
             ctas: [
-              { label: "Instagram", url: "https://www.instagram.com/bbccglasgow" },
-              { label: "Facebook", url: "https://www.facebook.com/glasgowbbcc" },
+              { type: "social", label: "Instagram", platform: "instagram" },
+              { type: "social", label: "Facebook", platform: "facebook" },
             ],
           },
         ],
@@ -596,7 +674,7 @@ describe("Pages schema", () => {
   });
 
   it("should reject a holding page entry missing a required field", () => {
-    const { ctaLabel: _removed, ...holdingWithoutCta } = validHolding;
+    const { ctas: _removed, ...holdingWithoutCta } = validHolding;
     const result = pagesSchema.safeParse(holdingWithoutCta);
     assert.ok(!result.success);
   });

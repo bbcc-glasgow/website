@@ -15,6 +15,12 @@ import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveCta } from "../src/lib/cta.ts";
+
+/** Escape a string for use inside a RegExp. */
+function escapeForRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -840,6 +846,14 @@ describe("SEO - worker routing", () => {
     }
   });
 
+  // The holding page can carry a document button like any other section, and
+  // a button that 503s is worse than no button at all.
+  it("serves an uploaded document in holding mode", async () => {
+    const response = await call("https://bbcc.scot/documents/example.pdf", "holding");
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("x-url"), "/documents/example.pdf");
+  });
+
   it("still 503s an ordinary path in holding mode", async () => {
     const response = await call("https://bbcc.scot/projects", "holding");
     assert.equal(response.status, 503);
@@ -908,11 +922,14 @@ describe("SEO - the neighbouring community councils", () => {
   });
 
   it("marks each one as leaving the site, in the tab and to a screen reader", () => {
-    const home = readRoute(ROUTES[0]);
-    const icons = home.match(/class="jag-card-icon"/g) ?? [];
+    // Scoped to the JAG section: every CTA that opens away now carries the
+    // same note, so a page-wide count would say nothing about these cards.
+    const section = readRoute(ROUTES[0]).match(/<section id="jag"[\s\S]*?<\/section>/)?.[0] ?? "";
+    assert.ok(section, "the JAG section is missing from the page");
+    const icons = section.match(/class="jag-card-icon"/g) ?? [];
     assert.equal(icons.length, linked.length, "every linked council needs the external-link arrow");
     // The arrow is aria-hidden, so the new tab has to be said in words too.
-    const notes = home.match(/\(opens in a new tab\)/g) ?? [];
+    const notes = section.match(/\(opens in a new tab\)/g) ?? [];
     assert.equal(notes.length, linked.length, "every linked council needs the new-tab note");
   });
 
@@ -920,6 +937,161 @@ describe("SEO - the neighbouring community councils", () => {
     const home = readRoute(ROUTES[0]);
     for (const card of pagesFacts.jag.cards.filter((c) => !c.url)) {
       assert.ok(home.includes(card.name), `${card.name} is missing from the grid`);
+    }
+  });
+});
+
+// ── Call-to-action buttons ─────────────────────────────────────────────
+//
+// Every button on the site now resolves through src/lib/cta.ts, so this is
+// where the resolution is checked against the page it actually produced. The
+// four things a CTA can get wrong are all invisible until somebody clicks:
+// an anchor that lands nowhere, a document that was never uploaded, a new tab
+// opened without saying so, and a download that costs more than a reader on
+// mobile data agreed to.
+//
+// linkinator (gate step 03) does not cover any of this. It skips external
+// hosts, and an in-page `#anchor` pointing at an id that does not exist is not
+// a broken link to a link checker.
+
+describe("SEO - call-to-action buttons", () => {
+  // The biggest a document may be before a phone download stops being a fair
+  // ask. Deliberately generous: this is a guard against uploading the wrong
+  // file, not a compression policy.
+  const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
+
+  const holdingFacts = JSON.parse(
+    fs.readFileSync(path.resolve(rootDir, "src/content/pages/holding.json"), "utf-8"),
+  );
+
+  const projectsDir = path.resolve(rootDir, "src/content/projects");
+  const projectFacts = fs
+    .readdirSync(projectsDir)
+    .filter((f) => f.endsWith(".json"))
+    .map((f) => JSON.parse(fs.readFileSync(path.join(projectsDir, f), "utf-8")));
+
+  /** Every CTA in content, with the route it renders on and where it came from. */
+  function everyCta() {
+    const found = [];
+    const walk = (value, route, where) => {
+      if (Array.isArray(value)) {
+        value.forEach((item, i) => walk(item, route, `${where}[${i}]`));
+      } else if (value && typeof value === "object") {
+        for (const [key, child] of Object.entries(value)) {
+          if (key === "ctas" && Array.isArray(child)) {
+            child.forEach((cta, i) => found.push({ cta, route, where: `${where}.ctas[${i}]` }));
+          } else {
+            walk(child, route, `${where}.${key}`);
+          }
+        }
+      }
+    };
+    walk(pagesFacts, ROUTES[0], "homepage");
+    projectFacts.forEach((p) => walk(p, ROUTES[0], `project ${p.title}`));
+    walk(holdingFacts, ROUTES[1], "holding");
+    return found;
+  }
+
+  const ctas = everyCta().map(({ cta, route, where }) => ({
+    where,
+    route,
+    resolved: resolveCta(cta, siteFacts),
+  }));
+
+  it("renders every button in content onto the page it belongs to", () => {
+    assert.ok(ctas.length > 0, "no CTAs found in content");
+    for (const { where, route, resolved } of ctas) {
+      assert.ok(resolved, `${where} resolves to no destination at all`);
+      const html = readRoute(route);
+      assert.ok(
+        html.includes(`href="${resolved.href}"`),
+        `${where} points at ${resolved.href}, which is on no anchor in ${route.url}`,
+      );
+      assert.ok(html.includes(`<span>${resolved.label}</span>`), `${where} has no label on the page`);
+    }
+  });
+
+  it("points every button at something that exists", () => {
+    for (const { where, route, resolved } of ctas) {
+      const href = resolved.href;
+      if (href.startsWith("#")) {
+        // An anchor to an id that is not on the page scrolls nowhere and
+        // reports nothing. This is the failure the CMS makes easiest to cause.
+        assert.match(
+          readRoute(route),
+          new RegExp(`id="${href.slice(1)}"`),
+          `${where} links to ${href}, which is not an id on ${route.url}`,
+        );
+      } else if (href.startsWith("/")) {
+        const onDisk = path.join(distDir, href.replace(/^\//, ""));
+        assert.ok(
+          fs.existsSync(onDisk) || fs.existsSync(path.join(onDisk, "index.html")),
+          `${where} links to ${href}, which the build does not produce`,
+        );
+      } else if (href.startsWith("mailto:")) {
+        assert.ok(
+          href.startsWith(`mailto:${siteFacts.contactEmail}`),
+          `${where} mails an address that is not the council's`,
+        );
+      } else {
+        assert.match(href, /^https:\/\//, `${where} has an address of no recognisable kind`);
+      }
+    }
+  });
+
+  it("keeps every document small enough to be worth downloading", () => {
+    for (const { where, resolved } of ctas) {
+      if (!resolved.documentPath) continue;
+      const onDisk = path.join(rootDir, "public", resolved.documentPath.replace(/^\//, ""));
+      assert.ok(fs.existsSync(onDisk), `${where} offers ${resolved.documentPath}, which is not in public/`);
+      const bytes = fs.statSync(onDisk).size;
+      assert.ok(
+        bytes <= MAX_DOCUMENT_BYTES,
+        `${where} offers a ${(bytes / 1024 / 1024).toFixed(1)} MB download`,
+      );
+      // The button says the size, read off this file. That claim is only true
+      // if the file the browser asks for is the one measured here.
+      assert.ok(
+        fs.existsSync(path.join(distDir, resolved.documentPath.replace(/^\//, ""))),
+        `${resolved.documentPath} is in public/ but never reaches dist/`,
+      );
+    }
+  });
+
+  it("never opens a new tab without saying so", () => {
+    for (const { where, route, resolved } of ctas) {
+      const html = readRoute(route);
+      const anchors = [
+        ...html.matchAll(
+          new RegExp(`<a href="${escapeForRegex(resolved.href)}"[\\s\\S]*?</a>`, "g"),
+        ),
+      ].map((m) => m[0]);
+      assert.ok(anchors.length > 0, `${where} has no anchor on ${route.url}`);
+
+      for (const anchor of anchors) {
+        if (!resolved.newTab) {
+          assert.ok(!anchor.includes('target="_blank"'), `${where} opens a tab it did not ask for`);
+          continue;
+        }
+        assert.match(anchor, /target="_blank"/, `${where} should open in a new tab`);
+        // Without noopener the opened page can reach back through window.opener.
+        assert.match(anchor, /rel="[^"]*noopener/, `${where} opens without noopener`);
+        assert.ok(
+          anchor.includes("(opens in a new tab)"),
+          `${where} changes tabs without telling a screen reader`,
+        );
+      }
+    }
+  });
+
+  // The council has one email address and two profiles. Every button that
+  // needs them names the fact rather than repeating it, which is the only
+  // reason changing any of the three is a one-line edit.
+  it("writes no contact address or profile URL into page content", () => {
+    const content = JSON.stringify({ pagesFacts, holdingFacts, projectFacts });
+    assert.ok(!content.includes(siteFacts.contactEmail), "an address is written out in content");
+    for (const profile of siteFacts.socialProfiles) {
+      assert.ok(!content.includes(profile), `${profile} is written out in content`);
     }
   });
 });

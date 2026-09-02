@@ -2,6 +2,8 @@
 import { Icon } from "astro-icon/components";
 import { getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
+import CtaLink from "../components/CtaLink.astro";
+import { linkCta, resolveCtas } from "../lib/cta";
 import { calendarLinks } from "../lib/calendar";
 import { loadMeetings } from "../lib/gcal";
 import { describeMeetingRule } from "../lib/meetings";
@@ -9,16 +11,17 @@ import { describeMeetingRule } from "../lib/meetings";
 // The Holding Page is the second file entry in the Pages collection, distinct
 // from the Homepage entry; this route always reads the Holding Page shape.
 const holdingEntry = await getEntry("pages", "holding");
-const { eyebrow, heading, body, ctaLabel } = holdingEntry.data as {
+const { eyebrow, heading, body, ctas } = holdingEntry.data as {
   eyebrow: string;
   heading: string;
   body: string;
-  ctaLabel: string;
+  ctas: Parameters<typeof resolveCtas>[0];
 };
 
 const siteEntry = await getEntry("site", "index");
 const {
   contactEmail,
+  socialProfiles,
   legalName,
   description,
   boundaryDescription,
@@ -27,6 +30,8 @@ const {
   meetingDetails,
   areaPartnership,
 } = siteEntry.data;
+
+const ctaFacts = { contactEmail, socialProfiles };
 
 // While the site is in holding mode the worker serves this content at `/`, so
 // whatever search and answer engines learn about the council now accrues to the
@@ -75,13 +80,13 @@ const calendarDownload = addToCalendar.filter((link) => !link.subscribes);
         <p class="text-white mb-8 leading-relaxed" style="font-size:1.125rem;">
           {body}
         </p>
-        <a
-          href={`mailto:${contactEmail}`}
-          class="btn font-semibold border-0 shadow-md"
-          style="background:#fff;color:var(--pink);"
-        >
-          {ctaLabel}
-        </a>
+        {resolveCtas(ctas, ctaFacts).map((cta) => (
+          <CtaLink
+            cta={cta}
+            class="btn font-semibold border-0 shadow-md inline-flex items-center gap-2"
+            style="background:#fff;color:var(--pink);"
+          />
+        ))}
       </div>
     </div>
 
@@ -143,7 +148,7 @@ const calendarDownload = addToCalendar.filter((link) => !link.subscribes);
             {
               calendarSubscribe.map((link) => (
                 <li>
-                  <a href={link.href}>{link.label}</a>
+                  <CtaLink cta={linkCta(link.href, link.label)} />
                 </li>
               ))
             }
@@ -157,7 +162,7 @@ const calendarDownload = addToCalendar.filter((link) => !link.subscribes);
             {
               calendarDownload.map((link) => (
                 <li>
-                  <a href={link.href}>{link.label}</a>
+                  <CtaLink cta={linkCta(link.href, link.label)} />
                 </li>
               ))
             }

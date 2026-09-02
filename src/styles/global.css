@@ -651,3 +651,14 @@ a.footer-link {
 .calendar-add-light .calendar-add-group {
   color: rgba(0, 0, 0, 0.6);
 }
+
+/* The "(PDF, 240 KB)" a document button carries. Read off the file at build
+   time by CtaLink.astro, so it is never a claim an editor has to maintain.
+   Inherits colour rather than picking one: the same note appears on nine
+   button treatments, on pink, on ink and on white. */
+.cta-doc-note {
+  font-size: 0.8em;
+  font-weight: 400;
+  opacity: 0.75;
+  white-space: nowrap;
+}

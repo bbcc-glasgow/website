@@ -71,7 +71,7 @@ no page attached and therefore no way to carry one.
 | --- | --- |
 | `pnpm dev` | Local dev server |
 | `pnpm build` | Static build to `dist/` |
-| `pnpm gate` | Every step in `gate.d/`, in filename order: build → sitemap → link integrity → axe a11y (zero violations) → Lighthouse budgets (perf ≥95, a11y =100, bp ≥95, seo ≥95) → SEO/GEO invariants |
+| `pnpm gate` | Every step in `gate.d/`, in filename order: build → sitemap → link integrity → axe a11y (zero violations) → Lighthouse budgets (perf ≥95, a11y =100, bp ≥95, seo ≥95) → SEO/GEO invariants → content, CMS config and component contracts |
 
 Adding a check to CI is one new `gate.d/NN-name.sh`; `gate.sh` and `.github/workflows/ci.yml`
 need no edit.
@@ -180,6 +180,27 @@ DecapBridge, which issues a PR behind the scenes.
    gates (link integrity, a11y, Lighthouse budgets) run automatically. A maintainer reviews the PR
    and merges it; the merge deploys to production automatically and your change goes live at
    https://bbcc.scot.
+
+### Buttons
+
+Every button on the site is edited the same way, through a **Call to Action Buttons** list. Add
+one and the first thing it asks is what kind of destination it has:
+
+- **Link** — an address you type. A `#section` jumps down the current page, `/page` goes to
+  another page on the site, and a full `https://` address goes somewhere else entirely.
+- **Document** — a file you upload. It lands in `public/documents/` and the button shows its type
+  and size ("PDF, 240 KB") automatically, read off the file rather than typed.
+- **Email us** — no address to fill in. It uses the contact address from **Site Settings**, with
+  an optional subject line to prefill.
+- **Social profile** — no address to fill in either. Pick Instagram or Facebook and it uses the
+  profile from **Site Settings**.
+
+The last two exist so the council's email address and profile URLs are written down once. Change
+the address in Site Settings and every button that uses it follows.
+
+Each button also has an **Open in a new tab** toggle. Leave it alone and it does the ordinary
+thing: pages on this site stay in the same tab, documents and other people's sites open away.
+Whichever way it ends up, a link that opens a new tab tells screen reader users so.
 
 ### Inviting a new volunteer
 
