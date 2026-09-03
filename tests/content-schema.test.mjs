@@ -379,8 +379,7 @@ const homepageSchema = z.object({
   ourArea: z.object({
     eyebrow: z.string(),
     heading: z.string(),
-    body1: z.string(),
-    body2: z.string(),
+    body: z.string(),
     boundaryLabel: z.string(),
     pillars: z.array(z.object({ heading: z.string(), body: z.string() })),
   }),
@@ -453,8 +452,9 @@ describe("Pages schema", () => {
     ourArea: {
       eyebrow: "Our Patch",
       heading: "The Commercial Heart of Glasgow",
-      body1: "We cover the dense, layered area between the M8 and Renfield Street.",
-      body2: "As a statutory Community Council, we have a right to be consulted.",
+      body:
+        "We cover the dense, layered area between the M8 and Renfield Street.\n\n" +
+        "As a statutory Community Council, we have a right to be consulted.",
       boundaryLabel: "Boundary",
       pillars: [
         { heading: "Planning & Licensing", body: "Statutory consultee on applications." },

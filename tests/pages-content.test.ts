@@ -29,8 +29,7 @@ const pagesSchema = z.object({
   ourArea: z.object({
     eyebrow: z.string(),
     heading: z.string(),
-    body1: z.string(),
-    body2: z.string(),
+    body: z.string(),
     boundaryLabel: z.string(),
     pillars: z.array(z.object({ heading: z.string(), body: z.string() })),
   }),

@@ -3,6 +3,7 @@ import { Icon } from "astro-icon/components";
 import { getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
 import CtaLink from "../components/CtaLink.astro";
+import Prose from "../components/Prose.astro";
 import { linkCta, resolveCtas } from "../lib/cta";
 import { calendarLinks } from "../lib/calendar";
 import { loadMeetings } from "../lib/gcal";
@@ -77,9 +78,12 @@ const calendarDownload = addToCalendar.filter((link) => !link.subscribes);
         </div>
         <p class="section-eyebrow mb-4 text-white">{eyebrow}</p>
         <h1 class="font-fraunces font-bold text-white leading-tight mb-6" style="font-size:clamp(2.25rem,6vw,3.5rem);" set:html={heading}></h1>
-        <p class="text-white mb-8 leading-relaxed" style="font-size:1.125rem;">
-          {body}
-        </p>
+        <Prose
+          text={body}
+          class="text-white mb-6 leading-relaxed"
+          lastClass="text-white mb-8 leading-relaxed"
+          style="font-size:1.125rem;"
+        />
         {resolveCtas(ctas, ctaFacts).map((cta) => (
           <CtaLink
             cta={cta}

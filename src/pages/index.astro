@@ -5,6 +5,7 @@ import { getCollection, getEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
 import CtaLink from "../components/CtaLink.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
+import Prose from "../components/Prose.astro";
 import { resolveProjectVariantColours } from "../lib/projectVariants";
 import { linkCta, resolveCtas } from "../lib/cta";
 import { calendarLinks } from "../lib/calendar";
@@ -178,9 +179,11 @@ const getInvolvedCardStyles = [
             {hero.eyebrow}
           </p>
           <h1 class="font-fraunces font-bold text-white leading-tight mb-6" set:html={hero.heading}></h1>
-          <p class="text-white mb-8 leading-relaxed" style="font-size:1.125rem;max-width:38ch;">
-            {hero.body}
-          </p>
+          <Prose
+            text={hero.body}
+            class="text-white mb-8 leading-relaxed"
+            style="font-size:1.125rem;max-width:38ch;"
+          />
           <div class="flex flex-wrap gap-3">
             {
               /*
@@ -253,12 +256,17 @@ const getInvolvedCardStyles = [
             <h2 class="font-fraunces font-bold text-white leading-tight mb-6" style="font-size:clamp(2rem,3.5vw,2.75rem);">
               {ourArea.heading}
             </h2>
-            <p class="leading-relaxed mb-6" style="color:rgba(255,255,255,0.75);font-size:1rem;">
-              {ourArea.body1}
-            </p>
-            <p class="leading-relaxed mb-8" style="color:rgba(255,255,255,0.75);font-size:1rem;">
-              {ourArea.body2}
-            </p>
+            {/*
+             * mb-8 on the last paragraph rather than mb-6 is the gap before the
+             * boundary box, which belongs to the layout and not to how many
+             * paragraphs the editor wrote.
+             */}
+            <Prose
+              text={ourArea.body}
+              class="leading-relaxed mb-6"
+              lastClass="leading-relaxed mb-8"
+              style="color:rgba(255,255,255,0.75);font-size:1rem;"
+            />
             <div class="boundary-box mb-6">
               <p class="font-semibold mb-1" style="color:var(--teal);">{ourArea.boundaryLabel}</p>
               <p style="color:rgba(255,255,255,0.75);font-size:0.9rem;line-height:1.6;">
@@ -311,7 +319,7 @@ const getInvolvedCardStyles = [
               return (
                 <div class="pillar-card" style={s.card}>
                   <h3 class={s.titleClass} style={s.titleStyle}>{pillar.heading}</h3>
-                  <p class={s.bodyClass} style={s.bodyStyle}>{pillar.body}</p>
+                  <Prose text={pillar.body} class={s.bodyClass} style={s.bodyStyle} />
                 </div>
               );
             })
@@ -340,7 +348,7 @@ const getInvolvedCardStyles = [
                   <div class="card-body-custom">
                     <span class="badge card-tag border-0" style={`background:${colours.tagBgColour};color:${colours.tagColour};`}>{p.tag}</span>
                     <h3>{p.title}</h3>
-                    <p>{p.summary}</p>
+                    <Prose text={p.summary} />
                     {
                       p.ctas && p.ctas.length > 0 && (
                         <div class="flex flex-wrap gap-2 mt-4">
@@ -367,9 +375,7 @@ const getInvolvedCardStyles = [
             style="opacity:1;transform:none;background:var(--paper);border:2px dashed rgba(26,26,46,0.15);"
           >
             <p class="font-fraunces font-semibold text-ink text-xl mb-3">{ourProjects.ideaCard.heading}</p>
-            <p class="text-sm text-gray-600 mb-5">
-              {ourProjects.ideaCard.body}
-            </p>
+            <Prose text={ourProjects.ideaCard.body} class="text-sm text-gray-600 mb-5" />
             {resolveCtas(ourProjects.ideaCard.ctas, ctaFacts).map((cta) => (
               <CtaLink
                 cta={cta}
@@ -392,9 +398,10 @@ const getInvolvedCardStyles = [
         <h2 class="font-fraunces" style="font-size:clamp(1.75rem,3vw,2.5rem);font-weight:600;color:white;line-height:1.2;margin-bottom:1.25rem;">
           {jag.heading}
         </h2>
-        <p style="font-size:1rem;color:rgba(255,255,255,0.75);line-height:1.72;max-width:65ch;margin-bottom:3rem;">
-          {jag.body}
-        </p>
+        <Prose
+          text={jag.body}
+          style="font-size:1rem;color:rgba(255,255,255,0.75);line-height:1.72;max-width:65ch;margin-bottom:3rem;"
+        />
         {/*
           The name and, where the council has confirmed one, that council's own
           site. Nothing else: a compass direction or a sentence about what each
@@ -438,9 +445,11 @@ const getInvolvedCardStyles = [
         <h2 class="font-fraunces font-bold text-white mb-4" style="font-size:clamp(2.25rem,4vw,3.25rem);">
           {getInvolved.heading}
         </h2>
-        <p class="text-white mb-12 mx-auto" style="font-size:1.0625rem;max-width:52ch;">
-          {getInvolved.body}
-        </p>
+        <Prose
+          text={getInvolved.body}
+          class="text-white mb-12 mx-auto"
+          style="font-size:1.0625rem;max-width:52ch;"
+        />
 
         <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {
@@ -453,7 +462,7 @@ const getInvolvedCardStyles = [
                       <Icon name={s.icon} class="w-6 h-6" style={`color:${s.iconColour};`} aria-hidden="true" />
                     </div>
                     <h3 class="font-fraunces font-semibold text-ink text-xl mb-2">{card.heading}</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-4">{card.body}</p>
+                    <Prose text={card.body} class="text-gray-600 text-sm leading-relaxed mb-4" />
                     <div class="flex flex-wrap gap-2 mt-auto">
                       {resolveCtas(card.ctas, ctaFacts).map((cta) => (
                         <CtaLink
@@ -619,9 +628,11 @@ const getInvolvedCardStyles = [
           {meetingRuleText}
         </p>
 
-        <p class="text-center text-sm" style="color:rgba(255,255,255,0.65);">
-          {meetings.body}
-        </p>
+        <Prose
+          text={meetings.body}
+          class="text-center text-sm"
+          style="color:rgba(255,255,255,0.65);"
+        />
       </div>
     </section>
 
@@ -632,9 +643,7 @@ const getInvolvedCardStyles = [
         <h2 class="font-fraunces font-bold text-ink mb-4" style="font-size:clamp(2rem,4vw,3rem);">
           {newsletter.heading}
         </h2>
-        <p class="text-ink mb-8 leading-relaxed" style="font-size:1rem;">
-          {newsletter.body}
-        </p>
+        <Prose text={newsletter.body} class="text-ink mb-8 leading-relaxed" style="font-size:1rem;" />
 
         {resolveCtas(newsletter.ctas, ctaFacts).map((cta) => (
           <CtaLink
