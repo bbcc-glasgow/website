@@ -1047,6 +1047,26 @@ describe("SEO - call-to-action buttons", () => {
     }
   });
 
+  // A mailto button does nothing at all for a reader whose browser has no mail
+  // handler, which is the normal state of a webmail user on a desktop. So the
+  // newsletter prints its address as text beside the button, for copying. That
+  // is a second copy of an address, and a second copy is the thing that goes
+  // stale. Rather than ban it, tie it to the button: an address the page shows
+  // has to be one the page also links to, so the two cannot drift apart.
+  it("shows no council address it does not also link to", () => {
+    const domain = siteFacts.contactEmail.split("@")[1];
+    const shown = new RegExp(`[\\w.+-]+@${domain.replace(/\./g, "\\.")}`, "g");
+    for (const route of ROUTES) {
+      const html = readRoute(route);
+      for (const address of new Set(html.match(shown) ?? [])) {
+        assert.ok(
+          html.includes(`mailto:${address}`),
+          `${route.url} shows ${address} but links to no such address`,
+        );
+      }
+    }
+  });
+
   it("keeps every document small enough to be worth downloading", () => {
     for (const { where, resolved } of ctas) {
       if (!resolved.documentPath) continue;
