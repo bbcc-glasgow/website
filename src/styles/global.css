@@ -148,7 +148,21 @@ input:focus-visible {
   background: var(--pink);
   display: flex;
   align-items: center;
-  padding: 7rem 4rem 5rem;
+  /* The hero is full-bleed while every other section is a centred max-w-7xl
+     column, so a fixed left padding held the heading 64px from the screen edge
+     while the column kept moving inward. On a 2280px screen that left the
+     heading 452px to the left of the navbar logo above it. This lands it on the
+     same column instead.
+
+     100% is half the page: the panel is one of two 1fr tracks, so the column's
+     left gutter is 100% - 40rem, and px-4 adds another 1rem. A percentage
+     rather than 100vw because vw counts the scrollbar and mx-auto does not,
+     which would offset the two by half a scrollbar on Windows.
+
+     max() keeps the old 4rem as a floor, for the widths where the column's
+     gutter is narrower than the breathing room the pink panel wants. The two
+     are equal at exactly 1376px, so the switch has no step in it. */
+  padding: 7rem 4rem 5rem max(4rem, calc(100% - 39rem));
 }
 .hero-right {
   position: relative;
