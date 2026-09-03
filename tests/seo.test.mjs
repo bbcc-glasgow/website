@@ -1029,9 +1029,17 @@ describe("SEO - call-to-action buttons", () => {
           `${where} links to ${href}, which the build does not produce`,
         );
       } else if (href.startsWith("mailto:")) {
+        // Checked by domain rather than by exact address. The council now has a
+        // second address that buttons legitimately point at: the mailing list's
+        // subscribe alias, which is not the general inbox and never will be. The
+        // domain is the part still worth asserting, because what this catches is
+        // a button that quietly mails somebody who is not the council at all.
+        // Read off contactEmail so the domain stays one fact rather than two.
+        const domain = siteFacts.contactEmail.split("@")[1];
+        const address = href.slice("mailto:".length).split("?")[0];
         assert.ok(
-          href.startsWith(`mailto:${siteFacts.contactEmail}`),
-          `${where} mails an address that is not the council's`,
+          address.endsWith(`@${domain}`),
+          `${where} mails ${address}, which is not an address at ${domain}`,
         );
       } else {
         assert.match(href, /^https:\/\//, `${where} has an address of no recognisable kind`);

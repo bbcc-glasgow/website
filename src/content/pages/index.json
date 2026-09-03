@@ -146,12 +146,12 @@
   "newsletter": {
     "eyebrow": "Stay Informed",
     "heading": "Stay in the Loop",
-    "body": "For occasional updates on meetings, consultations, and planning decisions that affect your city centre, email us and ask to join the mailing list.",
+    "body": "For occasional updates on meetings, consultations, and planning decisions that affect your city centre. The button opens a pre-filled email; send it as it is, and confirm if you are asked to.",
     "ctas": [
       {
-        "type": "contact",
-        "label": "Email us to subscribe",
-        "subject": "Subscribe to BBCC updates",
+        "type": "link",
+        "label": "Subscribe by email",
+        "url": "mailto:updates+subscribe@bbcc.scot?subject=Subscribe",
         "icon": "mail"
       }
     ],
