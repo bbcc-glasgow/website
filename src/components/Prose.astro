@@ -1,0 +1,38 @@
+---
+/**
+ * A CMS prose field, rendered as one `<p>` per paragraph.
+ *
+ * Replaces `<p class="...">{section.body}</p>` at every place a text field is
+ * printed as its own block. Where the field holds a single paragraph the output
+ * is byte-identical to what that markup produced, so adopting it changes
+ * nothing until an editor actually uses a blank line.
+ *
+ * `lastClass` exists because the final paragraph is usually the one carrying
+ * the gap to whatever follows the prose, and that gap belongs to the layout
+ * rather than to the number of paragraphs an editor happened to write.
+ */
+import { paragraphs } from "../lib/prose";
+
+interface Props {
+  text: string;
+  /** Applied to every paragraph, or to all but the last when lastClass is set. */
+  class?: string;
+  /** Applied to the final paragraph instead of `class`. */
+  lastClass?: string;
+  style?: string;
+}
+
+const { text, class: className, lastClass, style } = Astro.props;
+const parts = paragraphs(text);
+---
+
+{
+  parts.map((part, index) => (
+    <p
+      class={lastClass && index === parts.length - 1 ? lastClass : className}
+      style={style}
+    >
+      {part}
+    </p>
+  ))
+}

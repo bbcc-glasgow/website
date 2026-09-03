@@ -103,8 +103,10 @@ const homepageSchema = z.object({
   ourArea: z.object({
     eyebrow: z.string(),
     heading: z.string(),
-    body1: z.string(),
-    body2: z.string(),
+    // One field, not the body1/body2 it replaces: paragraphs now come from
+    // blank lines in the text, so how many there are is the editor's business
+    // rather than something the schema pins at exactly two.
+    body: z.string(),
     boundaryLabel: z.string(),
     pillars: z.array(z.object({ heading: z.string(), body: z.string() })),
   }),

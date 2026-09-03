@@ -19,6 +19,7 @@
 // than rendered pointing nowhere.
 import { Image, type ImageMetadata } from "astro:assets";
 import CtaLink from "./CtaLink.astro";
+import Prose from "./Prose.astro";
 import type { ResolvedCta } from "../lib/cta";
 
 interface FeedPost {
@@ -77,9 +78,11 @@ const tiles = posts
       <h2 id="instagram-heading" class="font-fraunces font-bold text-ink" style="font-size:clamp(2rem,3.5vw,2.75rem);">
         {copy.heading}
       </h2>
-      <p class="mx-auto leading-relaxed" style="color:var(--body-text);max-width:52ch;">
-        {copy.body}
-      </p>
+      <Prose
+        text={copy.body}
+        class="mx-auto leading-relaxed"
+        style="color:var(--body-text);max-width:52ch;"
+      />
     </div>
 
     {

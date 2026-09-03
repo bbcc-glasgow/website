@@ -98,6 +98,7 @@ async function buildFixture(
   for (const p of [
     "src/pages",
     "src/components",
+    "src/lib",
     "src/data/instagram",
     "src/assets/instagram",
     "src/styles",
@@ -106,13 +107,17 @@ async function buildFixture(
   }
   // CtaLink and CtaIcon come along because the follow buttons render through
   // them; copying rather than stubbing is what makes this test cover the
-  // target/rel handling the component no longer does itself.
-  for (const component of ["InstagramFeed.astro", "CtaLink.astro", "CtaIcon.astro"]) {
+  // target/rel handling the component no longer does itself. Prose is here for
+  // the section's body copy, and brings src/lib/prose.ts with it: it is the one
+  // import in this set that survives type stripping, so a stub would be the
+  // only thing under test.
+  for (const component of ["InstagramFeed.astro", "CtaLink.astro", "CtaIcon.astro", "Prose.astro"]) {
     copyFileSync(
       join(repoRoot, `src/components/${component}`),
       join(dir, `src/components/${component}`),
     );
   }
+  copyFileSync(join(repoRoot, "src/lib/prose.ts"), join(dir, "src/lib/prose.ts"));
 
   if (opts.postsFile) {
     writeFileSync(
