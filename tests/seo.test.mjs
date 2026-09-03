@@ -1029,12 +1029,40 @@ describe("SEO - call-to-action buttons", () => {
           `${where} links to ${href}, which the build does not produce`,
         );
       } else if (href.startsWith("mailto:")) {
+        // Checked by domain rather than by exact address. The council now has a
+        // second address that buttons legitimately point at: the mailing list's
+        // subscribe alias, which is not the general inbox and never will be. The
+        // domain is the part still worth asserting, because what this catches is
+        // a button that quietly mails somebody who is not the council at all.
+        // Read off contactEmail so the domain stays one fact rather than two.
+        const domain = siteFacts.contactEmail.split("@")[1];
+        const address = href.slice("mailto:".length).split("?")[0];
         assert.ok(
-          href.startsWith(`mailto:${siteFacts.contactEmail}`),
-          `${where} mails an address that is not the council's`,
+          address.endsWith(`@${domain}`),
+          `${where} mails ${address}, which is not an address at ${domain}`,
         );
       } else {
         assert.match(href, /^https:\/\//, `${where} has an address of no recognisable kind`);
+      }
+    }
+  });
+
+  // A mailto button does nothing at all for a reader whose browser has no mail
+  // handler, which is the normal state of a webmail user on a desktop. So the
+  // newsletter prints its address as text beside the button, for copying. That
+  // is a second copy of an address, and a second copy is the thing that goes
+  // stale. Rather than ban it, tie it to the button: an address the page shows
+  // has to be one the page also links to, so the two cannot drift apart.
+  it("shows no council address it does not also link to", () => {
+    const domain = siteFacts.contactEmail.split("@")[1];
+    const shown = new RegExp(`[\\w.+-]+@${domain.replace(/\./g, "\\.")}`, "g");
+    for (const route of ROUTES) {
+      const html = readRoute(route);
+      for (const address of new Set(html.match(shown) ?? [])) {
+        assert.ok(
+          html.includes(`mailto:${address}`),
+          `${route.url} shows ${address} but links to no such address`,
+        );
       }
     }
   });
