@@ -64,8 +64,8 @@ describe("instagram feed data seed", () => {
     );
   });
 
-  it("should carry the bbccglasgow account handle", () => {
-    assert.strictEqual(readFeed().account, "bbccglasgow");
+  it("should carry the glasgowbbcc account handle", () => {
+    assert.strictEqual(readFeed().account, "glasgowbbcc");
   });
 
   it("should start with an empty posts array", () => {
@@ -82,7 +82,7 @@ describe("instagram feed data seed", () => {
 // ── Feed contract schema (happy path and failure cases) ───────────────────
 
 describe("instagram feed contract schema", () => {
-  const validFeed = { account: "bbccglasgow", posts: [] };
+  const validFeed = { account: "glasgowbbcc", posts: [] };
 
   it("should accept the seeded stub", () => {
     assert.ok(instagramFeedSchema.safeParse(validFeed).success);
@@ -90,7 +90,7 @@ describe("instagram feed contract schema", () => {
 
   it("should accept a populated posts array", () => {
     const result = instagramFeedSchema.safeParse({
-      account: "bbccglasgow",
+      account: "glasgowbbcc",
       posts: [{ id: "post-1" }],
     });
     assert.ok(result.success);
