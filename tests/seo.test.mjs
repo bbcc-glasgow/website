@@ -878,21 +878,21 @@ describe("SEO - worker routing", () => {
 describe("SEO - social profiles", () => {
   // tests/instagram-feed.test.ts deliberately uses fixture URLs, so this is
   // the only place the URLs the live site publishes are pinned. The repo used
-  // to link facebook.com/bbccglasgow, which is not a page (#37).
+  // to link facebook.com/glasgowbbcc, which is not a page (#37).
   it("are the accounts in the entity map, rendered on the homepage", () => {
     const home = readRoute(ROUTES[0]);
 
     assert.deepEqual(siteFacts.socialProfiles.slice().sort(), [
       "https://www.facebook.com/glasgowbbcc",
-      "https://www.instagram.com/bbccglasgow",
+      "https://www.instagram.com/glasgowbbcc",
     ]);
 
     for (const url of siteFacts.socialProfiles) {
       assert.ok(home.includes(url), `${url} is not linked from the homepage`);
     }
     assert.ok(
-      !home.includes("facebook.com/bbccglasgow"),
-      "facebook.com/bbccglasgow does not exist",
+      !home.includes("facebook.com/glasgowbbcc"),
+      "facebook.com/glasgowbbcc does not exist",
     );
     assert.ok(!home.includes(DISOWNED_PROFILE), `The site should not link ${DISOWNED_PROFILE}`);
   });
