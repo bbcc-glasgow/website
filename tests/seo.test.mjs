@@ -901,6 +901,44 @@ describe("SEO - social profiles", () => {
       assert.ok(!home.includes(url), `The site should not link ${url}`);
     }
   });
+
+  // The chrome links are icon-only, which is what makes them worth their own
+  // assertion twice over. The check above is satisfied by the Follow buttons
+  // in the Instagram section alone, so it cannot see either the navbar or the
+  // footer losing its links; and a regression that dropped the sr-only span
+  // would leave a link with no accessible name at all and nothing on screen to
+  // show for it.
+  it("puts every profile in the navbar and the footer, each with a name", () => {
+    const home = readRoute(ROUTES[0]);
+    const between = (start, end) => {
+      const from = home.indexOf(start);
+      assert.notEqual(from, -1, `${start} not found in the homepage`);
+      return home.slice(from, home.indexOf(end, from));
+    };
+    const regions = {
+      navbar: between('<nav id="navbar"', "</nav>"),
+      footer: between('<footer id="footer"', "</footer>"),
+    };
+
+    for (const [where, region] of Object.entries(regions)) {
+      for (const profile of siteFacts.socialProfiles) {
+        const anchor = region.match(
+          new RegExp(`<a href="${escapeForRegex(profile)}"[\\s\\S]*?</a>`),
+        )?.[0];
+        assert.ok(anchor, `the ${where} does not link ${profile}`);
+        assert.match(
+          anchor,
+          /<span class="sr-only">[^<]+<\/span>/,
+          `the ${where} link to ${profile} is an icon with no accessible name`,
+        );
+        assert.match(
+          anchor,
+          /rel="noopener noreferrer"/,
+          `the ${where} link to ${profile} opens a new tab without noopener`,
+        );
+      }
+    }
+  });
 });
 
 describe("SEO - the neighbouring community councils", () => {

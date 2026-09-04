@@ -120,14 +120,9 @@ p {
 .nav-link.nav-active::after {
   transform: scaleX(1);
 }
-.nav-social {
-  color: rgba(26, 26, 46, 0.55);
-  transition: color 0.2s;
-  display: flex;
-}
-.nav-social:hover {
-  color: #dc1a84;
-}
+/* `.nav-social` used to sit here, unused, carried over from the concept. The
+   social links it was written for now exist and are styled with utilities in
+   the markup, so the rule is gone rather than left looking load-bearing. */
 
 /* ─── Focus visible ──────────────────────────────────────────── */
 a:focus-visible,
@@ -587,10 +582,17 @@ a.jag-card:focus-visible .jag-card-icon {
 }
 
 /* ─── Touch targets ──────────────────────────────────────────── */
+/* `a.footer-link` used to be in this list. It was inert everywhere the class is
+   used inline, and the one place it did apply, the Quick Links column, it was
+   sizing 14px text to a 44px box: three quarters of the height was padding, and
+   that is the loose spacing the column had. The links carry their own padding
+   now, which keeps them a comfortable target without the column reading as a
+   stack of buttons. It has to be padding rather than a min-height utility:
+   these rules are unlayered, so they beat Tailwind's utility layer whatever its
+   specificity, and a `min-h-*` on the markup would have silently lost. */
 .btn,
 button,
-.nav-link,
-a.footer-link {
+.nav-link {
   min-height: 44px;
 }
 

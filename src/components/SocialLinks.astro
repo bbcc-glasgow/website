@@ -1,0 +1,79 @@
+---
+/**
+ * The council's social profiles, as icon links.
+ *
+ * Takes no content input. It walks every platform the site knows about and
+ * resolves each one against `site.socialProfiles`, so the navbar and the footer
+ * cannot disagree with the Follow buttons or with the JSON-LD, and adding a
+ * third platform later is an edit to site settings rather than to markup. A
+ * platform the council has no profile for resolves to null and is dropped,
+ * which is the rule already applied to the Follow buttons and the JAG cards.
+ *
+ * Deliberately not a CMS list. Which accounts exist is a fact, already recorded
+ * once; which of them the chrome links is not an editorial decision, and a
+ * second list would only be a way for the two to drift.
+ *
+ * These are icon-only links, so they do not go through CtaLink: that component
+ * renders the label as visible text, which is the whole difference here. What
+ * matters about it is not the markup but that the new-tab decision is made in
+ * one place, and that still holds — `newTab` below is the value `resolveCta`
+ * computed, not a choice made here.
+ */
+import { Icon } from "astro-icon/components";
+import { SOCIAL_PLATFORMS, resolveCta } from "../lib/cta";
+import type { CtaSiteFacts, SocialPlatform } from "../lib/cta";
+
+interface Props {
+  /** The site content entry's CTA facts, as passed to any other CTA. */
+  facts: CtaSiteFacts;
+  /** Classes on the wrapper. */
+  class?: string;
+  /** Classes on each link. */
+  linkClass?: string;
+  /** Classes on each icon. */
+  iconClass?: string;
+}
+
+const { facts, class: className, linkClass, iconClass } = Astro.props;
+
+/**
+ * The accessible name for each profile, and its artwork.
+ *
+ * The wording matches the visible Follow buttons in the Instagram section, so a
+ * screen reader hears one name for one destination rather than two.
+ */
+const PLATFORMS: Record<SocialPlatform, { label: string; icon: string }> = {
+  instagram: { label: "Follow on Instagram", icon: "simple-icons:instagram" },
+  facebook: { label: "Follow on Facebook", icon: "simple-icons:facebook" },
+};
+
+const links = SOCIAL_PLATFORMS.map((platform) => {
+  const cta = resolveCta({ type: "social", label: PLATFORMS[platform].label, platform }, facts);
+  return cta ? { ...cta, icon: PLATFORMS[platform].icon } : null;
+}).filter((link) => link !== null);
+---
+
+{
+  links.length > 0 && (
+    <div class={className}>
+      {links.map((link) => (
+        <a
+          href={link.href}
+          class={linkClass}
+          target={link.newTab ? "_blank" : undefined}
+          rel={link.newTab ? "noopener noreferrer" : undefined}
+        >
+          <Icon name={link.icon} class={iconClass} aria-hidden="true" />
+          {/*
+           * The icon is the whole link, so without this the link has no
+           * accessible name at all. A span rather than aria-label because it
+           * is real text: it translates, and it is the same mechanism the rest
+           * of the site's links already use.
+           */}
+          <span class="sr-only">{link.label}</span>
+          {link.newTab && <span class="sr-only">(opens in a new tab)</span>}
+        </a>
+      ))}
+    </div>
+  )
+}

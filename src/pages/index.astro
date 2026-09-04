@@ -6,6 +6,7 @@ import Base from "../layouts/Base.astro";
 import CtaLink from "../components/CtaLink.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
 import Prose from "../components/Prose.astro";
+import SocialLinks from "../components/SocialLinks.astro";
 import { resolveProjectVariantColours } from "../lib/projectVariants";
 import { linkCta, resolveCtas } from "../lib/cta";
 import { calendarLinks } from "../lib/calendar";
@@ -132,22 +133,43 @@ const getInvolvedCardStyles = [
         </span>
       </a>
 
-      <div class="hidden md:flex items-center gap-1">
-        <a href="#our-area" class="nav-link">Our Area</a>
-        <a href="#our-projects" class="nav-link">Projects</a>
-        <a href="#meetings" class="nav-link">Meetings</a>
-        <a href="#get-involved" class="nav-link">Get Involved</a>
-        <a
-          href="#get-involved"
-          class="btn btn-sm text-white font-semibold border-0 ml-3"
-          style="background:var(--pink);">Join Us</a
-        >
-      </div>
+      {/*
+       * One right-hand group rather than three siblings under justify-between,
+       * so the social icons can sit at the far right on desktop and immediately
+       * left of the hamburger on mobile without the nav links drifting to the
+       * middle when a third child appears.
+       */}
+      <div class="flex items-center gap-1">
+        <div class="hidden md:flex items-center gap-1">
+          <a href="#our-area" class="nav-link">Our Area</a>
+          <a href="#our-projects" class="nav-link">Projects</a>
+          <a href="#meetings" class="nav-link">Meetings</a>
+          <a href="#get-involved" class="nav-link">Get Involved</a>
+          <a
+            href="#get-involved"
+            class="btn btn-sm text-white font-semibold border-0 ml-3"
+            style="background:var(--pink);">Join Us</a
+          >
+        </div>
 
-      <!-- Mobile hamburger -->
-      <label for="mobile-drawer" class="md:hidden btn btn-ghost btn-sm p-2" aria-label="Open menu">
-        <Icon name="heroicons:bars-3" class="w-6 h-6" aria-hidden="true" />
-      </label>
+        {/* Shown at every width: the only social links a reader gets on mobile,
+            since the top bar is the whole navigation there. */}
+        {/* min-h-11 is 44px: the link is nothing but a 20px glyph, so the
+            padding is the only thing making it big enough to hit. WCAG 2.2
+            asks for 24px; 44px is what nav-link already uses, which keeps the
+            row of hit areas even. */}
+        <SocialLinks
+          facts={ctaFacts}
+          class="flex items-center md:ml-3 md:pl-2 md:border-l md:border-gray-200"
+          linkClass="inline-flex items-center justify-center min-h-11 px-2 rounded-md text-ink/55 hover:text-pink hover:bg-pink/6 transition-colors"
+          iconClass="w-5 h-5"
+        />
+
+        <!-- Mobile hamburger -->
+        <label for="mobile-drawer" class="md:hidden btn btn-ghost btn-sm p-2" aria-label="Open menu">
+          <Icon name="heroicons:bars-3" class="w-6 h-6" aria-hidden="true" />
+        </label>
+      </div>
     </div>
   </nav>
 
@@ -676,16 +698,31 @@ const getInvolvedCardStyles = [
           <p style="color:rgba(255,255,255,0.65);font-size:0.875rem;line-height:1.6;max-width:28ch;">
             The statutory community council for the heart of Glasgow.
           </p>
+          {/* Under the brand block rather than in the Contact column, which is
+              already the densest of the three. */}
+          {/* footer-link carries the colours the five Quick Links already use,
+              so only the box is new. The glyph sits 12px inside its 44px hit
+              area, so -ml-3 pulls that padding back off the column edge and
+              lines the icon up with the text above rather than the box. */}
+          <SocialLinks
+            facts={ctaFacts}
+            class="flex items-center mt-4 -ml-3"
+            linkClass="footer-link inline-flex items-center justify-center min-w-11 min-h-11 rounded-md"
+            iconClass="w-5 h-5"
+          />
         </div>
 
         <div>
           <p class="text-white font-semibold text-sm mb-4">Quick Links</p>
-          <nav class="flex flex-col gap-2" aria-label="Footer navigation">
-            <a href="#our-area" class="footer-link">Our Area</a>
-            <a href="#our-projects" class="footer-link">Priority Projects</a>
-            <a href="#meetings" class="footer-link">Meetings</a>
-            <a href="#get-involved" class="footer-link">Get Involved</a>
-            <a href="#newsletter" class="footer-link">Newsletter</a>
+          {/* No gap: the space between the links is each link's own padding
+              instead, so the hit areas are 36px and touch each other rather
+              than leaving a dead strip between them. */}
+          <nav class="flex flex-col" aria-label="Footer navigation">
+            <a href="#our-area" class="footer-link py-2">Our Area</a>
+            <a href="#our-projects" class="footer-link py-2">Priority Projects</a>
+            <a href="#meetings" class="footer-link py-2">Meetings</a>
+            <a href="#get-involved" class="footer-link py-2">Get Involved</a>
+            <a href="#newsletter" class="footer-link py-2">Newsletter</a>
           </nav>
         </div>
 
