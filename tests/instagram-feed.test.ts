@@ -23,14 +23,14 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const FIXTURE_COPY = {
   eyebrow: "Social",
   heading: "Find Us on Instagram",
-  body: "Follow us on Instagram @bbccglasgow for updates from the heart of Glasgow city centre.",
+  body: "Follow us on Instagram @glasgowbbcc for updates from the heart of Glasgow city centre.",
 };
 
 // The feed contract written by scripts/fetch-instagram.mjs: one {id}.jpg per
 // post in src/assets/instagram/. Fixture posts carry the same caption and
 // timestamp fields the workflow emits, so the test can prove those never leak
 // into the rendered HTML.
-const ACCOUNT_URL = "https://www.instagram.com/bbccglasgow/";
+const ACCOUNT_URL = "https://www.instagram.com/glasgowbbcc/";
 
 // Deliberately not the council's real profiles. The component takes its follow
 // buttons as already-resolved CTAs, so a fixture URL proves the plumbing
