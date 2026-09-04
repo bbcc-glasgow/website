@@ -16,7 +16,7 @@ import {
 const facts = {
   contactEmail: "info@example.org",
   socialProfiles: [
-    "https://www.instagram.com/bbccglasgow",
+    "https://www.instagram.com/glasgowbbcc",
     "https://www.facebook.com/glasgowbbcc",
   ],
 };
@@ -55,7 +55,7 @@ describe("CTA destinations", () => {
   it("should find each social platform in the site's profile list", () => {
     const ig = resolveCta({ type: "social", label: "Instagram", platform: "instagram" }, facts);
     const fb = resolveCta({ type: "social", label: "Facebook", platform: "facebook" }, facts);
-    assert.strictEqual(ig.href, "https://www.instagram.com/bbccglasgow");
+    assert.strictEqual(ig.href, "https://www.instagram.com/glasgowbbcc");
     assert.strictEqual(fb.href, "https://www.facebook.com/glasgowbbcc");
   });
 
@@ -64,7 +64,7 @@ describe("CTA destinations", () => {
   it("should resolve to nothing when the platform is not in the profile list", () => {
     const cta = resolveCta(
       { type: "social", label: "Facebook", platform: "facebook" },
-      { ...facts, socialProfiles: ["https://www.instagram.com/bbccglasgow"] },
+      { ...facts, socialProfiles: ["https://www.instagram.com/glasgowbbcc"] },
     );
     assert.strictEqual(cta, null);
   });
@@ -75,7 +75,7 @@ describe("CTA destinations", () => {
         { type: "social", label: "Instagram", platform: "instagram" },
         { type: "social", label: "Facebook", platform: "facebook" },
       ],
-      { ...facts, socialProfiles: ["https://www.instagram.com/bbccglasgow"] },
+      { ...facts, socialProfiles: ["https://www.instagram.com/glasgowbbcc"] },
     );
     assert.strictEqual(resolved.length, 1);
     assert.strictEqual(resolved[0].label, "Instagram");

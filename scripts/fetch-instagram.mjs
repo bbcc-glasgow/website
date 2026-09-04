@@ -33,7 +33,7 @@ const API_FIELDS =
   "id,permalink,media_type,media_url,thumbnail_url,children{media_url},caption,timestamp";
 const MAX_POSTS = 6;
 const ALT_MAX_LENGTH = 120;
-const ACCOUNT = "bbccglasgow";
+const ACCOUNT = "glasgowbbcc";
 
 // Resolve the image download URL for a post, or undefined when the media type
 // has no downloadable image (the post is then excluded from the feed).

@@ -192,7 +192,7 @@ describe("fetch-instagram: happy path", () => {
       assert.strictEqual(code, 0, stderr);
 
       const feed = readFeed(join(dir, "posts.json"));
-      assert.strictEqual(feed.account, "bbccglasgow");
+      assert.strictEqual(feed.account, "glasgowbbcc");
       assert.deepStrictEqual(
         feed.posts.map((p) => p.id),
         ["VID1", "IMG1", "CAR1", "IMG2", "IMG3", "IMG4"],

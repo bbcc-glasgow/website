@@ -23,14 +23,14 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const FIXTURE_COPY = {
   eyebrow: "Social",
   heading: "Find Us on Instagram",
-  body: "Follow us on Instagram @bbccglasgow for updates from the heart of Glasgow city centre.",
+  body: "Follow us on Instagram @glasgowbbcc for updates from the heart of Glasgow city centre.",
 };
 
 // The feed contract written by scripts/fetch-instagram.mjs: one {id}.jpg per
 // post in src/assets/instagram/. Fixture posts carry the same caption and
 // timestamp fields the workflow emits, so the test can prove those never leak
 // into the rendered HTML.
-const ACCOUNT_URL = "https://www.instagram.com/bbccglasgow/";
+const ACCOUNT_URL = "https://www.instagram.com/glasgowbbcc/";
 
 // Deliberately not the council's real profiles. The component takes its follow
 // buttons as already-resolved CTAs, so a fixture URL proves the plumbing
@@ -189,7 +189,7 @@ describe("InstagramFeed populated feed", () => {
   it("renders six tiles with permalink links, local webp images, alt text and the View post overlay, plus both follow buttons", async (t) => {
     const { html } = await buildFixture(t, {
       postsFile: {
-        account: "bbccglasgow",
+        account: "glasgowbbcc",
         posts: fixturePosts(6, { emptyAltAt: 3 }),
       },
       imageIds: [
@@ -284,7 +284,7 @@ describe("InstagramFeed populated feed", () => {
   it("never renders like counts, captions or fetched-at timestamps", async (t) => {
     const { html } = await buildFixture(t, {
       postsFile: {
-        account: "bbccglasgow",
+        account: "glasgowbbcc",
         posts: fixturePosts(6),
       },
       imageIds: ["fixture-1", "fixture-2", "fixture-3", "fixture-4", "fixture-5", "fixture-6"],
@@ -298,7 +298,7 @@ describe("InstagramFeed populated feed", () => {
   it("extends the existing #instagram/.insta-tile CSS without duplicate rule blocks", async (t) => {
     const { css } = await buildFixture(t, {
       postsFile: {
-        account: "bbccglasgow",
+        account: "glasgowbbcc",
         posts: fixturePosts(6),
       },
       imageIds: ["fixture-1", "fixture-2", "fixture-3", "fixture-4", "fixture-5", "fixture-6"],
@@ -335,7 +335,7 @@ describe("InstagramFeed populated feed", () => {
   it("drops posts whose downloaded image is missing instead of rendering broken tiles", async (t) => {
     const { html } = await buildFixture(t, {
       postsFile: {
-        account: "bbccglasgow",
+        account: "glasgowbbcc",
         posts: fixturePosts(6),
       },
       imageIds: ["fixture-1", "fixture-3", "fixture-5"],
@@ -351,7 +351,7 @@ describe("InstagramFeed populated feed", () => {
 describe("InstagramFeed empty feed", () => {
   it("renders the section shell with both follow buttons and no tile grid in the DOM", async (t) => {
     const { html } = await buildFixture(t, {
-      postsFile: { account: "bbccglasgow", posts: [] },
+      postsFile: { account: "glasgowbbcc", posts: [] },
     });
 
     assert.match(html, /<section id="instagram"/);
@@ -359,7 +359,7 @@ describe("InstagramFeed empty feed", () => {
     assert.match(html, />\s*Find Us on Instagram\s*<\/h2>/, "heading renders");
     assert.match(
       html,
-      />\s*Follow us on Instagram @bbccglasgow for updates from the heart of Glasgow city centre\.\s*<\/p>/,
+      />\s*Follow us on Instagram @glasgowbbcc for updates from the heart of Glasgow city centre\.\s*<\/p>/,
       "intro line renders",
     );
     assert.ok(html.includes("<span>Follow on Instagram</span>"), "Instagram follow button renders");
