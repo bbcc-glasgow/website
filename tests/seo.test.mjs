@@ -877,8 +877,15 @@ describe("SEO - worker routing", () => {
 
 describe("SEO - social profiles", () => {
   // tests/instagram-feed.test.ts deliberately uses fixture URLs, so this is
-  // the only place the URLs the live site publishes are pinned. The repo used
-  // to link facebook.com/glasgowbbcc, which is not a page (#37).
+  // the only place the URLs the live site publishes are pinned.
+  //
+  // Both accounts are now `glasgowbbcc`, and `bbccglasgow` is wrong on both
+  // platforms: it was never a Facebook page, and the repo linked it as one
+  // anyway (#37), and it is the Instagram account's former handle. The council
+  // owns neither address, so either one appearing again means somebody
+  // reverted half of a rename.
+  const NOT_OURS = ["facebook.com/bbccglasgow", "instagram.com/bbccglasgow", DISOWNED_PROFILE];
+
   it("are the accounts in the entity map, rendered on the homepage", () => {
     const home = readRoute(ROUTES[0]);
 
@@ -890,11 +897,9 @@ describe("SEO - social profiles", () => {
     for (const url of siteFacts.socialProfiles) {
       assert.ok(home.includes(url), `${url} is not linked from the homepage`);
     }
-    assert.ok(
-      !home.includes("facebook.com/glasgowbbcc"),
-      "facebook.com/glasgowbbcc does not exist",
-    );
-    assert.ok(!home.includes(DISOWNED_PROFILE), `The site should not link ${DISOWNED_PROFILE}`);
+    for (const url of NOT_OURS) {
+      assert.ok(!home.includes(url), `The site should not link ${url}`);
+    }
   });
 });
 

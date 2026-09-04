@@ -334,8 +334,9 @@ the first release**:
 - [ ] **JAG cards**: "Visit council →" links are placeholders — add the neighbouring councils'
       real sites (or remove the link affordance).
 - [ ] **Instagram feed activation**: the section is built (epic #47; the accounts are
-      `instagram.com/glasgowbbcc` and `facebook.com/glasgowbbcc` — the Facebook handle is *not*
-      `glasgowbbcc`, which is not a page, see #37) and renders the shell until real posts are
+      `instagram.com/glasgowbbcc` and `facebook.com/glasgowbbcc` — both handles are the same;
+      `bbccglasgow` is the Instagram account's former handle and was never a Facebook page,
+      though the repo linked it as one, see #37) and renders the shell until real posts are
       committed. To activate: switch the Instagram account to Business/Creator, link the
       Facebook Page, create a Meta app with a long-lived Graph API token, and add the
       `IG_ACCESS_TOKEN` and `SECRETS_WRITE_PAT` repo secrets — the daily workflow then keeps
