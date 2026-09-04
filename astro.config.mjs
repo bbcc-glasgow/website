@@ -32,6 +32,11 @@ export default defineConfig({
           "share",
           "x-mark",
         ],
+        // Heroicons has no brand marks, and the social links need the real
+        // ones: a generic glyph is not recognisable as Instagram at 20px in a
+        // navbar. Simple Icons is CC0; the marks themselves are Meta's, used
+        // here to point at the council's own profiles.
+        "simple-icons": ["facebook", "instagram"],
       },
     }),
     sitemap({
