@@ -84,6 +84,14 @@ fallback/redeploy path. A concurrency group serialises back-to-back merges so th
 is always the one live. Requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository
 secrets.
 
+A deploy needs no cache purge, and `public/_headers` is written to keep it that way. Everything
+Astro emits under `/_astro/` is content-hashed, so it is served `immutable` for a year and a
+release changes the URL rather than invalidating it. Everything else — HTML, the CMS media in
+`/images/` and `/documents/`, `/meetings.ics` — stays on Cloudflare's `must-revalidate` default,
+where the ETag is a hash of the file and the next request after a deploy revalidates into the new
+bytes. `tests/cache-headers.test.mjs` pins both halves, including the hashing that makes the first
+one safe.
+
 ## Feed bot setup
 
 The `instagram-feed` workflow fetches the six most recent posts from the council's

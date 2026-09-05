@@ -17,7 +17,7 @@
     "test:a11y": "playwright test",
     "test:sitemap": "node --test tests/sitemap.test.mjs",
     "test:seo": "node --test tests/seo.test.mjs",
-    "test:content": "node --test tests/cta.test.mjs tests/prose.test.mjs tests/content-schema.test.mjs tests/pages-content.test.ts tests/project-content.test.ts tests/decap-cms.test.ts tests/instagram-feed.test.ts",
+    "test:content": "node --test tests/cta.test.mjs tests/prose.test.mjs tests/content-schema.test.mjs tests/cache-headers.test.mjs tests/pages-content.test.ts tests/project-content.test.ts tests/decap-cms.test.ts tests/instagram-feed.test.ts",
     "test:gitignore": "node --experimental-strip-types --test tests/gitignore.test.ts",
     "test:instagram-feed": "node --experimental-strip-types --test tests/instagram-feed.test.ts",
     "test:instagram-refresh": "node --test tests/refresh-ig-token.test.mjs",
