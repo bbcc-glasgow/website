@@ -2,13 +2,7 @@
   "tag": "Biodiversity",
   "variant": "amber",
   "title": "Mapping Street Trees",
-  "summary": "A community tree audit of every street tree in our area — building evidence for protecting and expanding the canopy.",
+  "summary": "We have two projects ongoing: \n\nA community tree audit of street trees in our area — building evidence for protecting and expanding the canopy.\n\nA pilot project for 2027 planting 20 cherry trees in salvaged barrels in key locations",
   "order": 3,
-  "ctas": [
-    {
-      "type": "contact",
-      "label": "Contact us",
-      "icon": "mail"
-    }
-  ]
+  "ctas": []
 }
